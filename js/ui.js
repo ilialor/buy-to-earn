@@ -3,79 +3,96 @@
  * This file contains UI utility functions
  */
 
-// Show modal
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize UI components
+  initializeModals();
+});
+
+// Initialize all modal windows
+function initializeModals() {
+  // Get all modals
+  const modals = document.querySelectorAll('.modal');
+  
+  // Set up event handlers for each modal
+  modals.forEach(modal => {
+    // Get close button for this modal
+    const closeBtn = modal.querySelector('.modal-close');
+    const cancelBtn = modal.querySelector('.btn-outline');
+    
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        closeModal(modal.id);
+      });
+    }
+    
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        closeModal(modal.id);
+      });
+    }
+    
+    // Close when clicking outside modal content
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal(modal.id);
+      }
+    });
+  });
+  
+  // Set up triggers for modals
+  const modalTriggers = document.querySelectorAll('[data-modal]');
+  modalTriggers.forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const modalId = trigger.getAttribute('data-modal');
+      showModal(modalId);
+    });
+  });
+}
+
+// Show a modal by ID
 function showModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
-    modal.classList.add('show');
-    document.body.classList.add('modal-open');
+    modal.style.display = 'flex';
   }
 }
 
-// Close modal
+// Close a modal by ID
 function closeModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
-    modal.classList.remove('show');
-    document.body.classList.remove('modal-open');
+    modal.style.display = 'none';
   }
 }
 
 // Show notification
 function showNotification(message, type = 'info', duration = 3000) {
-  // Create notification element
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
+  notification.textContent = message;
   
-  // Add icon based on type
-  let icon = 'info-circle';
-  if (type === 'success') icon = 'check-circle';
-  if (type === 'error') icon = 'exclamation-circle';
-  if (type === 'warning') icon = 'exclamation-triangle';
+  document.body.appendChild(notification);
   
-  // Set notification content
-  notification.innerHTML = `
-    <i class="fas fa-${icon}"></i>
-    <span>${message}</span>
-    <button class="notification-close">&times;</button>
-  `;
+  // Force reflow to enable transition
+  notification.offsetHeight;
   
-  // Add to notifications container (create if it doesn't exist)
-  let notificationsContainer = document.getElementById('notifications-container');
-  if (!notificationsContainer) {
-    notificationsContainer = document.createElement('div');
-    notificationsContainer.id = 'notifications-container';
-    document.body.appendChild(notificationsContainer);
-  }
+  // Show notification
+  notification.classList.add('show');
   
-  notificationsContainer.appendChild(notification);
-  
-  // Add show class for animation
+  // Remove after duration
   setTimeout(() => {
-    notification.classList.add('show');
-  }, 10);
-  
-  // Close button functionality
-  const closeBtn = notification.querySelector('.notification-close');
-  closeBtn.addEventListener('click', () => {
     closeNotification(notification);
-  });
-  
-  // Auto close after duration
-  if (duration > 0) {
-    setTimeout(() => {
-      closeNotification(notification);
-    }, duration);
-  }
+  }, duration);
   
   return notification;
 }
 
-// Close notification
+// Close a notification
 function closeNotification(notification) {
   notification.classList.remove('show');
   
-  // Remove after animation
+  // Remove from DOM after transition
   setTimeout(() => {
     if (notification.parentNode) {
       notification.parentNode.removeChild(notification);
@@ -83,134 +100,224 @@ function closeNotification(notification) {
   }, 300);
 }
 
-// Loading spinner
-function showLoading(containerId, message = 'Загрузка...') {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  
-  const loading = document.createElement('div');
-  loading.className = 'loading-spinner-container';
-  loading.innerHTML = `
-    <div class="loading-spinner"></div>
-    <p class="loading-text">${message}</p>
-  `;
-  
-  container.appendChild(loading);
-  return loading;
-}
-
-// Hide loading spinner
-function hideLoading(container) {
-  if (typeof container === 'string') {
-    container = document.getElementById(container);
+// Show loading indicator
+function showLoading(element) {
+  if (typeof element === 'string') {
+    element = document.getElementById(element);
   }
   
-  if (container) {
-    const spinner = container.querySelector('.loading-spinner-container');
-    if (spinner) {
-      container.removeChild(spinner);
+  if (element) {
+    const loader = document.createElement('div');
+    loader.className = 'loader';
+    element.appendChild(loader);
+  }
+}
+
+// Hide loading indicator
+function hideLoading(element) {
+  if (typeof element === 'string') {
+    element = document.getElementById(element);
+  }
+  
+  if (element) {
+    const loader = element.querySelector('.loader');
+    if (loader) {
+      element.removeChild(loader);
     }
   }
 }
 
-// Format currency
-function formatCurrency(value, currency = 'ETH', decimals = 2) {
-  return `${Number(value).toFixed(decimals)} ${currency}`;
+// Format currency amount
+function formatCurrency(amount, currency = 'USD') {
+  return new Intl.NumberFormat('ru-RU', { 
+    style: 'currency', 
+    currency: currency 
+  }).format(amount);
 }
 
 // Format date
-function formatDate(timestamp, format = 'full') {
-  if (!timestamp) return '';
+function formatDate(date) {
+  if (!date) return '';
   
-  const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
-  
-  if (format === 'full') {
-    return date.toLocaleString();
-  } else if (format === 'date') {
-    return date.toLocaleDateString();
-  } else if (format === 'time') {
-    return date.toLocaleTimeString();
-  } else if (format === 'relative') {
-    const now = new Date();
-    const diff = Math.floor((now - date) / 1000); // seconds
-    
-    if (diff < 60) return 'только что';
-    if (diff < 3600) return `${Math.floor(diff / 60)} мин. назад`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} ч. назад`;
-    if (diff < 2592000) return `${Math.floor(diff / 86400)} дн. назад`;
-    
-    return date.toLocaleDateString();
+  // If date is a timestamp
+  if (typeof date === 'object' && date.seconds) {
+    date = new Date(date.seconds * 1000);
+  } else if (!(date instanceof Date)) {
+    date = new Date(date);
   }
   
-  return date.toLocaleString();
+  return new Intl.DateTimeFormat('ru-RU', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
 }
 
-// Truncate text
+// Format time ago
+function formatTimeAgo(date) {
+  if (!date) return '';
+  
+  // If date is a timestamp
+  if (typeof date === 'object' && date.seconds) {
+    date = new Date(date.seconds * 1000);
+  } else if (!(date instanceof Date)) {
+    date = new Date(date);
+  }
+  
+  const now = new Date();
+  const seconds = Math.floor((now - date) / 1000);
+  
+  if (seconds < 60) return 'только что';
+  
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} ${declOfNum(minutes, ['минуту', 'минуты', 'минут'])} назад`;
+  
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} ${declOfNum(hours, ['час', 'часа', 'часов'])} назад`;
+  
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days} ${declOfNum(days, ['день', 'дня', 'дней'])} назад`;
+  
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} ${declOfNum(months, ['месяц', 'месяца', 'месяцев'])} назад`;
+  
+  const years = Math.floor(months / 12);
+  return `${years} ${declOfNum(years, ['год', 'года', 'лет'])} назад`;
+}
+
+// Helper function for declension of numerals
+function declOfNum(n, titles) {
+  return titles[(n % 10 === 1 && n % 100 !== 11) ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2];
+}
+
+// Toggle element visibility
+function toggleElement(element, show) {
+  if (typeof element === 'string') {
+    element = document.getElementById(element);
+  }
+  
+  if (element) {
+    element.style.display = show ? '' : 'none';
+  }
+}
+
+// Set button in loading state
+function setButtonLoading(button, isLoading) {
+  if (typeof button === 'string') {
+    button = document.getElementById(button);
+  }
+  
+  if (button) {
+    if (isLoading) {
+      button.dataset.originalText = button.innerHTML;
+      button.innerHTML = '<div class="spinner"></div>';
+      button.disabled = true;
+    } else {
+      button.innerHTML = button.dataset.originalText || button.innerHTML;
+      button.disabled = false;
+    }
+  }
+}
+
+// Validate form
+function validateForm(form) {
+  if (typeof form === 'string') {
+    form = document.getElementById(form);
+  }
+  
+  if (!form) return false;
+  
+  let isValid = true;
+  
+  // Get all required inputs
+  const requiredInputs = form.querySelectorAll('[required]');
+  
+  requiredInputs.forEach(input => {
+    if (!input.value.trim()) {
+      input.classList.add('error');
+      isValid = false;
+    } else {
+      input.classList.remove('error');
+    }
+  });
+  
+  return isValid;
+}
+
+// Clear form
+function clearForm(form) {
+  if (typeof form === 'string') {
+    form = document.getElementById(form);
+  }
+  
+  if (form) {
+    form.reset();
+    form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+  }
+}
+
+// Handle form submit with validation
+function handleFormSubmit(form, submitHandler) {
+  if (typeof form === 'string') {
+    form = document.getElementById(form);
+  }
+  
+  if (!form || !submitHandler) return;
+  
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm(form)) {
+      showNotification('Пожалуйста, заполните все обязательные поля', 'error');
+      return;
+    }
+    
+    // Get submit button
+    const submitBtn = form.querySelector('[type="submit"]');
+    
+    try {
+      // Show loading state
+      if (submitBtn) {
+        setButtonLoading(submitBtn, true);
+      }
+      
+      // Call submit handler
+      await submitHandler(form);
+      
+      // Clear form on success
+      clearForm(form);
+      
+    } catch (error) {
+      console.error('Form submission error:', error);
+      showNotification(error.message || 'Произошла ошибка при отправке формы', 'error');
+    } finally {
+      // Reset loading state
+      if (submitBtn) {
+        setButtonLoading(submitBtn, false);
+      }
+    }
+  });
+}
+
+// Truncate text to specified length
 function truncateText(text, maxLength = 20) {
-  if (!text || text.length <= maxLength) return text;
-  return text.substring(0, maxLength) + '...';
+  if (!text) return '';
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 
 // Truncate wallet address
 function truncateAddress(address, startChars = 6, endChars = 4) {
   if (!address) return '';
-  if (address.length <= startChars + endChars) return address;
-  
   return address.substring(0, startChars) + '...' + address.substring(address.length - endChars);
 }
 
-// Toggle element visibility
-function toggleElement(elementId, show = null) {
-  const element = document.getElementById(elementId);
-  if (!element) return;
-  
-  if (show === null) {
-    element.classList.toggle('hidden');
-  } else if (show) {
-    element.classList.remove('hidden');
-  } else {
-    element.classList.add('hidden');
-  }
-}
-
-// Update element text content
+// Update text content of an element
 function updateText(elementId, text) {
   const element = document.getElementById(elementId);
   if (element) {
     element.textContent = text;
   }
 }
-
-// Add event listeners
-document.addEventListener('DOMContentLoaded', () => {
-  // Modal close buttons
-  const modalCloseButtons = document.querySelectorAll('.modal-close');
-  modalCloseButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const modal = button.closest('.modal');
-      if (modal) {
-        modal.classList.remove('show');
-        document.body.classList.remove('modal-open');
-      }
-    });
-  });
-  
-  // Close modal when clicking outside the modal content
-  document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('modal') && e.target.classList.contains('show')) {
-      e.target.classList.remove('show');
-      document.body.classList.remove('modal-open');
-    }
-  });
-  
-  // Prevent modal content click from closing
-  const modalContents = document.querySelectorAll('.modal-content, .auth-content');
-  modalContents.forEach(content => {
-    content.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-  });
-});
 
 // UI event handlers and rendering functions
 

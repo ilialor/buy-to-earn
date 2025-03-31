@@ -11,25 +11,23 @@
 }
 
 .notification {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  border-radius: 8px;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-  transform: translateX(100%);
+  color: #fff;
+  font-size: 14px;
+  max-width: 300px;
+  z-index: 10000; /* Поверх модальных окон */
+  transform: translateY(-20px);
   opacity: 0;
-  max-width: 100%;
-  min-width: 280px;
-  position: relative;
-  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .notification.show {
-  transform: translateX(0);
+  transform: translateY(0);
   opacity: 1;
 }
 
@@ -59,20 +57,20 @@
 }
 
 /* Notification types */
-.notification-info i {
-  color: #3498db;
+.notification-info {
+  background-color: #2196F3;
 }
 
-.notification-success i {
-  color: #2ecc71;
+.notification-success {
+  background-color: #4CAF50;
 }
 
-.notification-warning i {
-  color: #f39c12;
+.notification-warning {
+  background-color: #FF9800;
 }
 
-.notification-error i {
-  color: #e74c3c;
+.notification-error {
+  background-color: #F44336;
 }
 
 .notification-info::before {
@@ -143,5 +141,16 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 576px) {
+  .notification {
+    top: auto;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    max-width: none;
+    transform: translateY(20px);
   }
 } 

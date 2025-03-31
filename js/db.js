@@ -11,8 +11,13 @@ const nftsRef = db.collection('nfts');
 const revenuesRef = db.collection('revenues');
 const transactionsRef = db.collection('transactions');
 
+// Get collection reference
+function getCollection(collectionName) {
+  return db.collection(collectionName);
+}
+
 // Get all items from a collection with optional query
-async function getCollection(collectionRef, queryFn = null) {
+async function getCollectionWithQuery(collectionRef, queryFn = null) {
   try {
     let query = collectionRef;
     
@@ -34,69 +39,50 @@ async function getCollection(collectionRef, queryFn = null) {
 }
 
 // Get document by ID
-async function getDocument(collectionRef, docId) {
+async function getDocument(collectionName, docId) {
   try {
-    const docRef = collectionRef.doc(docId);
-    const doc = await docRef.get();
-    
-    if (doc.exists) {
-      return {
-        id: doc.id,
-        ...doc.data()
-      };
-    } else {
-      return null;
-    }
-  } catch (err) {
-    console.error('Error getting document:', err);
-    throw err;
+    const doc = await db.collection(collectionName).doc(docId).get();
+    return doc.exists ? { id: doc.id, ...doc.data() } : null;
+  } catch (error) {
+    console.error('Error getting document:', error);
+    throw error;
   }
 }
 
 // Add document to collection
-async function addDocument(collectionRef, data) {
+async function addDocument(collectionName, data) {
   try {
-    // Add timestamp
-    const dataWithTimestamp = {
+    const docRef = await db.collection(collectionName).add({
       ...data,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    const docRef = await collectionRef.add(dataWithTimestamp);
+    });
     return docRef.id;
-  } catch (err) {
-    console.error('Error adding document:', err);
-    throw err;
+  } catch (error) {
+    console.error('Error adding document:', error);
+    throw error;
   }
 }
 
 // Update document
-async function updateDocument(collectionRef, docId, data) {
+async function updateDocument(collectionName, docId, data) {
   try {
-    // Add update timestamp
-    const dataWithTimestamp = {
+    await db.collection(collectionName).doc(docId).update({
       ...data,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    const docRef = collectionRef.doc(docId);
-    await docRef.update(dataWithTimestamp);
-    return true;
-  } catch (err) {
-    console.error('Error updating document:', err);
-    throw err;
+    });
+  } catch (error) {
+    console.error('Error updating document:', error);
+    throw error;
   }
 }
 
 // Delete document
-async function deleteDocument(collectionRef, docId) {
+async function deleteDocument(collectionName, docId) {
   try {
-    const docRef = collectionRef.doc(docId);
-    await docRef.delete();
-    return true;
-  } catch (err) {
-    console.error('Error deleting document:', err);
-    throw err;
+    await db.collection(collectionName).doc(docId).delete();
+  } catch (error) {
+    console.error('Error deleting document:', error);
+    throw error;
   }
 }
 
@@ -105,31 +91,42 @@ async function deleteDocument(collectionRef, docId) {
 // Get user's NFTs
 async function getUserNFTs(userId) {
   try {
-    return await getCollection(nftsRef, query => 
-      query.where('ownerId', '==', userId)
-    );
-  } catch (err) {
-    console.error('Error getting user NFTs:', err);
-    throw err;
+    const snapshot = await db.collection('nfts')
+      .where('ownerId', '==', userId)
+      .get();
+    
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error getting user NFTs:', error);
+    throw error;
   }
 }
 
 // Get user's orders
 async function getUserOrders(userId) {
   try {
-    return await getCollection(ordersRef, query => 
-      query.where('userId', '==', userId)
-    );
-  } catch (err) {
-    console.error('Error getting user orders:', err);
-    throw err;
+    const snapshot = await db.collection('orders')
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .get();
+    
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error getting user orders:', error);
+    throw error;
   }
 }
 
 // Get user's participations
 async function getUserParticipations(userId) {
   try {
-    return await getCollection(participationsRef, query => 
+    return await getCollectionWithQuery(participationsRef, query => 
       query.where('userId', '==', userId)
     );
   } catch (err) {
@@ -141,26 +138,36 @@ async function getUserParticipations(userId) {
 // Get user's transactions
 async function getUserTransactions(userId) {
   try {
-    return await getCollection(transactionsRef, query => 
-      query.where('userId', '==', userId)
-           .orderBy('createdAt', 'desc')
-    );
-  } catch (err) {
-    console.error('Error getting user transactions:', err);
-    throw err;
+    const snapshot = await db.collection('transactions')
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .get();
+    
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error getting user transactions:', error);
+    throw error;
   }
 }
 
-// Get user's revenue history
+// Get user's revenues
 async function getUserRevenues(userId) {
   try {
-    return await getCollection(revenuesRef, query => 
-      query.where('userId', '==', userId)
-           .orderBy('createdAt', 'desc')
-    );
-  } catch (err) {
-    console.error('Error getting user revenues:', err);
-    throw err;
+    const snapshot = await db.collection('revenues')
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .get();
+    
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error getting user revenues:', error);
+    throw error;
   }
 }
 
@@ -181,10 +188,10 @@ async function createOrder(orderData) {
     };
     
     // Create order document
-    const orderId = await addDocument(ordersRef, orderWithUser);
+    const orderId = await addDocument('orders', orderWithUser);
     
     // Create transaction record
-    await addDocument(transactionsRef, {
+    await addDocument('transactions', {
       userId: user.uid,
       type: 'purchase',
       amount: orderData.totalPrice,
@@ -282,4 +289,84 @@ function listenToUserTransactions(userId, callback) {
     }, error => {
       console.error('Error listening to user transactions:', error);
     });
+}
+
+// Update user's wallet balance
+async function updateUserWalletBalance(userId, amount, type = 'add') {
+  try {
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+    
+    if (!userDoc.exists) {
+      throw new Error('User not found');
+    }
+    
+    const currentBalance = userDoc.data().walletBalance || 0;
+    const newBalance = type === 'add' ? currentBalance + amount : currentBalance - amount;
+    
+    if (newBalance < 0) {
+      throw new Error('Insufficient funds');
+    }
+    
+    await userRef.update({
+      walletBalance: newBalance
+    });
+    
+    return newBalance;
+  } catch (error) {
+    console.error('Error updating wallet balance:', error);
+    throw error;
+  }
+}
+
+// Create transaction record
+async function createTransaction(userId, amount, type, description) {
+  try {
+    const transactionRef = await db.collection('transactions').add({
+      userId,
+      amount,
+      type,
+      description,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    return transactionRef.id;
+  } catch (error) {
+    console.error('Error creating transaction:', error);
+    throw error;
+  }
+}
+
+// Create revenue record
+async function createRevenue(userId, amount, source) {
+  try {
+    const revenueRef = await db.collection('revenues').add({
+      userId,
+      amount,
+      source,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    return revenueRef.id;
+  } catch (error) {
+    console.error('Error creating revenue:', error);
+    throw error;
+  }
+}
+
+// Get all orders
+async function getAllOrders() {
+  try {
+    const snapshot = await window.db.collection('orders')
+      .orderBy('createdAt', 'desc')
+      .get();
+    
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error getting all orders:', error);
+    throw error;
+  }
 } 
