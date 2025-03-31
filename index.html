@@ -2,6 +2,15 @@
 <html lang="en">
 
 <head>
+    <!-- Firebase Core -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <!-- Firebase Authentication -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- Auth Styles -->
+    <link rel="stylesheet" href="styles/auth.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Co-Intent Platform</title>
@@ -33,10 +42,39 @@
                 </ul>
             </nav>
 
-            <div class="user-controls">
-                <button class="btn btn-outline"><i class="fas fa-wallet"></i> Connect Wallet</button>
-                <button class="btn btn-primary"><i class="fas fa-user"></i> Sign In</button>
-            </div>
+            <div class="user-controls user-controls-auth">
+                <button class="btn btn-outline" id="connect-wallet-btn"><i class="fas fa-wallet"></i> Connect Wallet</button>
+                <button class="btn btn-primary" id="sign-in-btn"><i class="fas fa-user"></i> Sign In</button>
+              </div>
+              <div class="user-controls-logged-in">
+                <div class="btn btn-outline" id="wallet-balance-display">
+                  <i class="fas fa-wallet"></i> <span id="wallet-balance-value">0.00</span> ETH
+                </div>
+                
+                <div class="user-info" id="user-info">
+                  <div class="user-avatar" id="user-avatar">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <span class="user-name" id="user-display-name">User</span>
+                  <i class="fas fa-chevron-down"></i>
+                  
+                  <div class="user-dropdown" id="user-dropdown">
+                    <div class="user-dropdown-item" id="go-to-profile">
+                      <i class="fas fa-user-circle"></i> Профиль
+                    </div>
+                    <div class="user-dropdown-item" id="go-to-wallet">
+                      <i class="fas fa-wallet"></i> Кошелек
+                    </div>
+                    <div class="user-dropdown-item" id="go-to-portfolio">
+                      <i class="fas fa-chart-pie"></i> Портфолио
+                    </div>
+                    <div class="user-dropdown-divider"></div>
+                    <div class="user-dropdown-item" id="sign-out-btn">
+                      <i class="fas fa-sign-out-alt"></i> Выйти
+                    </div>
+                  </div>
+                </div>
+              </div>
         </header>
 
         <!-- Marketplace Page -->
