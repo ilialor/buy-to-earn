@@ -1,0 +1,136 @@
+/**
+ * Fixes for UI issues
+ */
+
+/* Fix for modal window display */
+.modal {
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-modal {
+  z-index: 1050; /* Higher z-index to be on top of other elements */
+}
+
+.auth-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Fix for notifications */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 4px;
+  color: #fff;
+  z-index: 2000; /* Even higher than modals */
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  max-width: 350px;
+}
+
+.notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.notification-info {
+  background-color: #2196F3;
+}
+
+.notification-success {
+  background-color: #4CAF50;
+}
+
+.notification-warning {
+  background-color: #FF9800;
+}
+
+.notification-error {
+  background-color: #F44336;
+}
+
+/* Fix for form elements */
+.auth-tab-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+/* Fix for buttons */
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Fix for tab switching */
+.auth-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.auth-tab {
+  padding: 10px 15px;
+  cursor: pointer;
+  opacity: 0.7;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.auth-tab:hover {
+  opacity: 1;
+}
+
+.auth-tab.active {
+  opacity: 1;
+  border-bottom-color: #007bff;
+  font-weight: 500;
+}
+
+.auth-tab-content {
+  display: none;
+}
+
+.auth-tab-content.active {
+  display: block;
+} 

@@ -327,6 +327,18 @@ function initializeUI() {
   setupAuthListeners();
   setupUIListeners();
   
+  // Проверяем состояние авторизации при инициализации
+  if (auth && auth.currentUser) {
+    console.log("Пользователь авторизован:", auth.currentUser.uid);
+    
+    // Обновляем UI в соответствии с авторизованным пользователем
+    if (typeof showUserInfo === 'function') {
+      showUserInfo(auth.currentUser);
+    }
+  } else {
+    console.log("Пользователь не авторизован");
+  }
+  
   // Load initial data
   loadMarketplaceOrders();
 }
@@ -446,6 +458,63 @@ function setupAuthListeners() {
 
 // Set up UI interaction listeners
 function setupUIListeners() {
+  // Обработчик клика по аватару пользователя
+  const userAvatar = document.getElementById('user-info');
+  if (userAvatar) {
+    userAvatar.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('user-dropdown');
+      if (dropdown) {
+        dropdown.classList.toggle('show');
+        e.stopPropagation();
+      }
+    });
+
+    // Закрытие дропдауна при клике вне него
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('user-dropdown');
+      if (dropdown && dropdown.classList.contains('show') && !userAvatar.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+  }
+
+  // Обработчик клика по балансу кошелька
+  const walletBalance = document.getElementById('wallet-balance-display');
+  if (walletBalance) {
+    walletBalance.addEventListener('click', function() {
+      navigateToPage('wallet');
+    });
+  }
+
+  // Обработчики пунктов дропдауна профиля
+  const goToProfile = document.getElementById('go-to-profile');
+  const goToWallet = document.getElementById('go-to-wallet');
+  const goToPortfolio = document.getElementById('go-to-portfolio');
+
+  if (goToProfile) {
+    goToProfile.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      navigateToPage('profile');
+    });
+  }
+
+  if (goToWallet) {
+    goToWallet.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      navigateToPage('wallet');
+    });
+  }
+
+  if (goToPortfolio) {
+    goToPortfolio.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      navigateToPage('portfolio');
+    });
+  }
+
   // Submit Order Form
   const submitOrderForm = document.querySelector('#submit form');
   if (submitOrderForm) {
@@ -613,7 +682,18 @@ function loadMarketplaceOrders() {
 
 // Load user portfolio data
 function loadUserPortfolio() {
-  if (!auth.currentUser) return;
+  // Проверяем, авторизован ли пользователь, но не показываем окно авторизации
+  // если данные о пользователе еще загружаются
+  if (!auth) {
+    console.log("Сервис авторизации не готов");
+    return;
+  }
+  
+  if (!auth.currentUser) {
+    showNotification('Пожалуйста, войдите в систему', 'error');
+    showModal('auth-modal');
+    return;
+  }
   
   const userId = auth.currentUser.uid;
   
@@ -638,7 +718,18 @@ function loadUserPortfolio() {
 
 // Load user revenue data
 function loadUserRevenue() {
-  if (!auth.currentUser) return;
+  // Проверяем, авторизован ли пользователь, но не показываем окно авторизации
+  // если данные о пользователе еще загружаются
+  if (!auth) {
+    console.log("Сервис авторизации не готов");
+    return;
+  }
+  
+  if (!auth.currentUser) {
+    showNotification('Пожалуйста, войдите в систему', 'error');
+    showModal('auth-modal');
+    return;
+  }
   
   const userId = auth.currentUser.uid;
   
@@ -653,7 +744,18 @@ function loadUserRevenue() {
 
 // Load user wallet transactions
 function loadUserTransactions() {
-  if (!auth.currentUser) return;
+  // Проверяем, авторизован ли пользователь, но не показываем окно авторизации
+  // если данные о пользователе еще загружаются
+  if (!auth) {
+    console.log("Сервис авторизации не готов");
+    return;
+  }
+  
+  if (!auth.currentUser) {
+    showNotification('Пожалуйста, войдите в систему', 'error');
+    showModal('auth-modal');
+    return;
+  }
   
   const userId = auth.currentUser.uid;
   
@@ -929,25 +1031,54 @@ function showParticipationModal(orderId) {
     });
 }
 
+// Добавляем новую функцию для навигации
+function navigateToPage(page) {
+  const navLink = document.querySelector(`[data-page="${page}"]`);
+  if (navLink) {
+    navLink.click();
+    const dropdown = document.getElementById('user-dropdown');
+    if (dropdown) dropdown.classList.remove('show');
+  }
+}
+
 // Document ready
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize UI
   initializeUI();
+  
+  // Глобальный метод для проверки авторизации
+  window.checkAuthentication = function() {
+    if (auth && auth.currentUser) {
+      return true;
+    }
+    return false;
+  };
   
   // Add navigation event listener for page changes
   document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', function() {
       const page = this.getAttribute('data-page');
       
-      // Load page-specific data
+      // Загружаем данные для страницы, только если пользователь авторизован
+      // или если это маркетплейс (публичная страница)
       if (page === 'marketplace') {
         loadMarketplaceOrders();
-      } else if (page === 'portfolio') {
-        loadUserPortfolio();
-      } else if (page === 'revenue') {
-        loadUserRevenue();
-      } else if (page === 'wallet') {
-        loadUserTransactions();
+      } else if (checkAuthentication()) {
+        if (page === 'portfolio') {
+          loadUserPortfolio();
+        } else if (page === 'revenue') {
+          loadUserRevenue();
+        } else if (page === 'wallet') {
+          loadUserTransactions();
+        } else if (page === 'profile') {
+          // Если будет добавлена функция загрузки профиля
+          if (typeof loadUserProfile === 'function') {
+            loadUserProfile();
+          }
+        }
+      } else if (page !== 'marketplace') {
+        showNotification('Пожалуйста, войдите в систему', 'error');
+        showModal('auth-modal');
       }
     });
   });

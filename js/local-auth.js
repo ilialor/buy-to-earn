@@ -17,6 +17,24 @@ class LocalAuth {
   
   // Инициализация системы
   init() {
+    // Создаем тестового пользователя, если список пользователей пуст
+    const users = this._getUsers();
+    if (users.length === 0) {
+      console.log('LocalAuth: создание тестового пользователя');
+      users.push({
+        uid: this._generateUid(),
+        email: 'test@example.com',
+        password: 'password', // В реальности пароль должен хешироваться
+        displayName: 'Тестовый пользователь',
+        photoURL: null,
+        emailVerified: true,
+        createdAt: Date.now(),
+        providerData: [{ providerId: 'password', email: 'test@example.com' }]
+      });
+      this._saveUsers(users);
+      console.log('LocalAuth: тестовый пользователь создан - email: test@example.com, пароль: password');
+    }
+    
     // Проверяем наличие текущего пользователя
     const savedUser = localStorage.getItem(this.currentUserKey);
     if (savedUser) {
@@ -33,16 +51,28 @@ class LocalAuth {
     if (this.currentUser) {
       this._notifyListeners();
     }
+    
+    // Выводим список доступных пользователей в консоль
+    console.log('LocalAuth: доступные пользователи для тестирования:');
+    users.forEach(user => {
+      console.log(`- ${user.email} (пароль: ${user.password})`);
+    });
   }
   
   // Регистрация нового пользователя
   async createUserWithEmailAndPassword(email, password) {
     return new Promise((resolve, reject) => {
       try {
+        if (!email || !password) {
+          console.error('LocalAuth: email и пароль обязательны');
+          return reject({ code: 'auth/invalid-email', message: 'Email и пароль обязательны' });
+        }
+        
         // Проверяем, существует ли пользователь
         const users = this._getUsers();
         if (users.find(u => u.email === email)) {
-          return reject({ code: 'auth/email-already-in-use' });
+          console.error('LocalAuth: пользователь с таким email уже существует', email);
+          return reject({ code: 'auth/email-already-in-use', message: 'Пользователь с таким email уже существует' });
         }
         
         // Создаем нового пользователя
@@ -60,6 +90,7 @@ class LocalAuth {
         // Сохраняем пользователя
         users.push(newUser);
         this._saveUsers(users);
+        console.log('LocalAuth: пользователь успешно создан', email);
         
         // Устанавливаем текущего пользователя
         this.currentUser = { ...newUser };
@@ -71,6 +102,7 @@ class LocalAuth {
         
         resolve({ user: this.currentUser });
       } catch (error) {
+        console.error('LocalAuth: ошибка при создании пользователя', error);
         reject({ code: 'auth/operation-not-allowed', message: error.message });
       }
     });
@@ -80,17 +112,28 @@ class LocalAuth {
   async signInWithEmailAndPassword(email, password) {
     return new Promise((resolve, reject) => {
       try {
+        if (!email || !password) {
+          console.error('LocalAuth: email и пароль обязательны');
+          return reject({ code: 'auth/invalid-email', message: 'Email и пароль обязательны' });
+        }
+        
+        console.log('LocalAuth: попытка входа', email, password);
+        
         // Ищем пользователя
         const users = this._getUsers();
         const user = users.find(u => u.email === email);
         
         if (!user) {
-          return reject({ code: 'auth/user-not-found' });
+          console.error('LocalAuth: пользователь не найден', email);
+          return reject({ code: 'auth/user-not-found', message: 'Пользователь не найден' });
         }
         
         if (user.password !== password) {
-          return reject({ code: 'auth/wrong-password' });
+          console.error('LocalAuth: неверный пароль', email);
+          return reject({ code: 'auth/wrong-password', message: 'Неверный пароль' });
         }
+        
+        console.log('LocalAuth: вход успешен', email);
         
         // Устанавливаем текущего пользователя
         this.currentUser = { ...user };
@@ -102,6 +145,7 @@ class LocalAuth {
         
         resolve({ user: this.currentUser });
       } catch (error) {
+        console.error('LocalAuth: ошибка при входе', error);
         reject({ code: 'auth/operation-not-allowed', message: error.message });
       }
     });
@@ -112,7 +156,8 @@ class LocalAuth {
     return new Promise((resolve, reject) => {
       try {
         if (!this.currentUser) {
-          return reject({ code: 'auth/no-current-user' });
+          console.error('LocalAuth: нет авторизованного пользователя');
+          return reject({ code: 'auth/no-current-user', message: 'Нет текущего пользователя' });
         }
         
         // Обновляем профиль текущего пользователя
@@ -120,6 +165,8 @@ class LocalAuth {
           ...this.currentUser,
           ...userProfile
         };
+        
+        console.log('LocalAuth: профиль обновлен', this.currentUser.email);
         
         // Сохраняем обновленные данные
         localStorage.setItem(this.currentUserKey, JSON.stringify(this.currentUser));
@@ -141,6 +188,7 @@ class LocalAuth {
         
         resolve();
       } catch (error) {
+        console.error('LocalAuth: ошибка при обновлении профиля', error);
         reject({ code: 'auth/operation-not-allowed', message: error.message });
       }
     });
@@ -150,12 +198,18 @@ class LocalAuth {
   async sendPasswordResetEmail(email) {
     return new Promise((resolve, reject) => {
       try {
+        if (!email) {
+          console.error('LocalAuth: email обязателен');
+          return reject({ code: 'auth/invalid-email', message: 'Email обязателен' });
+        }
+        
         // Проверяем, существует ли пользователь
         const users = this._getUsers();
         const user = users.find(u => u.email === email);
         
         if (!user) {
-          return reject({ code: 'auth/user-not-found' });
+          console.error('LocalAuth: пользователь не найден', email);
+          return reject({ code: 'auth/user-not-found', message: 'Пользователь не найден' });
         }
         
         // В реальности здесь отправлялся бы email
@@ -163,6 +217,7 @@ class LocalAuth {
         
         resolve();
       } catch (error) {
+        console.error('LocalAuth: ошибка при сбросе пароля', error);
         reject({ code: 'auth/operation-not-allowed', message: error.message });
       }
     });
@@ -173,6 +228,8 @@ class LocalAuth {
     return new Promise((resolve) => {
       this.currentUser = null;
       localStorage.removeItem(this.currentUserKey);
+      
+      console.log('LocalAuth: выход из системы');
       
       // Отправляем событие авторизации
       this._notifyListeners();
@@ -225,6 +282,8 @@ class LocalAuth {
           this._saveUsers(users);
         }
         
+        console.log('LocalAuth: вход через Google', email);
+        
         // Устанавливаем текущего пользователя
         this.currentUser = existingUser || newUser;
         localStorage.setItem(this.currentUserKey, JSON.stringify(this.currentUser));
@@ -240,6 +299,7 @@ class LocalAuth {
           }
         });
       } catch (error) {
+        console.error('LocalAuth: ошибка при входе через Google', error);
         reject({ code: 'auth/operation-not-allowed', message: error.message });
       }
     });
@@ -248,14 +308,7 @@ class LocalAuth {
   // Получение списка пользователей
   _getUsers() {
     const usersJSON = localStorage.getItem(this.storageKey);
-    if (usersJSON) {
-      try {
-        return JSON.parse(usersJSON);
-      } catch (e) {
-        console.error('LocalAuth: ошибка при получении списка пользователей', e);
-      }
-    }
-    return [];
+    return usersJSON ? JSON.parse(usersJSON) : [];
   }
   
   // Сохранение списка пользователей
@@ -263,20 +316,20 @@ class LocalAuth {
     localStorage.setItem(this.storageKey, JSON.stringify(users));
   }
   
-  // Генерация уникального ID
+  // Генерация уникального идентификатора
   _generateUid() {
-    return 'local-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+    return 'local_' + Math.random().toString(36).substr(2, 9);
   }
   
-  // Уведомление всех слушателей об изменении статуса авторизации
+  // Уведомление слушателей об изменении статуса авторизации
   _notifyListeners() {
-    for (const listener of this.listeners) {
+    this.listeners.forEach(callback => {
       try {
-        listener(this.currentUser);
-      } catch (e) {
-        console.error('LocalAuth: ошибка в обработчике событий', e);
+        callback(this.currentUser);
+      } catch (error) {
+        console.error('LocalAuth: ошибка при уведомлении слушателя', error);
       }
-    }
+    });
   }
 }
 
@@ -285,6 +338,7 @@ class LocalFirestore {
   constructor() {
     this.storageKeyPrefix = 'co-intent-firestore-';
     this.collections = {};
+    this.transactions = new Map();
   }
   
   // Получение коллекции
@@ -305,6 +359,66 @@ class LocalFirestore {
   enablePersistence(options) {
     console.log('LocalFirestore: enablePersistence called with', options);
     return Promise.resolve();
+  }
+  
+  // Эмуляция транзакций
+  async runTransaction(updateFunction) {
+    const transactionId = this._generateId();
+    this.transactions.set(transactionId, new Map());
+    
+    try {
+      const result = await updateFunction({
+        get: async (docRef) => {
+          const collection = this.collection(docRef.parent.id);
+          const doc = await collection.doc(docRef.id).get();
+          return doc;
+        },
+        set: async (docRef, data) => {
+          this.transactions.get(transactionId).set(docRef.id, {
+            type: 'set',
+            data: data
+          });
+        },
+        update: async (docRef, data) => {
+          this.transactions.get(transactionId).set(docRef.id, {
+            type: 'update',
+            data: data
+          });
+        },
+        delete: async (docRef) => {
+          this.transactions.get(transactionId).set(docRef.id, {
+            type: 'delete'
+          });
+        }
+      });
+      
+      // Применяем изменения
+      for (const [docId, change] of this.transactions.get(transactionId)) {
+        const collection = this.collection(docId.split('/')[0]);
+        const docRef = collection.doc(docId.split('/')[1]);
+        
+        switch (change.type) {
+          case 'set':
+            await docRef.set(change.data);
+            break;
+          case 'update':
+            await docRef.update(change.data);
+            break;
+          case 'delete':
+            await docRef.delete();
+            break;
+        }
+      }
+      
+      return result;
+    } finally {
+      this.transactions.delete(transactionId);
+    }
+  }
+  
+  // Генерация ID документа
+  _generateId() {
+    return 'local-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
   }
 }
 
@@ -526,11 +640,6 @@ class LocalCollection {
     localStorage.setItem(this.storageKey, JSON.stringify(docs));
   }
   
-  // Генерация ID документа
-  _generateId() {
-    return 'local-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
-  }
-  
   // Серверная метка времени
   _serverTimestamp() {
     return {
@@ -581,26 +690,44 @@ const localFirebaseUtils = {
 function initLocalAuth() {
   console.log('Инициализация локальной системы авторизации');
   
-  // Создаем экземпляры локальных сервисов
-  const localAuth = new LocalAuth();
-  const localFirestore = new LocalFirestore();
-  const localAnalytics = new LocalAnalytics();
-  const localGoogleProvider = new GoogleAuthProvider();
-  
-  // Экспортируем в window
-  window.auth = localAuth;
-  window.db = localFirestore;
-  window.analytics = localAnalytics;
-  window.googleProvider = localGoogleProvider;
-  window.firebase = {
-    auth: () => localAuth,
-    firestore: () => localFirestore,
-    analytics: () => localAnalytics,
-    ...localFirebaseUtils
-  };
-  
-  console.log('Локальная система авторизации инициализирована успешно');
-  console.log('Вы можете зарегистрироваться и войти с любыми данными - они будут сохранены в localStorage');
+  try {
+    // Создаем экземпляры локальных сервисов
+    const localAuth = new LocalAuth();
+    const localFirestore = new LocalFirestore();
+    const localAnalytics = new LocalAnalytics();
+    const localGoogleProvider = new GoogleAuthProvider();
+    
+    // Экспортируем в window
+    window.auth = localAuth;
+    window.db = localFirestore;
+    window.analytics = localAnalytics;
+    window.googleProvider = localGoogleProvider;
+    window.firebase = {
+      auth: () => localAuth,
+      firestore: () => localFirestore,
+      analytics: () => localAnalytics,
+      ...localFirebaseUtils
+    };
+    
+    console.log('Локальная система авторизации инициализирована успешно');
+    console.log('Вы можете зарегистрироваться и войти с любыми данными - они будут сохранены в localStorage');
+    
+    // Проверяем наличие тестовых данных
+    if (!localStorage.getItem('co-intent-users')) {
+      console.log('Создаем тестовые данные');
+      // Создаем тестового пользователя
+      localAuth.createUserWithEmailAndPassword('test@example.com', 'password123')
+        .then(() => {
+          console.log('Тестовый пользователь создан: test@example.com / password123');
+        })
+        .catch(e => {
+          console.error('Ошибка при создании тестового пользователя:', e);
+        });
+    }
+  } catch (e) {
+    console.error('Ошибка при инициализации локального хранилища:', e);
+    throw e;
+  }
 }
 
 // Запускаем локальную авторизацию немедленно

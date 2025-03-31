@@ -3,31 +3,39 @@
  * This file contains functions for user authentication
  */
 
-// Wait for Firebase to initialize
-document.addEventListener('DOMContentLoaded', () => {
+// Проверка и инициализация аутентификации
+function checkAndInitAuth() {
   // Проверяем доступность Firebase или локальной авторизации
-  setTimeout(() => {
-    if (!window.auth || !window.db) {
-      console.error('Authentication services not initialized - please check local-auth.js');
-      return;
+  if (!window.auth) {
+    console.error('Authentication services not initialized - please check firebase-config.js and local-auth.js');
+    showNotification('Ошибка инициализации системы авторизации', 'error');
+    return false;
+  }
+
+  // Auth state observer
+  window.auth.onAuthStateChanged((user) => {
+    if (user) {
+      // User is signed in
+      console.log('Auth state changed: user signed in', user.email);
+      updateUIOnAuth(user);
+    } else {
+      // User is signed out
+      console.log('Auth state changed: user signed out');
+      updateUIOnAuth(null);
     }
+  });
 
-    // Auth state observer
-    window.auth.onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in
-        updateUIOnAuth(user);
-      } else {
-        // User is signed out
-        updateUIOnAuth(null);
-      }
-    });
+  // Set up modal functionality
+  setupAuthModal();
+  
+  console.log('Auth module initialized successfully');
+  return true;
+}
 
-    // Set up modal functionality
-    setupAuthModal();
-    
-    console.log('Auth module initialized successfully');
-  }, 500); // Небольшая задержка для завершения инициализации
+// Проверяем при загрузке DOM
+document.addEventListener('DOMContentLoaded', () => {
+  // Даем время на инициализацию Firebase/локальной авторизации
+  checkAndInitAuth();
 });
 
 // Setup auth modal functionality
@@ -135,6 +143,12 @@ function setupAuthFormListeners() {
     signInForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
+      // Проверяем доступность аутентификации
+      if (!window.auth) {
+        showNotification('Система авторизации недоступна', 'error');
+        return;
+      }
+      
       // Показываем индикатор загрузки
       const submitBtn = signInForm.querySelector('[type="submit"]');
       if (submitBtn) {
@@ -145,9 +159,16 @@ function setupAuthFormListeners() {
       try {
         const email = document.getElementById('sign-in-email').value;
         const password = document.getElementById('sign-in-password').value;
+        
+        if (!email || !password) {
+          throw new Error('Пожалуйста, введите email и пароль');
+        }
+        
+        console.log("Попытка входа: ", email);
         await signInWithEmail(email, password);
       } catch (error) {
         console.error('Sign in error:', error);
+        showNotification(getAuthErrorMessage(error.code) || error.message || 'Ошибка входа', 'error');
       } finally {
         // Возвращаем кнопку в исходное состояние
         if (submitBtn) {
@@ -163,6 +184,12 @@ function setupAuthFormListeners() {
     signUpForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
+      // Проверяем доступность аутентификации
+      if (!window.auth) {
+        showNotification('Система авторизации недоступна', 'error');
+        return;
+      }
+      
       // Показываем индикатор загрузки
       const submitBtn = signUpForm.querySelector('[type="submit"]');
       if (submitBtn) {
@@ -174,9 +201,16 @@ function setupAuthFormListeners() {
         const name = document.getElementById('sign-up-name').value;
         const email = document.getElementById('sign-up-email').value;
         const password = document.getElementById('sign-up-password').value;
+        
+        if (!name || !email || !password) {
+          throw new Error('Пожалуйста, заполните все поля');
+        }
+        
+        console.log("Попытка регистрации: ", email);
         await signUpWithEmail(email, password, name);
       } catch (error) {
         console.error('Sign up error:', error);
+        showNotification(getAuthErrorMessage(error.code) || error.message || 'Ошибка регистрации', 'error');
       } finally {
         // Возвращаем кнопку в исходное состояние
         if (submitBtn) {
@@ -192,6 +226,12 @@ function setupAuthFormListeners() {
     resetForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
+      // Проверяем доступность аутентификации
+      if (!window.auth) {
+        showNotification('Система авторизации недоступна', 'error');
+        return;
+      }
+      
       // Показываем индикатор загрузки
       const submitBtn = resetForm.querySelector('[type="submit"]');
       if (submitBtn) {
@@ -201,9 +241,15 @@ function setupAuthFormListeners() {
       
       try {
         const email = document.getElementById('reset-email').value;
+        
+        if (!email) {
+          throw new Error('Пожалуйста, введите email');
+        }
+        
         await resetPassword(email);
       } catch (error) {
         console.error('Reset password error:', error);
+        showNotification(getAuthErrorMessage(error.code) || error.message || 'Ошибка сброса пароля', 'error');
       } finally {
         // Возвращаем кнопку в исходное состояние
         if (submitBtn) {
@@ -217,11 +263,18 @@ function setupAuthFormListeners() {
   // Вход через Google
   if (googleSignInBtn) {
     googleSignInBtn.addEventListener('click', async () => {
+      // Проверяем доступность аутентификации
+      if (!window.auth) {
+        showNotification('Система авторизации недоступна', 'error');
+        return;
+      }
+      
       googleSignInBtn.disabled = true;
       try {
         await signInWithGoogle();
       } catch (error) {
         console.error('Google sign in error:', error);
+        showNotification(getAuthErrorMessage(error.code) || error.message || 'Ошибка входа через Google', 'error');
       } finally {
         googleSignInBtn.disabled = false;
       }
@@ -231,11 +284,18 @@ function setupAuthFormListeners() {
   // Регистрация через Google
   if (googleSignUpBtn) {
     googleSignUpBtn.addEventListener('click', async () => {
+      // Проверяем доступность аутентификации
+      if (!window.auth) {
+        showNotification('Система авторизации недоступна', 'error');
+        return;
+      }
+      
       googleSignUpBtn.disabled = true;
       try {
         await signInWithGoogle();
       } catch (error) {
         console.error('Google sign up error:', error);
+        showNotification(getAuthErrorMessage(error.code) || error.message || 'Ошибка входа через Google', 'error');
       } finally {
         googleSignUpBtn.disabled = false;
       }
@@ -245,11 +305,18 @@ function setupAuthFormListeners() {
   // Выход из системы
   if (signOutBtn) {
     signOutBtn.addEventListener('click', async () => {
+      // Проверяем доступность аутентификации
+      if (!window.auth) {
+        showNotification('Система авторизации недоступна', 'error');
+        return;
+      }
+      
       signOutBtn.disabled = true;
       try {
         await signOut();
       } catch (error) {
         console.error('Sign out error:', error);
+        showNotification(error.message || 'Ошибка выхода', 'error');
       } finally {
         signOutBtn.disabled = false;
       }
@@ -259,13 +326,13 @@ function setupAuthFormListeners() {
 
 // Activate specific tab
 function activateTab(tabId) {
-  const tabTrigger = document.querySelector(`.auth-tab[data-target="${tabId}"]`);
-  if (tabTrigger) {
-    tabTrigger.click();
+  const tab = document.querySelector(`.auth-tab[data-target="${tabId}"]`);
+  if (tab) {
+    tab.click();
   }
 }
 
-// Show modal function
+// Show modal
 function showModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
@@ -273,7 +340,7 @@ function showModal(modalId) {
   }
 }
 
-// Close modal function
+// Close modal
 function closeModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
@@ -281,7 +348,7 @@ function closeModal(modalId) {
   }
 }
 
-// Show notification function
+// Show notification
 function showNotification(message, type = 'info') {
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
@@ -289,287 +356,325 @@ function showNotification(message, type = 'info') {
   
   document.body.appendChild(notification);
   
-  // Trigger reflow
-  notification.offsetHeight;
+  // Add class to trigger animation
+  setTimeout(() => {
+    notification.classList.add('show');
+  }, 10);
   
-  // Add show class
-  notification.classList.add('show');
-  
-  // Remove after 3 seconds
+  // Remove after 5 seconds
   setTimeout(() => {
     notification.classList.remove('show');
     setTimeout(() => {
       notification.remove();
     }, 300);
-  }, 3000);
+  }, 5000);
 }
 
-// Update UI when user is authenticated
+// Update UI based on auth state
 function updateUIOnAuth(user) {
-  const elements = {
-    authControls: document.querySelector('.user-controls-auth'),
-    loggedInControls: document.querySelector('.user-controls-logged-in'),
-    userDisplayName: document.getElementById('user-display-name'),
-    userAvatar: document.getElementById('user-avatar'),
-    walletBalance: document.getElementById('wallet-balance-value')
-  };
+  const authControls = document.querySelector('.user-controls-auth');
+  const loggedInControls = document.querySelector('.user-controls-logged-in');
+  const userDisplayName = document.getElementById('user-display-name');
+  const userAvatar = document.getElementById('user-avatar');
 
-  // Check if elements exist before updating
   if (user) {
-    // User is signed in
-    if (elements.authControls) {
-      elements.authControls.style.display = 'none';
-    }
-    if (elements.loggedInControls) {
-      elements.loggedInControls.style.display = 'flex';
-    }
-    if (elements.userDisplayName) {
-      elements.userDisplayName.textContent = user.displayName || 'Пользователь';
-    }
-    if (elements.userAvatar) {
-      elements.userAvatar.innerHTML = user.photoURL ? 
-        `<img src="${user.photoURL}" alt="User avatar">` : 
-        '<i class="fas fa-user"></i>';
-    }
+    console.log('Updating UI for authenticated user', user.email);
     
-    // Update wallet balance if element exists
-    if (elements.walletBalance) {
-      updateWalletBalance(user.uid);
-    }
-    
-    // Log analytics event
-    try {
-      if (window.analytics) {
-        window.analytics.logEvent('login', {
-          method: user.providerData && user.providerData[0] ? user.providerData[0].providerId : 'unknown'
-        });
-      }
-    } catch (error) {
-      console.error('Analytics error:', error);
-    }
-  } else {
-    // User is signed out
-    if (elements.authControls) {
-      elements.authControls.style.display = 'flex';
-    }
-    if (elements.loggedInControls) {
-      elements.loggedInControls.style.display = 'none';
-    }
-    if (elements.userDisplayName) {
-      elements.userDisplayName.textContent = 'Пользователь';
-    }
-    if (elements.userAvatar) {
-      elements.userAvatar.innerHTML = '<i class="fas fa-user"></i>';
-    }
-    if (elements.walletBalance) {
-      elements.walletBalance.textContent = '0.00';
-    }
-    
-    // Log analytics event
-    try {
-      if (window.analytics) {
-        window.analytics.logEvent('logout');
-      }
-    } catch (error) {
-      console.error('Analytics error:', error);
-    }
-  }
-}
-
-// Sign in with email and password
-async function signInWithEmail(email, password) {
-  if (!window.auth) {
-    console.error('Система авторизации недоступна');
-    showNotification('Система авторизации не инициализирована', 'error');
-    return null;
-  }
-  
-  try {
-    console.log('Попытка входа через email:', email);
-    const userCredential = await window.auth.signInWithEmailAndPassword(email, password);
-    console.log('Успешный вход:', userCredential);
-    showNotification('Успешный вход', 'success');
-    closeModal('auth-modal');
-    return userCredential.user;
-  } catch (error) {
-    console.error('Ошибка входа:', error);
-    const errorMessage = getAuthErrorMessage(error.code);
-    showNotification(errorMessage, 'error');
-    throw error;
-  }
-}
-
-// Sign up with email and password
-async function signUpWithEmail(email, password, name) {
-  if (!window.auth) {
-    console.error('Система авторизации недоступна');
-    showNotification('Система авторизации не инициализирована', 'error');
-    return null;
-  }
-  
-  try {
-    console.log('Попытка регистрации через email:', email);
-    const userCredential = await window.auth.createUserWithEmailAndPassword(email, password);
-    console.log('Успешная регистрация:', userCredential);
-    const user = userCredential.user;
-    
-    // Update user profile
-    if (user) {
-      try {
-        await user.updateProfile({
-          displayName: name
-        });
-        console.log('Профиль пользователя обновлен');
-      } catch (profileError) {
-        console.error('Ошибка обновления профиля:', profileError);
-        // Продолжаем выполнение, даже если обновление профиля не удалось
+    // User is signed in, show logged in UI
+    if (authControls) authControls.style.display = 'none';
+    if (loggedInControls) {
+      loggedInControls.style.display = 'flex';
+      
+      // Update user info
+      if (userDisplayName) {
+        userDisplayName.textContent = user.displayName || user.email.split('@')[0];
       }
       
-      // Create user document in Firestore
-      if (window.db) {
-        try {
-          console.log('Создание документа пользователя');
-          const userData = {
-            name: name,
-            email: email,
-            createdAt: window.firebase && window.firebase.firestore ? 
-              window.firebase.firestore.FieldValue.serverTimestamp() : 
-              new Date(),
-            role: 'user',
-            walletBalance: 0
-          };
-          
-          await window.db.collection('users').doc(user.uid).set(userData);
-          console.log('Документ пользователя создан');
-        } catch (dbError) {
-          console.error('Ошибка создания документа пользователя:', dbError);
-          // Продолжаем даже если документ не создан
+      // Update avatar
+      if (userAvatar) {
+        if (user.photoURL) {
+          userAvatar.innerHTML = `<img src="${user.photoURL}" alt="${user.displayName || 'User'}" />`;
+        } else {
+          userAvatar.innerHTML = `<i class="fas fa-user"></i>`;
         }
-      } else {
-        console.warn('Firestore недоступен для создания документа пользователя');
       }
+      
+      // Close auth modal if open
+      closeModal('auth-modal');
+      
+      // Загружаем баланс кошелька
+      updateWalletBalance(user.uid);
+    }
+  } else {
+    console.log('Updating UI for signed out state');
+    
+    // User is signed out, show auth controls
+    if (authControls) authControls.style.display = 'flex';
+    if (loggedInControls) loggedInControls.style.display = 'none';
+  }
+}
+
+/**
+ * Функции авторизации
+ */
+
+// Вход по email и паролю
+async function signInWithEmail(email, password) {
+  try {
+    // Проверяем доступность аутентификации
+    if (!window.auth) {
+      throw new Error('Система авторизации недоступна');
     }
     
-    showNotification('Регистрация успешна', 'success');
-    closeModal('auth-modal');
-    return user;
+    console.log('Вход по email:', email);
+    const res = await window.auth.signInWithEmailAndPassword(email, password);
+    
+    if (res && res.user) {
+      console.log('Успешный вход:', res.user.email);
+      closeModal('auth-modal');
+      
+      // Показываем уведомление
+      showNotification(`Добро пожаловать, ${res.user.displayName || res.user.email}!`, 'success');
+      
+      // Log event в аналитику
+      if (window.analytics) {
+        window.analytics.logEvent('login', { method: 'email' });
+      }
+      
+      return res.user;
+    }
+  } catch (error) {
+    console.error('Ошибка входа:', error);
+    throw error;
+  }
+}
+
+// Регистрация по email и паролю
+async function signUpWithEmail(email, password, name) {
+  try {
+    // Проверяем доступность аутентификации
+    if (!window.auth) {
+      throw new Error('Система авторизации недоступна');
+    }
+    
+    console.log('Регистрация по email:', email);
+    const res = await window.auth.createUserWithEmailAndPassword(email, password);
+    
+    if (res && res.user) {
+      console.log('Успешная регистрация:', res.user.email);
+      
+      // Обновляем профиль пользователя
+      if (name) {
+        await res.user.updateProfile({
+          displayName: name
+        });
+      }
+      
+      // Создаем запись пользователя в Firestore (если доступен)
+      try {
+        if (window.db) {
+          await window.db.collection('users').doc(res.user.uid).set({
+            email: res.user.email,
+            displayName: name || res.user.email.split('@')[0],
+            createdAt: new Date(),
+            walletBalance: 0
+          }, { merge: true });
+        }
+      } catch (dbError) {
+        console.error('Ошибка создания профиля в базе данных:', dbError);
+        // Не рушим основной процесс регистрации, если БД недоступна
+      }
+      
+      // Закрываем модальное окно
+      closeModal('auth-modal');
+      
+      // Показываем уведомление
+      showNotification(`Аккаунт успешно создан, ${name || res.user.email}!`, 'success');
+      
+      // Log event в аналитику
+      if (window.analytics) {
+        window.analytics.logEvent('sign_up', { method: 'email' });
+      }
+      
+      return res.user;
+    } else {
+      throw new Error('Неизвестная ошибка при регистрации');
+    }
   } catch (error) {
     console.error('Ошибка регистрации:', error);
-    const errorMessage = getAuthErrorMessage(error.code);
-    showNotification(errorMessage, 'error');
     throw error;
   }
 }
 
-// Sign in with Google
+// Вход через Google
 async function signInWithGoogle() {
-  if (!window.auth || !window.googleProvider) {
-    showNotification('Система авторизации не инициализирована', 'error');
-    return null;
-  }
-  
   try {
-    const result = await window.auth.signInWithPopup(window.googleProvider);
+    // Проверяем доступность аутентификации
+    if (!window.auth) {
+      throw new Error('Система авторизации недоступна');
+    }
     
-    // Check if this is a new user
-    const isNewUser = result.additionalUserInfo?.isNewUser;
+    // Проверяем наличие провайдера
+    if (!window.googleProvider) {
+      throw new Error('Google Auth провайдер недоступен');
+    }
     
-    if (isNewUser && window.db) {
-      try {
-        await window.db.collection('users').doc(result.user.uid).set({
-          name: result.user.displayName,
-          email: result.user.email,
-          createdAt: window.firebase ? firebase.firestore.FieldValue.serverTimestamp() : new Date(),
-          role: 'user',
-          walletBalance: 0
-        });
-      } catch (dbError) {
-        console.error('Error creating user document', dbError);
-        // Продолжаем даже если документ не создан
+    console.log('Вход через Google');
+    const res = await window.auth.signInWithPopup(window.googleProvider);
+    
+    if (res && res.user) {
+      console.log('Успешный вход через Google:', res.user.email);
+      
+      // Создаем запись пользователя в Firestore (если доступен)
+      if (res.additionalUserInfo?.isNewUser && window.db) {
+        try {
+          await window.db.collection('users').doc(res.user.uid).set({
+            email: res.user.email,
+            displayName: res.user.displayName || res.user.email.split('@')[0],
+            photoURL: res.user.photoURL,
+            createdAt: new Date(),
+            walletBalance: 0
+          }, { merge: true });
+        } catch (dbError) {
+          console.error('Ошибка создания профиля в базе данных:', dbError);
+          // Не рушим основной процесс регистрации, если БД недоступна
+        }
+      }
+      
+      // Закрываем модальное окно
+      closeModal('auth-modal');
+      
+      // Показываем уведомление
+      if (res.additionalUserInfo?.isNewUser) {
+        showNotification(`Аккаунт успешно создан, ${res.user.displayName || res.user.email}!`, 'success');
+      } else {
+        showNotification(`Добро пожаловать, ${res.user.displayName || res.user.email}!`, 'success');
+      }
+      
+      // Log event в аналитику
+      if (window.analytics) {
+        window.analytics.logEvent(res.additionalUserInfo?.isNewUser ? 'sign_up' : 'login', { method: 'google' });
+      }
+      
+      return res.user;
+    } else {
+      throw new Error('Неизвестная ошибка при входе через Google');
+    }
+  } catch (error) {
+    console.error('Ошибка входа через Google:', error);
+    throw error;
+  }
+}
+
+// Сброс пароля
+async function resetPassword(email) {
+  try {
+    // Проверяем доступность аутентификации
+    if (!window.auth) {
+      throw new Error('Система авторизации недоступна');
+    }
+    
+    console.log('Сброс пароля для:', email);
+    await window.auth.sendPasswordResetEmail(email);
+    
+    // Показываем уведомление
+    showNotification(`Инструкции по сбросу пароля отправлены на ${email}`, 'success');
+    
+    // Переключаемся на экран входа
+    activateTab('sign-in-tab');
+    
+    return true;
+  } catch (error) {
+    console.error('Ошибка сброса пароля:', error);
+    throw error;
+  }
+}
+
+// Выход из системы
+async function signOut() {
+  try {
+    // Проверяем доступность аутентификации
+    if (!window.auth) {
+      throw new Error('Система авторизации недоступна');
+    }
+    
+    console.log('Выход из системы');
+    await window.auth.signOut();
+    
+    // Показываем уведомление
+    showNotification('Вы успешно вышли из системы', 'success');
+    
+    return true;
+  } catch (error) {
+    console.error('Ошибка выхода из системы:', error);
+    throw error;
+  }
+}
+
+// Обновление баланса кошелька
+async function updateWalletBalance(userId) {
+  try {
+    if (!window.db || !userId) return;
+    
+    // Получаем данные пользователя
+    const userDoc = await window.db.collection('users').doc(userId).get();
+    
+    if (userDoc.exists) {
+      const userData = userDoc.data();
+      const walletBalanceValue = document.getElementById('wallet-balance-value');
+      
+      if (walletBalanceValue) {
+        walletBalanceValue.textContent = userData.walletBalance?.toFixed(2) || '0.00';
       }
     }
-    
-    showNotification('Успешный вход через Google', 'success');
-    closeModal('auth-modal');
-    return result.user;
   } catch (error) {
-    const errorMessage = getAuthErrorMessage(error.code);
-    showNotification(errorMessage, 'error');
-    throw error;
+    console.error('Ошибка обновления баланса:', error);
   }
 }
 
-// Reset password
-async function resetPassword(email) {
-  if (!window.auth) {
-    showNotification('Система авторизации не инициализирована', 'error');
-    return;
-  }
-  
-  try {
-    await window.auth.sendPasswordResetEmail(email);
-    showNotification('Инструкции по сбросу пароля отправлены на email', 'success');
-    closeModal('auth-modal');
-  } catch (error) {
-    const errorMessage = getAuthErrorMessage(error.code);
-    showNotification(errorMessage, 'error');
-    throw error;
-  }
-}
-
-// Sign out
-async function signOut() {
-  if (!window.auth) {
-    showNotification('Система авторизации не инициализирована', 'error');
-    return;
-  }
-  
-  try {
-    await window.auth.signOut();
-    showNotification('Вы успешно вышли из системы', 'success');
-  } catch (error) {
-    const errorMessage = getAuthErrorMessage(error.code);
-    showNotification(errorMessage, 'error');
-    throw error;
-  }
-}
-
-// Update wallet balance
-async function updateWalletBalance(userId) {
-  if (!window.db) {
-    return;
-  }
-  
-  try {
-    const userDoc = await window.db.collection('users').doc(userId).get();
-    const balanceElement = document.getElementById('wallet-balance-value');
-    
-    if (userDoc.exists && balanceElement) {
-      const balance = userDoc.data().walletBalance || 0;
-      balanceElement.textContent = balance.toFixed(2);
-    }
-  } catch (error) {
-    console.error('Error updating wallet balance:', error);
-  }
-}
-
-// Get localized error message
+// Получение сообщения об ошибке
 function getAuthErrorMessage(errorCode) {
   const errorMessages = {
-    'auth/email-already-in-use': 'Этот email уже используется',
-    'auth/invalid-email': 'Неверный формат email',
-    'auth/operation-not-allowed': 'Операция не разрешена',
-    'auth/weak-password': 'Слишком слабый пароль',
-    'auth/user-disabled': 'Аккаунт отключен',
+    'auth/invalid-email': 'Указан неверный формат email',
+    'auth/user-disabled': 'Учетная запись отключена',
     'auth/user-not-found': 'Пользователь не найден',
     'auth/wrong-password': 'Неверный пароль',
-    'auth/too-many-requests': 'Слишком много попыток входа. Попробуйте позже',
-    'auth/popup-closed-by-user': 'Окно авторизации было закрыто',
-    'auth/no-current-user': 'Нет активного пользователя',
-    'auth/configuration-not-found': 'Ошибка конфигурации авторизации',
-    'auth/network-request-failed': 'Ошибка сети. Проверьте подключение к интернету',
-    'default': 'Произошла ошибка при авторизации'
+    'auth/email-already-in-use': 'Этот email уже используется',
+    'auth/weak-password': 'Пароль слишком простой',
+    'auth/operation-not-allowed': 'Операция не разрешена',
+    'auth/account-exists-with-different-credential': 'Учетная запись с таким email уже существует',
+    'auth/requires-recent-login': 'Требуется повторная авторизация',
+    'auth/unauthorized-domain': 'Домен не авторизован',
+    'auth/popup-blocked': 'Всплывающее окно было заблокировано',
+    'auth/popup-closed-by-user': 'Всплывающее окно было закрыто пользователем',
+    'auth/network-request-failed': 'Сетевая ошибка',
+    'auth/timeout': 'Время ожидания истекло',
+    'auth/app-deleted': 'Приложение удалено',
+    'auth/app-not-authorized': 'Приложение не авторизовано',
+    'auth/argument-error': 'Ошибка в аргументах',
+    'auth/invalid-api-key': 'Неверный API ключ',
+    'auth/invalid-continue-uri': 'Неверный URL',
+    'auth/invalid-credential': 'Неверные учетные данные',
+    'auth/invalid-message-payload': 'Неверное сообщение',
+    'auth/invalid-oauth-client-id': 'Неверный ID клиента OAuth',
+    'auth/invalid-oauth-provider': 'Неверный провайдер OAuth',
+    'auth/invalid-persistence-type': 'Неверный тип хранения',
+    'auth/invalid-phone-number': 'Неверный номер телефона',
+    'auth/invalid-provider-data': 'Неверные данные провайдера',
+    'auth/invalid-recipient-email': 'Неверный email получателя',
+    'auth/invalid-sender': 'Неверный отправитель',
+    'auth/missing-iframe-start': 'Отсутствует начало iframe',
+    'auth/missing-phone-number': 'Отсутствует номер телефона',
+    'auth/missing-verification-code': 'Отсутствует код подтверждения',
+    'auth/missing-verification-id': 'Отсутствует ID подтверждения',
+    'auth/no-current-user': 'Нет текущего пользователя',
+    'auth/tenant-id-mismatch': 'Несоответствие tenant ID',
+    'auth/too-many-requests': 'Слишком много запросов',
+    'auth/web-storage-unsupported': 'Web-хранилище не поддерживается',
+    'auth/not-found': 'Не найдено',
+    'auth/internal-error': 'Внутренняя ошибка',
+    'auth/configuration-not-found': 'Конфигурация не найдена'
   };
   
-  return errorMessages[errorCode] || errorMessages.default;
+  return errorMessages[errorCode] || `Ошибка: ${errorCode}`;
 } 
