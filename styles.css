@@ -1,0 +1,849 @@
+:root {
+    --primary: #6c5ce7;
+    --secondary: #a29bfe;
+    --accent: #fd79a8;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --success: #00b894;
+    --warning: #fdcb6e;
+    --danger: #d63031;
+    --info: #0984e3;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f6fa;
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    justify-content: center;
+}
+
+.logo h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.logo i {
+    font-size: 28px;
+    color: var(--primary);
+}
+
+nav {
+    width: 100%;
+    order: 3;
+    margin-top: 15px;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+nav a {
+    text-decoration: none;
+    color: var(--dark);
+    font-weight: 500;
+    transition: color 0.3s;
+    padding: 5px 0;
+    position: relative;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+nav a:hover {
+    color: var(--primary);
+}
+
+nav a.active {
+    color: var(--primary);
+}
+
+nav a.active:after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary);
+}
+
+.user-controls {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #5d4de0;
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+.main-title {
+    font-size: 28px;
+    margin-bottom: 15px;
+    text-align: center;
+    color: var(--primary);
+}
+
+.subtitle {
+    font-size: 16px;
+    color: #666;
+    text-align: center;
+    margin-bottom: 30px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 15px;
+}
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: wrap;
+}
+
+.tab {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.tab.active {
+    color: var(--primary);
+    border-bottom: 3px solid var(--primary);
+}
+
+.content-area {
+    display: none;
+    padding: 0 10px;
+}
+
+.content-area.active {
+    display: block;
+}
+
+.card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    flex-wrap: wrap;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.badge-success {
+    background-color: var(--success);
+    color: white;
+}
+
+.badge-warning {
+    background-color: var(--warning);
+    color: var(--dark);
+}
+
+.order-item,
+.product-item {
+    display: flex;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    transition: transform 0.3s;
+    flex-direction: column;
+}
+
+.order-item:hover,
+.product-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.order-thumbnail,
+.product-thumbnail {
+    width: 60px;
+    height: 60px;
+    border-radius: 5px;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.order-thumbnail i,
+.product-thumbnail i {
+    font-size: 24px;
+    color: #666;
+}
+
+.order-details,
+.product-details {
+    flex: 1;
+    width: 100%;
+}
+
+.order-title,
+.product-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.order-meta,
+.product-meta {
+    display: flex;
+    gap: 10px;
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.order-meta span,
+.product-meta span {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.order-description,
+.product-description {
+    color: #555;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+.order-participation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.progress-container {
+    flex: 1;
+    margin-right: 0;
+    width: 100%;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 3px;
+}
+
+.progress-bar {
+    height: 6px;
+    background-color: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--primary);
+    border-radius: 4px;
+    width: 0;
+    transition: width 1s ease-in-out;
+}
+
+.order-actions,
+.product-actions {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
+form {
+    margin-top: 15px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #666;
+}
+
+.nft-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.nft-card {
+    width: 200px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.nft-image {
+    width: 170px;
+    height: 170px;
+    border-radius: 8px;
+    background-color: #ddd;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.nft-image i {
+    font-size: 40px;
+    color: #666;
+}
+
+.nft-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.nft-id {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.nft-price {
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+.modal-body {
+    margin-bottom: 20px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.modal-row-label {
+    font-weight: 500;
+    color: #666;
+}
+
+.modal-row-value {
+    font-weight: 600;
+}
+
+/* Revenue Sharing Page Specific Styles */
+.revenue-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.revenue-product {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.revenue-amount {
+    font-weight: 700;
+}
+
+.revenue-date {
+    color: #666;
+    font-size: 12px;
+}
+
+/* Documentation Page Specific Styles */
+.doc-section {
+    margin-bottom: 30px;
+}
+
+.doc-section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.doc-text {
+    margin-bottom: 15px;
+}
+
+/* Support Page Specific Styles */
+.support-faq {
+    margin-bottom: 20px;
+}
+
+.faq-item {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.faq-question {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--primary);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.faq-answer {
+    color: #555;
+    display: none;
+    padding: 10px 0;
+}
+
+.faq-answer.show {
+    display: block;
+}
+
+/* Mobile menu toggle */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--primary);
+}
+
+/* Responsive styles */
+@media (min-width: 768px) {
+    .logo {
+        width: auto;
+        margin-bottom: 0;
+    }
+
+    .user-controls {
+        width: auto;
+        margin-bottom: 0;
+    }
+
+    nav {
+        width: auto;
+        order: initial;
+        margin-top: 0;
+    }
+
+    .order-item,
+    .product-item {
+        flex-direction: row;
+    }
+
+    .order-thumbnail,
+    .product-thumbnail {
+        margin-right: 15px;
+        margin-bottom: 0;
+    }
+
+    .order-participation {
+        flex-direction: row;
+    }
+
+    .progress-container {
+        margin-right: 15px;
+    }
+
+    .order-actions,
+    .product-actions {
+        width: auto;
+    }
+
+    .btn-sm {
+        width: auto;
+    }
+}
+
+@media (max-width: 767px) {
+    header {
+        flex-direction: column;
+    }
+
+    nav {
+        display: none;
+        margin-top: 20px;
+        width: 100%;
+    }
+
+    nav ul {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    nav a {
+        display: block;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .menu-toggle {
+        display: block;
+        margin-left: auto;
+    }
+}
+
+/* Profile page styles */
+.profile-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    overflow: hidden;
+}
+
+.profile-avatar i {
+    font-size: 40px;
+    color: #666;
+}
+
+.profile-info h2 {
+    font-size: 24px;
+    margin-bottom: 5px;
+    color: var(--primary);
+}
+
+.profile-info p {
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.profile-section {
+    margin-bottom: 20px;
+}
+
+.profile-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Wallet page styles */
+.wallet-balance {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.wallet-currency {
+    font-size: 16px;
+    color: #666;
+}
+
+.wallet-actions {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 4px solid transparent;
+}
+
+.transaction-incoming {
+    border-left-color: var(--success);
+}
+
+.transaction-outgoing {
+    border-left-color: var(--danger);
+}
+
+.transaction-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.transaction-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.transaction-date {
+    font-size: 12px;
+    color: #666;
+}
+
+.transaction-amount {
+    font-weight: 700;
+}
+
+.transaction-amount.positive {
+    color: var(--success);
+}
+
+.transaction-amount.negative {
+    color: var(--danger);
+}
+
+.page-content {
+    display: none;
+}
+
+.page-content.active {
+    display: block;
+} 
