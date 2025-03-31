@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-Intent Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #fd79a8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+            --info: #0984e3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f6fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        nav {
+            width: 100%;
+            order: 3;
+            margin-top: 15px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 5px 0;
+            position: relative;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        nav a.active {
+            color: var(--primary);
+        }
+
+        nav a.active:after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .user-controls {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #5d4de0;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .main-title {
+            font-size: 28px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--primary);
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 15px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .content-area {
+            display: none;
+            padding: 0 10px;
+        }
+
+        .content-area.active {
+            display: block;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .badge-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+
+        .order-item,
+        .product-item {
+            display: flex;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            transition: transform 0.3s;
+            flex-direction: column;
+        }
+
+        .order-item:hover,
+        .product-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-thumbnail,
+        .product-thumbnail {
+            width: 60px;
+            height: 60px;
+            border-radius: 5px;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .order-thumbnail i,
+        .product-thumbnail i {
+            font-size: 24px;
+            color: #666;
+        }
+
+        .order-details,
+        .product-details {
+            flex: 1;
+            width: 100%;
+        }
+
+        .order-title,
+        .product-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .order-meta,
+        .product-meta {
+            display: flex;
+            gap: 10px;
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .order-meta span,
+        .product-meta span {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .order-description,
+        .product-description {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .order-participation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin-right: 0;
+            width: 100%;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background-color: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 4px;
+            width: 0;
+            transition: width 1s ease-in-out;
+        }
+
+        .order-actions,
+        .product-actions {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        form {
+            margin-top: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .nft-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .nft-card {
+            width: 200px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .nft-image {
+            width: 170px;
+            height: 170px;
+            border-radius: 8px;
+            background-color: #ddd;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .nft-image i {
+            font-size: 40px;
+            color: #666;
+        }
+
+        .nft-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .nft-id {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .nft-price {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .modal-row-label {
+            font-weight: 500;
+            color: #666;
+        }
+
+        .modal-row-value {
+            font-weight: 600;
+        }
+
+        /* Revenue Sharing Page Specific Styles */
+        .revenue-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .revenue-product {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .revenue-amount {
+            font-weight: 700;
+        }
+
+        .revenue-date {
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* Documentation Page Specific Styles */
+        .doc-section {
+            margin-bottom: 30px;
+        }
+
+        .doc-section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .doc-item {
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .doc-item-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .doc-item-title i {
+            color: var(--primary);
+        }
+
+        .doc-item-content {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Mobile menu toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .logo {
+                width: auto;
+                margin-bottom: 0;
+                justify-content: flex-start;
+            }
+
+            nav {
+                width: auto;
+                order: initial;
+                margin-top: 0;
+            }
+
+            .user-controls {
+                width: auto;
+                margin-bottom: 0;
+                justify-content: flex-end;
+            }
+
+            .order-item,
+            .product-item {
+                flex-direction: row;
+            }
+
+            .order-thumbnail,
+            .product-thumbnail {
+                margin-right: 15px;
+                margin-bottom: 0;
+            }
+
+            .order-participation {
+                flex-direction: row;
+            }
+
+            .progress-container {
+                margin-right: 15px;
+            }
+
+            .btn-sm {
+                width: auto;
+            }
+
+            .main-title {
+                font-size: 32px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+            }
+
+            nav ul {
+                gap: 20px;
+            }
+
+            nav a {
+                font-size: 16px;
+            }
+
+            .btn {
+                font-size: 16px;
+            }
+
+            .tab {
+                padding: 12px 24px;
+                font-size: 16px;
+            }
+
+            .card {
+                padding: 25px;
+            }
+
+            .card-title {
+                font-size: 20px;
+            }
+
+            .order-title,
+            .product-title {
+                font-size: 18px;
+            }
+
+            .order-meta,
+            .product-meta {
+                font-size: 14px;
+            }
+
+            .order-description,
+            .product-description {
+                font-size: 14px;
+            }
+
+            .revenue-item {
+                padding: 20px;
+            }
+
+            .doc-item {
+                padding: 20px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            header {
+                flex-wrap: nowrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <button class="menu-toggle" id="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo">
+                <i class="fas fa-hands-helping"></i>
+                <h1>Co-Intent</h1>
+            </div>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#" class="nav-link active" data-page="marketplace">Marketplace</a></li>
+                    <li><a href="#" class="nav-link" data-page="portfolio">My Portfolio</a></li>
+                    <li><a href="#" class="nav-link" data-page="revenue">Revenue Sharing</a></li>
+                    <li><a href="#" class="nav-link" data-page="docs">Documentation</a></li>
+                    <li><a href="#" class="nav-link" data-page="support">Support</a></li>
+                </ul>
+            </nav>
+            <div class="user-controls">
+                <button class="btn btn-outline"><i class="fas fa-wallet"></i> Connect Wallet</button>
+                <button class="btn btn-primary"><i class="fas fa-user"></i> My Account</button>
+            </div>
+        </header>
+
+        <!-- Marketplace Page -->
+        <div class="page-content active" id="marketplace">
+            <h1 class="main-title">Co-Created Digital Products Marketplace</h1>
+            <p class="subtitle">Join forces with others to commission digital products, share in their success, and earn
+                from subsequent sales through our innovative buy-to-earn model.</p>
+
+            <div class="tabs">
+                <div class="tab active" data-tab="explore">Explore Orders</div>
+                <div class="tab" data-tab="submit">Submit Order</div>
+                <div class="tab" data-tab="executor">Executor Dashboard</div>
+                <div class="tab" data-tab="portfolio">My Portfolio</div>
+            </div>
+
+            <!-- Explore Orders Tab -->
+            <div class="content-area active" id="explore">
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value">142</div>
+                        <div class="stat-label">Active Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$256K</div>
+                        <div class="stat-label">Total Budget</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">89%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">2.4K</div>
+                        <div class="stat-label">Participants</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Software Development</div>
+                        <div class="badge badge-primary">Featured</div>
+                    </div>
+
+                    <div class="order-item">
+                        <div class="order-thumbnail">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-title">Custom E-commerce Solution for Small Businesses</div>
+                            <div class="order-meta">
+                                <span><i class="fas fa-dollar-sign"></i> $15,000</span>
+                                <span><i class="fas fa-users"></i> 26 backers</span>
+                                <span><i class="fas fa-calendar"></i> 18 days left</span>
+                            </div>
+                            <div class="order-description">
+                                A modular e-commerce platform specifically designed for small businesses with inventory
+                                management, multi-channel sales, and simple analytics built in.
+                            </div>
+                            <div class="order-participation">
+                                <div class="progress-container">
+                                    <div class="progress-label">
+                                        <span>72% funded</span>
+                                        <span>26/30 needed</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 72%"></div>
+                                    </div>
+                                </div>
+                                <div class="order-actions">
+                                    <button class="btn btn-primary btn-sm btn-join-group" data-order="ecom-saas">
+                                        <i class="fas fa-plus-circle"></i> Join Group
+                                    </button>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-info-circle"></i> Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Order Tab -->
+            <div class="content-area" id="submit">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Submit New Group Order</div>
+                        <div class="badge badge-success">Beta</div>
+                    </div>
+
+                    <form id="order-form">
+                        <div class="form-group">
+                            <label for="product-title">Product/Service Title</label>
+                            <input type="text" id="product-title" placeholder="Describe what you want to commission"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-description">Detailed Description</label>
+                            <textarea id="product-description"
+                                placeholder="Provide as much detail as possible about your requirements..."
+                                required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-category">Category</label>
+                            <select id="product-category" required>
+                                <option value="">Select category</option>
+                                <option value="software">Software Development</option>
+                                <option value="design">Design & Creative</option>
+                                <option value="research">Research & Reports</option>
+                                <option value="content">Content Creation</option>
+                                <option value="education">Education & Courses</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="total-budget">Total Budget Required</label>
+                            <input type="number" id="total-budget" placeholder="USD amount" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="min-buyers">Minimum Number of Buyers</label>
+                            <input type="number" id="min-buyers" placeholder="How many people needed to fund this"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="price-per-share">Price per Share (%)</label>
+                            <input type="number" id="price-per-share" placeholder="Cost for 1% ownership share"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="delivery-time">Expected Delivery Time</label>
+                            <input type="number" id="delivery-time" placeholder="Weeks until completion" required>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Submit For Approval</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Executor Dashboard Tab -->
+            <div class="content-area" id="executor">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Your Active Tasks</div>
+                    </div>
+
+                    <div class="order-item">
+                        <div class="order-thumbnail">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-title">Stock Analysis Dashboard</div>
+                            <div class="order-meta">
+                                <span><i class="fas fa-dollar-sign"></i> $4,200 payout</span>
+                                <span><i class="fas fa-clock"></i> Due in 14 days</span>
+                                <span><i class="fas fa-star"></i> 4.8 rating</span>
+                            </div>
+                            <div class="order-description">
+                                Build a dashboard that pulls in stock data from API and displays performance metrics
+                                with interactive charts and export functionality.
+                            </div>
+                            <div class="order-participation">
+                                <div class="progress-container">
+                                    <div class="progress-label">
+                                        <span>65% complete</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                                <div class="order-actions">
+                                    <button class="btn btn-primary btn-sm">Continue Work</button>
+                                    <button class="btn btn-outline btn-sm">Request Extension</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Portfolio Tab -->
+            <div class="content-area" id="portfolio">
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Active Shares</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$3.2K</div>
+                        <div class="stat-label">Total Invested</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$620</div>
+                        <div class="stat-label">Earned Revenue</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">19%</div>
+                        <div class="stat-label">Avg. ROI</div>
+                    </div>
+                </div>
+
+                <div class="nft-display">
+                    <h3>Your NFT Ownership Certificates</h3>
+                    <div class="nft-card">
+                        <div class="nft-image">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div class="nft-title">E-commerce Solution</div>
+                        <div class="nft-id">#ECO-2F7B42</div>
+                        <div class="nft-price">Owns 2.5% shares</div>
+                        <button class="btn btn-primary btn-sm">View Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Sharing Page -->
+        <div class="page-content" id="revenue">
+            <h1 class="main-title">Revenue Sharing</h1>
+            <p class="subtitle">Track your earnings from co-created digital products you've invested in.</p>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value">$1,850</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Products Earning</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$620</div>
+                    <div class="stat-label">Available to Withdraw</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">16.3%</div>
+                    <div class="stat-label">Avg. Monthly ROI</div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" data-tab="recent-earnings">Recent Earnings</div>
+                <div class="tab" data-tab="withdraw">Withdraw Funds</div>
+                <div class="tab" data-tab="projections">Projections</div>
+            </div>
+
+            <div class="content-area active" id="recent-earnings">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Your Recent Revenue</div>
+                    </div>
+
+                    <div class="revenue-item">
+                        <div>
+                            <div class="revenue-product">AI Content Generator (5%)</div>
+                            <div class="revenue-date">Today</div>
+                        </div>
+                        <div class="revenue-amount">+$42.50</div>
+                    </div>
+
+                    <div class="revenue-item">
+                        <div>
+                            <div class="revenue-product">JavaScript eBook (1%)</div>
+                            <div class="revenue-date">Yesterday</div>
+                        </div>
+                        <div class="revenue-amount">+$89.30</div>
+                    </div>
+
+                    <div class="revenue-item">
+                        <div>
+                            <div class="revenue-product">UX Design Templates (3%)</div>
+                            <div class="revenue-date">May 15, 2023</div>
+                        </div>
+                        <div class="revenue-amount">+$28.75</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area" id="withdraw">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Withdraw Your Earnings</div>
+                    </div>
+
+                    <form id="withdraw-form">
+                        <div class="form-group">
+                            <label for="withdraw-amount">Amount to Withdraw</label>
+                            <input type="number" id="withdraw-amount" placeholder="$0.00" max="620" min="10"
+                                step="0.01">
+                            <small>Available balance: $620.00</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="withdraw-method">Withdrawal Method</label>
+                            <select id="withdraw-method" required>
+                                <option value="">Select method</option>
+                                <option value="crypto">Cryptocurrency (USDC)</option>
+                                <option value="bank">Bank Transfer</option>
+                                <option value="paypal">PayPal</option>
+                            </select>
+                        </div>
+
+                        <div id="crypto-details" class="form-group" style="display: none;">
+                            <label for="wallet-address">Wallet Address</label>
+                            <input type="text" id="wallet-address"
+                                placeholder="Enter your cryptocurrency wallet address">
+                        </div>
+
+                        <div id="bank-details" class="form-group" style="display: none;">
+                            <div class="form-group">
+                                <label for="account-number">Account Number</label>
+                                <input type="text" id="account-number" placeholder="Enter your account number">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="routing-number">Routing Number</label>
+                                <input type="text" id="routing-number" placeholder="Enter your routing number">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Request Withdrawal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documentation Page -->
+        <div class="page-content" id="docs">
+            <h1 class="main-title">Documentation</h1>
+            <p class="subtitle">Learn how Co-Intent works and get the most out of our platform.</p>
+
+            <div class="doc-section">
+                <div class="doc-section-title">
+                    <i class="fas fa-question-circle"></i> Getting Started
+                </div>
+
+                <div class="doc-item">
+                    <div class="doc-item-title">
+                        <i class="fas fa-play-circle"></i> How It Works
+                    </div>
+                    <div class="doc-item-content">
+                        Co-Intent is a platform for collaborative digital creation. Group buyers pool resources to
+                        commission digital products, then share in future revenue from sales of those products through
+                        our buy-to-earn model.
+                    </div>
+                </div>
+
+                <div class="doc-item">
+                    <div class="doc-item-title">
+                        <i class="fas fa-wallet"></i> Connecting Your Wallet
+                    </div>
+                    <div class="doc-item-content">
+                        To participate in orders and receive revenue shares, you'll need to connect a compatible
+                        cryptocurrency wallet. We support MetaMask, WalletConnect, and other Ethereum-compatible
+                        wallets. Revenue is distributed in USDC stablecoin.
+                    </div>
+                </div>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title">
+                    <i class="fas fa-shopping-cart"></i> Participating in Orders
+                </div>
+
+                <div class="doc-item">
+                    <div class="doc-item-title">
+                        <i class="fas fa-search-dollar"></i> Finding Orders
+                    </div>
+                    <div class="doc-item-content">
+                        Browse available group orders in the Marketplace. Each order specifies the product being
+                        commissioned, total budget, minimum number of buyers needed, and share price (cost for 1%
+                        ownership stake).
+                    </div>
+                </div>
+
+                <div class="doc-item">
+                    <div class="doc-item-title">
+                        <i class="fas fa-hand-holding-usd"></i> Joining an Order
+                    </div>
+                    <div class="doc-item-content">
+                        Once you find an order you want to join, click "Join Group" and specify your desired
+                        contribution amount. You'll receive an NFT certificate representing your ownership share, which
+                        entitles you to a percentage of future revenue.
+                    </div>
+                </div>
+            </div>
+
+            <div class="doc-section">
+                <div class="doc-section-title">
+                    <i class="fas fa-chart-line"></i> Revenue Sharing
+                </div>
+
+                <div class="doc-item">
+                    <div class="doc-item-title">
+                        <i class="fas fa-money-bill-wave"></i> How Earnings Work
+                    </div>
+                    <div class="doc-item-content">
+                        When a product you've invested in generates sales, revenue is automatically distributed
+                        proportionally to all shareholders. 70% of each sale goes to shareholders, 20% to the platform,
+                        and 10% to the executor who created the product.
+                    </div>
+                </div>
+
+                <div class="doc-item">
+                    <div class="doc-item-title">
+                        <i class="fas fa-file-signature"></i> Smart Contracts
+                    </div>
+                    <div class="doc-item-content">
+                        All orders are managed by immutable smart contracts on the Ethereum blockchain. These guarantee
+                        transparent and automatic execution of revenue distribution according to the agreed terms.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support Page -->
+        <div class="page-content" id="support">
+            <h1 class="main-title">Support Center</h1>
+            <p class="subtitle">Need help? We're here for you.</p>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Frequently Asked Questions</div>
+                </div>
+
+                <div class="doc-item">
+                    <div class="doc-item-title">
+                        <i class="fas fa-question"></i> How do I contact support?
+                    </div>
+                    <div class="doc-item-content">
+                        You can reach our support team by emailing support@co-intent.com or through the live chat
+                        feature in the bottom right corner of the screen (available 9AM-5PM EST).
+                    </div>
+                </div>
+
+                <div class="doc-item">
+                    <div class="doc-item-title">
+                        <i class="fas fa-clock"></i> How long do withdrawals take?
+                    </div>
+                    <div class="doc-item-content">
+                        Crypto withdrawals are processed within 24 hours. Bank transfers typically take 3-5 business
+                        days. Some verification may be required for larger withdrawals for security purposes.
+                    </div>
+                </div>
+
+                <div class="doc-item">
+                    <div class="doc-item-title">
+                        <i class="fas fa-user-shield"></i> Is my investment safe?
+                    </div>
+                    <div class="doc-item-content">
+                        While we take every precaution to vet orders, like any investment platform there is risk
+                        involved. We recommend diversifying across multiple orders and carefully reviewing all project
+                        details before committing funds.
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 30px;">
+                    <div class="card-header">
+                        <div class="card-title">Submit a Support Request</div>
+                    </div>
+
+                    <form id="support-form">
+                        <div class="form-group">
+                            <label for="support-subject">Subject</label>
+                            <input type="text" id="support-subject" placeholder="Briefly describe your issue" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="support-message">Message</label>
+                            <textarea id="support-message" rows="5"
+                                placeholder="Please provide as much detail as possible..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join Group Modal -->
+    <div class="modal" id="join-group-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Join Group Order</div>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-row">
+                    <div class="modal-row-label">Product:</div>
+                    <div class="modal-row-value" id="modal-product-title"></div>
+                </div>
+                <div class="modal-row">
+                    <div class="modal-row-label">Total Budget:</div>
+                    <div class="modal-row-value" id="modal-total-budget"></div>
+                </div>
+                <div class="modal-row">
+                    <div class="modal-row-label">Your Cost:</div>
+                    <div class="modal-row-value" id="modal-your-cost"></div>
+                </div>
+                <div class="modal-row">
+                    <div class="modal-row-label">Min Buyers Needed:</div>
+                    <div class="modal-row-value" id="modal-min-buyers"></div>
+                </div>
+                <div class="modal-row">
+                    <div class="modal-row-label">Current Buyers:</div>
+                    <div class="modal-row-value" id="modal-current-buyers"></div>
+                </div>
+
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="modal-contribution">Your Contribution</label>
+                    <input type="number" id="modal-contribution" placeholder="Enter amount in USD">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline modal-close-btn">Cancel</button>
+                <button class="btn btn-primary" id="confirm-join">Confirm & Pay</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Submitted Modal -->
+    <div class="modal" id="order-submitted-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Order Submitted</div>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin: 20px 0 30px;">
+                    <i class="fas fa-check-circle"
+                        style="font-size: 60px; color: var(--success); margin-bottom: 15px;"></i>
+                    <h3 style="margin-bottom: 10px;">Thank You!</h3>
+                    <p>Your order has been submitted for review. Our team will evaluate your request and get back to you
+                        within 2 business days.</p>
+                    <p>You'll receive a confirmation email with next steps shortly.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary modal-close-btn">Got It!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu');
+        const mainNav = document.getElementById('main-nav');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mainNav.style.display = mainNav.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Navigation functionality between pages
+        document.querySelectorAll('.nav-link').forEach(menuItem => {
+            menuItem.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // Remove active class from all menu items
+                document.querySelectorAll('.nav-link').forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // Add active class to clicked menu item
+                menuItem.classList.add('active');
+
+                // Hide all page contents
+                document.querySelectorAll('.page-content').forEach(page => {
+                    page.classList.remove('active');
+                });
+
+                // Show selected page content
+                const page = menuItem.getAttribute('data-page');
+                document.getElementById(page).classList.add('active');
+
+                // Hide mobile menu if open
+                if (window.innerWidth <= 768) {
+                    mainNav.style.display = 'none';
+                }
+
+                // Reset scroll to top
+                window.scrollTo(0, 0);
+            });
+        });
+
+        // Tab switching functionality within pages
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabContainer = tab.closest('.tabs');
+
+                // Remove active class from all tabs in this container
+                tabContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+                // Add active class to clicked tab
+                tab.classList.add('active');
+
+                const tabId = tab.getAttribute('data-tab');
+                const parentPage = tab.closest('.page-content').id;
+
+                // Hide all content areas in this page
+                document.querySelectorAll(`#${parentPage} .content-area`).forEach(c => c.classList.remove('active'));
+
+                // Show corresponding content area
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Modal functionality for join group buttons
+        const orderData = {
+            'ecom-saas': {
+                title: 'Custom E-commerce Solution for Small Businesses',
+                totalBudget: '$15,000',
+                yourCost: '$375 (2.5% share)',
+                minBuyers: 30,
+                currentBuyers: 26
+            },
+            'web-dev-course': {
+                title: 'Complete Web Development Bootcamp (2023 Edition)',
+                totalBudget: '$8,000',
+                yourCost: '$80 (1% share)',
+                minBuyers: 100,
+                currentBuyers: 80
+            },
+            'blockchain-report': {
+                title: '2023 Blockchain Adoption in Supply Chain',
+                totalBudget: '$5,000',
+                yourCost: '$200 (4% share)',
+                minBuyers: 25,
+                currentBuyers: 7
+            }
+        };
+
+        document.querySelectorAll('.btn-join-group').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const orderId = btn.getAttribute('data-order');
+                const order = orderData[orderId];
+
+                document.getElementById('modal-product-title').textContent = order.title;
+                document.getElementById('modal-total-budget').textContent = order.totalBudget;
+                document.getElementById('modal-your-cost').textContent = order.yourCost;
+                document.getElementById('modal-min-buyers').textContent = order.minBuyers;
+                document.getElementById('modal-current-buyers').textContent = order.currentBuyers;
+
+                document.getElementById('join-group-modal').style.display = 'flex';
+            });
+        });
+
+        // Close modal buttons
+        document.querySelectorAll('.modal-close, .modal-close-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            });
+        });
+
+        // Confirm join group
+        document.getElementById('confirm-join').addEventListener('click', () => {
+            document.getElementById('join-group-modal').style.display = 'none';
+            setTimeout(() => {
+                alert('Payment processed successfully! You are now part of this group order.');
+            }, 300);
+        });
+
+        // Form submissions
+        document.getElementById('order-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            document.getElementById('order-submitted-modal').style.display = 'flex';
+            document.getElementById('order-form').reset();
+        });
+
+        document.getElementById('withdraw-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Withdrawal request submitted! You will receive your funds within 3-5 business days.');
+            document.getElementById('withdraw-form').reset();
+        });
+
+        document.getElementById('support-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Thank you for contacting support! We will respond to your inquiry within 24 hours.');
+            document.getElementById('support-form').reset();
+        });
+
+        // Show/hide withdrawal method details
+        document.getElementById('withdraw-method').addEventListener('change', (e) => {
+            document.getElementById('crypto-details').style.display = 'none';
+            document.getElementById('bank-details').style.display = 'none';
+
+            if (e.target.value === 'crypto') {
+                document.getElementById('crypto-details').style.display = 'block';
+            } else if (e.target.value === 'bank') {
+                document.getElementById('bank-details').style.display = 'block';
+            }
+        });
+
+        // Initialize progress bars animation
+        setTimeout(() => {
+            document.querySelectorAll('.progress-fill').forEach(bar => {
+                bar.style.width = bar.style.width; // Triggers the animation
+            });
+        }, 500);
+
+        // Handle responsive behavior
+        function handleResponsive() {
+            if (window.innerWidth > 768) {
+                mainNav.style.display = '';
+            }
+        }
+
+        window.addEventListener('resize', handleResponsive);
+        handleResponsive(); // Run on initial load
+    </script>
+    </div>
+</body>
+
+</html>
