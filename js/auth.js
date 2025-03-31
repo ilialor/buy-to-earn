@@ -379,16 +379,20 @@ function updateUIOnAuth(user) {
 // Sign in with email and password
 async function signInWithEmail(email, password) {
   if (!window.auth) {
+    console.error('Система авторизации недоступна');
     showNotification('Система авторизации не инициализирована', 'error');
     return null;
   }
   
   try {
+    console.log('Попытка входа через email:', email);
     const userCredential = await window.auth.signInWithEmailAndPassword(email, password);
+    console.log('Успешный вход:', userCredential);
     showNotification('Успешный вход', 'success');
     closeModal('auth-modal');
     return userCredential.user;
   } catch (error) {
+    console.error('Ошибка входа:', error);
     const errorMessage = getAuthErrorMessage(error.code);
     showNotification(errorMessage, 'error');
     throw error;
@@ -397,33 +401,52 @@ async function signInWithEmail(email, password) {
 
 // Sign up with email and password
 async function signUpWithEmail(email, password, name) {
-  if (!window.auth || !window.db) {
+  if (!window.auth) {
+    console.error('Система авторизации недоступна');
     showNotification('Система авторизации не инициализирована', 'error');
     return null;
   }
   
   try {
+    console.log('Попытка регистрации через email:', email);
     const userCredential = await window.auth.createUserWithEmailAndPassword(email, password);
+    console.log('Успешная регистрация:', userCredential);
     const user = userCredential.user;
     
     // Update user profile
     if (user) {
-      await user.updateProfile({
-        displayName: name
-      });
+      try {
+        await user.updateProfile({
+          displayName: name
+        });
+        console.log('Профиль пользователя обновлен');
+      } catch (profileError) {
+        console.error('Ошибка обновления профиля:', profileError);
+        // Продолжаем выполнение, даже если обновление профиля не удалось
+      }
       
       // Create user document in Firestore
-      try {
-        await window.db.collection('users').doc(user.uid).set({
-          name: name,
-          email: email,
-          createdAt: window.firebase ? firebase.firestore.FieldValue.serverTimestamp() : new Date(),
-          role: 'user',
-          walletBalance: 0
-        });
-      } catch (dbError) {
-        console.error('Error creating user document', dbError);
-        // Продолжаем даже если документ не создан
+      if (window.db) {
+        try {
+          console.log('Создание документа пользователя');
+          const userData = {
+            name: name,
+            email: email,
+            createdAt: window.firebase && window.firebase.firestore ? 
+              window.firebase.firestore.FieldValue.serverTimestamp() : 
+              new Date(),
+            role: 'user',
+            walletBalance: 0
+          };
+          
+          await window.db.collection('users').doc(user.uid).set(userData);
+          console.log('Документ пользователя создан');
+        } catch (dbError) {
+          console.error('Ошибка создания документа пользователя:', dbError);
+          // Продолжаем даже если документ не создан
+        }
+      } else {
+        console.warn('Firestore недоступен для создания документа пользователя');
       }
     }
     
@@ -431,6 +454,7 @@ async function signUpWithEmail(email, password, name) {
     closeModal('auth-modal');
     return user;
   } catch (error) {
+    console.error('Ошибка регистрации:', error);
     const errorMessage = getAuthErrorMessage(error.code);
     showNotification(errorMessage, 'error');
     throw error;
@@ -542,6 +566,8 @@ function getAuthErrorMessage(errorCode) {
     'auth/too-many-requests': 'Слишком много попыток входа. Попробуйте позже',
     'auth/popup-closed-by-user': 'Окно авторизации было закрыто',
     'auth/no-current-user': 'Нет активного пользователя',
+    'auth/configuration-not-found': 'Ошибка конфигурации авторизации',
+    'auth/network-request-failed': 'Ошибка сети. Проверьте подключение к интернету',
     'default': 'Произошла ошибка при авторизации'
   };
   

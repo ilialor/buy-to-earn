@@ -577,7 +577,7 @@ const localFirebaseUtils = {
   }
 };
 
-// Инициализация локальной авторизации, если Firebase недоступен
+// Инициализация локальной авторизации
 function initLocalAuth() {
   console.log('Инициализация локальной системы авторизации');
   
@@ -585,12 +585,13 @@ function initLocalAuth() {
   const localAuth = new LocalAuth();
   const localFirestore = new LocalFirestore();
   const localAnalytics = new LocalAnalytics();
+  const localGoogleProvider = new GoogleAuthProvider();
   
   // Экспортируем в window
   window.auth = localAuth;
   window.db = localFirestore;
   window.analytics = localAnalytics;
-  window.googleProvider = new GoogleAuthProvider();
+  window.googleProvider = localGoogleProvider;
   window.firebase = {
     auth: () => localAuth,
     firestore: () => localFirestore,
@@ -598,34 +599,18 @@ function initLocalAuth() {
     ...localFirebaseUtils
   };
   
-  console.log('Локальная система авторизации инициализирована');
+  console.log('Локальная система авторизации инициализирована успешно');
+  console.log('Вы можете зарегистрироваться и войти с любыми данными - они будут сохранены в localStorage');
 }
 
-// Пытаемся использовать Firebase, если он доступен, иначе - локальную авторизацию
-function checkAndInitAuth() {
-  // Проверяем, есть ли ошибка с Firebase
-  const checkFirebase = setTimeout(() => {
-    console.log('Firebase не инициализирован, используем локальную авторизацию');
+// Запускаем локальную авторизацию немедленно
+initLocalAuth();
+
+// Также запускаем при загрузке DOM для гарантии инициализации
+document.addEventListener('DOMContentLoaded', function() {
+  // Проверяем, существуют ли объекты auth и db
+  if (!window.auth || !window.db) {
+    console.log('Перезапуск локальной системы авторизации при загрузке DOM');
     initLocalAuth();
-  }, 2000);
-  
-  // Проверяем Firebase
-  if (typeof firebase !== 'undefined') {
-    try {
-      const testAuth = firebase.auth();
-      if (testAuth) {
-        console.log('Firebase Auth доступен, используем его');
-        clearTimeout(checkFirebase);
-      } else {
-        throw new Error('Firebase Auth не доступен');
-      }
-    } catch (e) {
-      console.error('Ошибка при проверке Firebase Auth:', e);
-      clearTimeout(checkFirebase);
-      initLocalAuth();
-    }
   }
-}
-
-// Запускаем проверку при загрузке документа
-document.addEventListener('DOMContentLoaded', checkAndInitAuth); 
+}); 
