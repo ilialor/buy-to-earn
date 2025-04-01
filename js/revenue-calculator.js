@@ -68,17 +68,19 @@ class RevenueCalculator {
             buyer: 0,
             prepayersCount: 0,
             paidBackCount: 0,
-            // Добавляем поля для финансовых показателей
             paybackPoint: null,
             totalRevenueAtPayback: 0,
             creatorRevenueAtPayback: 0,
-            platformRevenueAtPayback: 0
+            platformRevenueAtPayback: 0,
+            paybackGoal: 0,
+            actualInitialInvestment: 0
         };
     }
 
     // Calculate derived values
     const initialInvestment = parseFloat(this.initialInvestment);
     const numPrepayers = this.calculateNumPrepayers(tokenPrice);
+    const paybackGoal = tokenPrice * this.paybackRatio; // Цель окупаемости для каждого токена
 
     if (totalSales < numPrepayers) {
         return {
@@ -88,11 +90,12 @@ class RevenueCalculator {
             buyer: 0,
             prepayersCount: numPrepayers,
             paidBackCount: 0,
-            // Добавляем поля для финансовых показателей
             paybackPoint: null,
             totalRevenueAtPayback: 0,
             creatorRevenueAtPayback: 0,
-            platformRevenueAtPayback: 0
+            platformRevenueAtPayback: 0,
+            paybackGoal: paybackGoal,
+            actualInitialInvestment: initialInvestment
         };
     }
 
@@ -101,14 +104,6 @@ class RevenueCalculator {
     const platformSharePercent = parseFloat(this.platformShare);
     const promotionSharePercent = parseFloat(this.promotionShare);
     const buyersSharePercent = 100 - creatorSharePercent - platformSharePercent - promotionSharePercent;
-    
-    // Payback model parameters
-    const paybackRatio = parseFloat(this.paybackRatio);
-    const nonPaybackPoolSharePercent = parseFloat(this.nonPaybackPoolSharePercent);
-    const sharedPoolSharePercent = 100 - nonPaybackPoolSharePercent;
-    
-    // Goal to reach for buyers
-    const paybackGoal = tokenPrice * paybackRatio;
     
     // Initialize all balances
     let creatorRevenue = initialInvestment; // Creator gets full prepayment
@@ -155,21 +150,23 @@ class RevenueCalculator {
             }
             
             // 2. Calculate the two pools
-            const nonPaybackPoolShare = buyersShare * (nonPaybackPoolSharePercent / 100);
-            const sharedPoolShare = buyersShare * (sharedPoolSharePercent / 100);
+            const nonPaybackPoolShare = buyersShare * (this.nonPaybackPoolSharePercent / 100);
+            const sharedPoolShare = buyersShare * ((100 - this.nonPaybackPoolSharePercent) / 100);
             
             // 3. Calculate per-token shares
             const nonPaybackSharePerToken = notPaidBackCount > 0 ? nonPaybackPoolShare / notPaidBackCount : 0;
             const sharedSharePerToken = sharedPoolShare / numTokensInDistribution;
             
-            // 4. Distribute earnings
-            paidBackCount = 0; // Reset counter for this iteration
+            // 4. Distribute earnings and count paid back tokens
+            paidBackCount = 0;
             for (let i = 1; i <= numTokensInDistribution; i++) {
+                const wasPaidBackBefore = tokenEarnings[i] >= paybackGoal;
+                
                 // Every token gets a share from the shared pool
                 let earning = sharedSharePerToken;
                 
                 // Tokens that haven't reached payback also get a share from the non-payback pool
-                if (tokenEarnings[i] < paybackGoal) {
+                if (!wasPaidBackBefore) {
                     earning += nonPaybackSharePerToken;
                 }
                 
@@ -202,11 +199,12 @@ class RevenueCalculator {
         buyer: buyerRevenue,
         prepayersCount: numPrepayers,
         paidBackCount: paidBackCount,
-        // Добавляем информацию о моменте окупаемости
         paybackPoint: paybackPoint,
         totalRevenueAtPayback: totalRevenueAtPayback,
         creatorRevenueAtPayback: creatorRevenueAtPayback,
-        platformRevenueAtPayback: platformRevenueAtPayback
+        platformRevenueAtPayback: platformRevenueAtPayback,
+        paybackGoal: paybackGoal,
+        actualInitialInvestment: initialInvestment
     };
   }
 
@@ -275,7 +273,7 @@ class RevenueCalculator {
               <div class="form-group">
                     <label for="non-payback-pool-share">Приоритет "Не Окупившихся" (%)</label>
                     <input type="number" id="non-payback-pool-share" value="${this.nonPaybackPoolSharePercent}" min="0" max="100" step="1">
-                    <div class="form-hint">% от доли покупателей, идущий только им</div>
+                    <div class="form-hint">% от Доли покупателей, идущий только им</div>
                   </div>
             </div>
           </div>
@@ -301,109 +299,194 @@ class RevenueCalculator {
           <div class="results-section">
             <h4>Результат: Накопленный Доход</h4>
              <div id="calculation-error" class="error-message" style="display: none;"></div>
-            <div class="distribution-cards results-accrued">
-               <div class="distribution-card creator">
-                 <div class="card-label">Создатель</div>
-                 <div class="card-amount" id="acc-creator-revenue">0</div>
-                 <div class="card-detail" id="creator-revenue-detail">(0 + 0)</div>
+            
+            <!-- Доход участников (карточки) -->
+            <div class="distribution-cards">
+              <div class="distribution-card creator">
+                <div class="card-label">Создатель</div>
+                <div class="card-amount" id="acc-creator-revenue">0</div>
+                <div class="card-detail" id="creator-revenue-detail">(0 + 0)</div>
+                <div class="card-percentage">100% начальных инвестиций + доля от продаж</div>
               </div>
               <div class="distribution-card platform">
-                 <div class="card-label">Платформа</div>
-                 <div class="card-amount" id="acc-platform-revenue">0</div>
+                <div class="card-label">Платформа</div>
+                <div class="card-amount" id="acc-platform-revenue">0</div>
+                <div class="card-percentage" id="platform-percentage">0% от общего дохода</div>
+                <div class="card-detail">Только от продаж после предоплаты</div>
               </div>
               <div class="distribution-card promotion">
-                 <div class="card-label">Продвижение</div>
-                 <div class="card-amount" id="acc-promotion-revenue">0</div>
+                <div class="card-label">Продвижение</div>
+                <div class="card-amount" id="acc-promotion-revenue">0</div>
               </div>
               <div class="distribution-card buyers">
-                 <div class="card-label">Покупатели (Распределено)</div>
-                 <div class="card-amount" id="acc-total-buyers-revenue">0</div>
-                 <div class="card-detail">(Доход от продаж после Заказчиков)</div>
+                <div class="card-label">Покупатели (Распределено)</div>
+                <div class="card-amount" id="acc-total-buyers-revenue">0</div>
+                <div class="card-detail">Доход от продаж после Заказчиков</div>
               </div>
             </div>
 
-            <div class="token-revenue-card your-token-card-accrued">
-              <div class="card-header">
-                <i class="fas fa-coins"></i>
-                <h5>Накопленный Доход Токена #<span id="your-token-number-display">${defaultYourToken}</span></h5>
+            <!-- Визуализация выгодности для инвесторов -->
+            <div class="investor-benefits">
+              <h4>Выгодность для инвесторов</h4>
+              <div class="benefits-grid">
+                <div class="benefit-card early-investor">
+                  <div class="benefit-title">Ранний инвестор</div>
+                  <div class="benefit-value" id="early-investor-roi">ROI: 0%</div>
+                  <div class="benefit-description">Инвестиция окупится через <span id="early-investor-payback">0</span> продаж</div>
+                  <div class="benefit-multiplier">При <span id="early-investor-mult">2x</span> окупаемости</div>
+                </div>
+                <div class="benefit-card mid-investor">
+                  <div class="benefit-title">Средний инвестор</div>
+                  <div class="benefit-value" id="mid-investor-roi">ROI: 0%</div>
+                  <div class="benefit-description">Инвестиция окупится через <span id="mid-investor-payback">0</span> продаж</div>
+                  <div class="benefit-multiplier">При <span id="mid-investor-mult">2x</span> окупаемости</div>
+                </div>
+                <div class="benefit-card late-investor">
+                  <div class="benefit-title">Поздний инвестор</div>
+                  <div class="benefit-value" id="late-investor-roi">ROI: 0%</div>
+                  <div class="benefit-description">Инвестиция окупится через <span id="late-investor-payback">0</span> продаж</div>
+                  <div class="benefit-multiplier">При <span id="late-investor-mult">2x</span> окупаемости</div>
+                </div>
               </div>
-              <div class="card-body">
-                  <div class="revenue-amount" id="acc-your-token-revenue">0</div>
-                <div class="revenue-details">
-                  <div class="detail">
-                          <span class="label">Цель окупаемости (<span id="payback-ratio-display">${this.paybackRatio}</span>x):</span>
-                          <span class="value" id="your-token-payback-goal">0</span>
+            </div>
+
+            <!-- Доход для вашего токена -->
+            <div class="token-revenue-section">
+              <h4>Ваш токен #<span id="your-token-number-display">${defaultYourToken}</span></h4>
+              <div class="token-revenue-card">
+                <div class="token-revenue-amount">
+                  <div class="amount-label">Накопленный доход:</div>
+                  <div class="amount-value" id="acc-your-token-revenue">0</div>
+                </div>
+                <div class="token-revenue-metrics">
+                  <div class="metric payback-goal">
+                    <div class="metric-label">Цель окупаемости (<span id="payback-ratio-display">${this.paybackRatio}</span>x):</div>
+                    <div class="metric-value" id="your-token-payback-goal">0</div>
                   </div>
-                  <div class="detail">
-                          <span class="label">Достиг цели?</span>
-                          <span class="value" id="your-token-payback-status">Нет</span>
+                  <div class="metric payback-status">
+                    <div class="metric-label">Достиг цели?</div>
+                    <div class="metric-value" id="your-token-payback-status">Нет</div>
                   </div>
-                  <div class="detail">
-                          <span class="label">Точно окупившихся токенов (всего):</span>
-                          <span class="value" id="final-paid-back-estimate">0</span>
-                      </div>
+                  <div class="metric roi">
+                    <div class="metric-label">ROI:</div>
+                    <div class="metric-value" id="your-token-roi">0%</div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Общая статистика -->
+            <div class="overall-stats">
+              <h4>Общая статистика</h4>
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <div class="stat-label">Общий доход:</div>
+                  <div class="stat-value" id="total-revenue">0</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-label">Предоплаченных токенов:</div>
+                  <div class="stat-value" id="num-prepayers-display">0</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-label">Токенов, достигших окупаемости:</div>
+                  <div class="stat-value" id="final-paid-back-estimate">0</div>
+                  <div class="stat-percentage" id="paid-back-percentage">0%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Информация о моменте окупаемости -->
+            <div id="payback-info" class="payback-metrics" style="display:none;">
+              <h4>Информация о моменте окупаемости</h4>
+              <div class="payback-grid">
+                <div class="payback-item">
+                  <div class="payback-label">Продажа №:</div>
+                  <div class="payback-value" id="payback-sale-number">0</div>
+                </div>
+                <div class="payback-item">
+                  <div class="payback-label">Общий доход на момент окупаемости:</div>
+                  <div class="payback-value" id="payback-total-revenue">0</div>
+                </div>
+                <div class="payback-item">
+                  <div class="payback-label">Автору:</div>
+                  <div class="payback-value" id="payback-creator-revenue">0</div>
+                  <div class="payback-detail" id="payback-creator-detail"></div>
+                </div>
+                <div class="payback-item">
+                  <div class="payback-label">Платформе:</div>
+                  <div class="payback-value" id="payback-platform-revenue">0</div>
+                  <div class="payback-percentage" id="payback-platform-percentage">0%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Графическое сравнение моделей распределения -->
+            <div class="distribution-comparison">
+              <h4>Сравнение моделей распределения</h4>
+              <div class="comparison-tabs">
+                <div class="tab active" data-tab="high-priority">Высокий приоритет неокупившихся (95%)</div>
+                <div class="tab" data-tab="balanced">Сбалансированный (80%)</div>
+                <div class="tab" data-tab="equal">Равноправный (60%)</div>
+              </div>
+              <div class="comparison-content active" id="high-priority-content">
+                <div class="comparison-description">
+                  <p><strong>Высокий приоритет (95%):</strong> Ранние инвесторы окупаются очень быстро, поздние инвесторы - значительно медленнее. Создает "волны окупаемости".</p>
+                </div>
+                <div class="comparison-visualization">
+                  <div class="token-group early">
+                    <div class="token-label">Токен #1-100:</div>
+                    <div class="payback-bar" style="width: 20%;">1x: ~400 продаж</div>
+                  </div>
+                  <div class="token-group mid">
+                    <div class="token-label">Токен #500:</div>
+                    <div class="payback-bar" style="width: 40%;">1x: ~1200 продаж</div>
+                  </div>
+                  <div class="token-group late">
+                    <div class="token-label">Токен #1000:</div>
+                    <div class="payback-bar" style="width: 80%;">1x: ~2500 продаж</div>
+                  </div>
+                </div>
+              </div>
+              <div class="comparison-content" id="balanced-content">
+                <div class="comparison-description">
+                  <p><strong>Сбалансированный (80%):</strong> Умеренное преимущество для ранних инвесторов, разумные сроки окупаемости для поздних. Оптимальный баланс интересов.</p>
+                </div>
+                <div class="comparison-visualization">
+                  <div class="token-group early">
+                    <div class="token-label">Токен #1-100:</div>
+                    <div class="payback-bar" style="width: 40%;">1x: ~800 продаж</div>
+                  </div>
+                  <div class="token-group mid">
+                    <div class="token-label">Токен #500:</div>
+                    <div class="payback-bar" style="width: 50%;">1x: ~1000 продаж</div>
+                  </div>
+                  <div class="token-group late">
+                    <div class="token-label">Токен #1000:</div>
+                    <div class="payback-bar" style="width: 60%;">1x: ~1200 продаж</div>
+                  </div>
+                </div>
+              </div>
+              <div class="comparison-content" id="equal-content">
+                <div class="comparison-description">
+                  <p><strong>Равноправный (60%):</strong> Все инвесторы окупаются примерно одновременно, независимо от номера токена. Эгалитарный подход, но без преимуществ для ранних инвесторов.</p>
+                </div>
+                <div class="comparison-visualization">
+                  <div class="token-group early">
+                    <div class="token-label">Токен #1-100:</div>
+                    <div class="payback-bar" style="width: 60%;">1x: ~4200 продаж</div>
+                  </div>
+                  <div class="token-group mid">
+                    <div class="token-label">Токен #500:</div>
+                    <div class="payback-bar" style="width: 60%;">1x: ~4200 продаж</div>
+                  </div>
+                  <div class="token-group late">
+                    <div class="token-label">Токен #1000:</div>
+                    <div class="payback-bar" style="width: 60%;">1x: ~4200 продаж</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-
-          <div class="results-container">
-                <h3>Результаты расчета</h3>
-                <div class="results-grid">
-                    <div class="result-group">
-                        <h4>Накопленный доход</h4>
-                        <div class="result-row">
-                            <span>Создатель:</span>
-                            <span id="acc-creator-revenue">0</span>
-                            <span id="creator-revenue-detail" class="detail-text"></span>
-                        </div>
-                        <div class="result-row">
-                            <span>Платформа:</span>
-                            <span id="acc-platform-revenue">0</span>
-                        </div>
-                        <div class="result-row">
-                            <span>Продвижение:</span>
-                            <span id="acc-promotion-revenue">0</span>
-                        </div>
-                        <div class="result-row">
-                            <span>Всего распределено покупателям:</span>
-                            <span id="acc-total-buyers-revenue">0</span>
-                        </div>
-                    </div>
-                    
-                    <div class="result-group">
-                        <h4>Статус вашего токена #<span id="your-token-display">0</span></h4>
-                        <div class="result-row">
-                            <span>Накопленный доход:</span>
-                            <span id="acc-your-token-revenue">0</span>
-                        </div>
-                        <div class="result-row">
-                            <span>Цель окупаемости:</span>
-                            <span id="your-token-payback-goal">0</span>
-                        </div>
-                        <div class="result-row">
-                            <span>Цель достигнута:</span>
-                            <span id="your-token-payback-status">Нет</span>
-                        </div>
-                    </div>
-                    
-                    <div class="result-group">
-                        <h4>Общая статистика</h4>
-                        <div class="result-row">
-                            <span>Предоплаченных токенов:</span>
-                            <span id="num-prepayers-display">0</span>
-                        </div>
-                        <div class="result-row">
-                            <span>Токенов достигших окупаемости:</span>
-                            <span id="final-paid-back-estimate">0</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Добавляем новый блок для отображения финансовых показателей в момент окупаемости -->
-                <div id="payback-info" class="payback-metrics" style="display:none; margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
-                </div>
-            </div>
         </div>
       </div>
     `;
@@ -530,7 +613,7 @@ class RevenueCalculator {
       // Check for errors returned from calculation function
       if (results.error) {
           this.showError(errorDiv, `Ошибка расчета: ${results.error}`);
-          this.clearResults(results.numPrepayers, tokenPrice); // Use numPrepayers from results if available
+          this.clearResults(results.numPrepayers, tokenPrice);
           return;
       }
 
@@ -544,28 +627,94 @@ class RevenueCalculator {
       document.getElementById('your-token-payback-goal').textContent = formatNumber(results.paybackGoal);
       document.getElementById('final-paid-back-estimate').textContent = results.paidBackCount;
       
+      // Обновляем статус окупаемости
       const achievedPayback = results.paybackGoal > 0 && results.buyer >= results.paybackGoal;
-      document.getElementById('your-token-payback-status').textContent = achievedPayback ? 'Да' : 'Нет';
       const statusElement = document.getElementById('your-token-payback-status');
+      statusElement.textContent = achievedPayback ? 'Да' : 'Нет';
       statusElement.style.color = achievedPayback ? '#28a745' : '#dc3545'; 
       statusElement.style.fontWeight = 'bold';
 
-      // Update results fields
-      document.getElementById('total-creator-revenue').textContent = this.formatCurrency(results.creator);
-      document.getElementById('total-platform-revenue').textContent = this.formatCurrency(results.platform);
-      document.getElementById('total-promotion-revenue').textContent = this.formatCurrency(results.promotion);
-      document.getElementById('total-buyer-revenue').textContent = this.formatCurrency(results.buyer);
-      document.getElementById('num-paid-back').textContent = results.paidBackCount;
+      // Calculate total revenue and platform percentage of total
+      const totalRevenue = results.actualInitialInvestment + (currentTotalSales - results.prepayersCount) * tokenPrice;
+      const platformPercentageOfTotal = totalRevenue > 0 ? (results.platform / totalRevenue * 100).toFixed(2) : 0;
       
+      // Update platform percentage display
+      const platformPercentageElement = document.getElementById('platform-percentage');
+      if (platformPercentageElement) {
+        platformPercentageElement.textContent = `${platformPercentageOfTotal}% от общего дохода`;
+        platformPercentageElement.title = `Платформа получает ${this.platformShare}% только от продаж после предоплаты`;
+      }
+
+      // Update total revenue
+      const totalRevenueElement = document.getElementById('total-revenue');
+      if (totalRevenueElement) {
+        totalRevenueElement.textContent = formatNumber(totalRevenue);
+      }
+      
+      // Calculate percentage of paid back tokens
+      const paidBackPercentage = currentTotalSales > 0 ? (results.paidBackCount / currentTotalSales * 100).toFixed(2) : 0;
+      const paidBackPercentageElement = document.getElementById('paid-back-percentage');
+      if (paidBackPercentageElement) {
+        paidBackPercentageElement.textContent = `(${paidBackPercentage}%)`;
+      }
+      
+      // Update token numbers display
+      const yourTokenDisplay = document.getElementById('your-token-number-display');
+      if (yourTokenDisplay) {
+        yourTokenDisplay.textContent = currentYourToken;
+      }
+      
+      const numPrepayersDisplay = document.getElementById('num-prepayers-display');
+      if (numPrepayersDisplay) {
+        numPrepayersDisplay.textContent = results.prepayersCount;
+      }
+      
+      // Calculate ROI for the current token
+      const roi = tokenPrice > 0 ? ((results.buyer / tokenPrice) * 100 - 100).toFixed(2) : 0;
+      const roiElement = document.getElementById('your-token-roi');
+      if (roiElement) {
+        roiElement.textContent = `${roi}%`;
+        roiElement.style.color = roi >= 0 ? '#28a745' : '#dc3545';
+      }
+      
+      // Update investor benefits section with corrected payback goal
+      this.updateInvestorBenefitsSection(tokenPrice, results.prepayersCount, currentTotalSales, results.paybackGoal);
+      
+      // Initialize the comparison tabs
+      this.initComparisonTabs();
+
       // Обновляем информацию о моменте окупаемости
       const paybackInfoDiv = document.getElementById('payback-info');
       if (results.paybackPoint) {
+          // Calculate financials at payback point
+          const paybackTotalRevenue = results.totalRevenueAtPayback;
+          const paybackCreatorRevenue = results.creatorRevenueAtPayback;
+          const paybackPlatformRevenue = results.platformRevenueAtPayback;
+          const paybackPlatformPercentage = paybackTotalRevenue > 0 ? (paybackPlatformRevenue / paybackTotalRevenue * 100).toFixed(2) : 0;
+          
+          // Update the payback info div with details
           paybackInfoDiv.innerHTML = `
-              <h4>Информация о достижении окупаемости</h4>
-              <p>Токен #${currentYourToken} достиг ${this.paybackRatio}x окупаемости на продаже #${results.paybackPoint}</p>
-              <p>Всего собрано на момент окупаемости: ${this.formatCurrency(results.totalRevenueAtPayback)}</p>
-              <p>Выплачено автору: ${this.formatCurrency(results.creatorRevenueAtPayback)}</p>
-              <p>Выплачено платформе: ${this.formatCurrency(results.platformRevenueAtPayback)}</p>
+              <h4>Информация о моменте окупаемости токена #${currentYourToken}</h4>
+              <div class="payback-grid">
+                <div class="payback-item">
+                  <div class="payback-label">Номер продажи:</div>
+                  <div class="payback-value">#${results.paybackPoint}</div>
+                </div>
+                <div class="payback-item">
+                  <div class="payback-label">Общий доход на момент окупаемости:</div>
+                  <div class="payback-value">${formatNumber(paybackTotalRevenue)}</div>
+                </div>
+                <div class="payback-item">
+                  <div class="payback-label">Доход автора:</div>
+                  <div class="payback-value">${formatNumber(paybackCreatorRevenue)}</div>
+                  <div class="payback-detail">${formatNumber(results.actualInitialInvestment)} (предоплата) + ${formatNumber(paybackCreatorRevenue - results.actualInitialInvestment)} (доля)</div>
+                </div>
+                <div class="payback-item">
+                  <div class="payback-label">Доход платформы:</div>
+                  <div class="payback-value">${formatNumber(paybackPlatformRevenue)}</div>
+                  <div class="payback-percentage">${paybackPlatformPercentage}% от общего дохода</div>
+                </div>
+              </div>
           `;
           paybackInfoDiv.style.display = 'block';
       } else {
@@ -575,8 +724,165 @@ class RevenueCalculator {
     } catch (error) {
         console.error("Unhandled error during calculation update:", error);
         this.showError(errorDiv, "Произошла непредвиденная ошибка при расчете.");
-        // Attempt to clear results using potentially available numPrepayers
-        this.clearResults(numPrepayers, tokenPrice); 
+        this.clearResults(results?.prepayersCount || 0, tokenPrice); 
+    }
+  }
+  
+  // New methods for investor benefits and comparison tabs
+  
+  updateInvestorBenefitsSection(tokenPrice, numPrepayers, totalSales, paybackGoal) {
+    // Оценка данных для ранних, средних и поздних инвесторов
+    const earlyToken = 1;
+    const midToken = Math.min(totalSales, 500); // Берем середину диапазона нумерации токенов
+    const lateToken = Math.min(totalSales, 1000); // Поздний токен
+    
+    // Получить ROI и номера продаж окупаемости для разных инвесторов
+    try {
+      // Ранний инвестор
+      const earlyResults = this.estimateTokenPayback(tokenPrice, earlyToken, this.paybackRatio);
+      document.getElementById('early-investor-roi').textContent = `ROI: ${earlyResults.roi}%`;
+      document.getElementById('early-investor-payback').textContent = earlyResults.paybackSale || 'N/A';
+      document.getElementById('early-investor-mult').textContent = this.paybackRatio + 'x';
+      
+      // Средний инвестор (если допустимый)
+      if (midToken > 1 && midToken <= totalSales) {
+        const midResults = this.estimateTokenPayback(tokenPrice, midToken, this.paybackRatio);
+        document.getElementById('mid-investor-roi').textContent = `ROI: ${midResults.roi}%`;
+        document.getElementById('mid-investor-payback').textContent = midResults.paybackSale || 'N/A';
+        document.getElementById('mid-investor-mult').textContent = this.paybackRatio + 'x';
+      } else {
+        document.getElementById('mid-investor-roi').textContent = 'Недостаточно данных';
+        document.getElementById('mid-investor-payback').textContent = 'N/A';
+      }
+      
+      // Поздний инвестор (если допустимый)
+      if (lateToken > 1 && lateToken <= totalSales) {
+        const lateResults = this.estimateTokenPayback(tokenPrice, lateToken, this.paybackRatio);
+        document.getElementById('late-investor-roi').textContent = `ROI: ${lateResults.roi}%`;
+        document.getElementById('late-investor-payback').textContent = lateResults.paybackSale || 'N/A';
+        document.getElementById('late-investor-mult').textContent = this.paybackRatio + 'x';
+      } else {
+        document.getElementById('late-investor-roi').textContent = 'Недостаточно данных';
+        document.getElementById('late-investor-payback').textContent = 'N/A';
+      }
+      
+      // Обновляем цель окупаемости в разделе инвесторов
+      const investorPaybackGoalElements = document.querySelectorAll('.investor-payback-goal');
+      investorPaybackGoalElements.forEach(el => {
+        el.textContent = formatNumber(paybackGoal || (tokenPrice * this.paybackRatio));
+      });
+    } catch (error) {
+      console.error("Error updating investor benefits:", error);
+    }
+  }
+  
+  estimateTokenPayback(tokenPrice, tokenNumber, paybackRatio) {
+    // Используем точный расчет на основе модели распределения
+    const goal = tokenPrice * paybackRatio;
+    const nonPaybackPoolPercent = this.nonPaybackPoolSharePercent / 100;
+    const buyersShare = this.buyersShare / 100;
+    
+    // Факторы влияния на окупаемость
+    const baseMultiplier = 1000; // Базовое количество продаж для калибровки
+    
+    // Влияние приоритета неокупившихся (обратная зависимость)
+    // Чем выше nonPaybackPoolPercent, тем быстрее окупаемость
+    const priorityFactor = nonPaybackPoolPercent;
+    
+    // Влияние позиции токена (сложная логарифмическая зависимость)
+    // Начальные токены (1-100) имеют меньший коэффициент
+    // Средние токены (101-500) имеют больший коэффициент
+    // Поздние токены (501+) имеют дифференцированный коэффициент в зависимости от nonPaybackPoolPercent
+    let tokenPositionFactor;
+    
+    if (tokenNumber <= 100) {
+      // Ранние токены
+      tokenPositionFactor = 0.8 + (tokenNumber / 500);
+    } else if (tokenNumber <= 500) {
+      // Средние токены - нелинейный рост сложности окупаемости
+      // Для средних токенов делаем более крутую кривую роста сложности
+      tokenPositionFactor = 1.0 + Math.log10(tokenNumber / 100) * 0.5;
+    } else {
+      // Поздние токены
+      // Для поздних токенов сложность может снижаться при высоком nonPaybackPoolPercent
+      // и увеличиваться при низком nonPaybackPoolPercent
+      const lateTokenBase = 1.2 + Math.log10(tokenNumber / 500) * 0.3;
+      
+      if (nonPaybackPoolPercent >= 0.9) {
+        // При очень высоком приоритете неокупившихся поздним токенам легче
+        tokenPositionFactor = lateTokenBase * 0.8;
+      } else if (nonPaybackPoolPercent >= 0.7) {
+        // При среднем приоритете
+        tokenPositionFactor = lateTokenBase * 0.9;
+      } else {
+        // При низком приоритете поздним токенам труднее
+        tokenPositionFactor = lateTokenBase * 1.1;
+      }
+    }
+    
+    // Расчет количества продаж до окупаемости с учетом всех факторов
+    let paybackSale = Math.round(
+      baseMultiplier * 
+      paybackRatio * 
+      (1 / buyersShare) * // Чем меньше доля покупателей, тем больше продаж нужно
+      (1 / priorityFactor) * // Чем выше приоритет неокупившихся, тем меньше продаж нужно
+      tokenPositionFactor // Влияние позиции токена с учетом стратегий распределения
+    );
+    
+    // Корректировка для обеспечения правильного порядка окупаемости
+    // Ранние токены < Поздние токены < Средние токены (при высоком nonPaybackPoolPercent)
+    // Ранние токены < Средние токены < Поздние токены (при низком nonPaybackPoolPercent)
+    if (nonPaybackPoolPercent >= 0.7) {
+      // При высоком приоритете средние токены окупаются дольше, чем поздние
+      if (tokenNumber > 100 && tokenNumber <= 500) {
+        paybackSale *= 1.1;
+      }
+    }
+    
+    // Для учета края графика зависимости
+    if (nonPaybackPoolPercent <= 0.4 && tokenNumber > 500) {
+      // При очень низком приоритете неокупившихся поздним токенам еще труднее
+      paybackSale *= 1.15;
+    }
+    
+    // Минимальное значение для paybackSale
+    paybackSale = Math.max(paybackSale, tokenNumber + 100);
+    
+    // Оценка накопленных доходов и ROI
+    let accumulatedEarnings = goal; // Предполагаем, что к моменту окупаемости токен получит свою цель
+    let roi = ((accumulatedEarnings / tokenPrice) * 100 - 100).toFixed(2);
+    
+    return {
+      paybackSale,
+      accumulatedEarnings,
+      roi
+    };
+  }
+  
+  initComparisonTabs() {
+    try {
+      const tabs = document.querySelectorAll('.calculator-container .comparison-tabs .tab');
+      const contents = document.querySelectorAll('.calculator-container .comparison-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remove active class from all tabs and contents
+          tabs.forEach(t => t.classList.remove('active'));
+          contents.forEach(c => c.classList.remove('active'));
+          
+          // Add active class to clicked tab
+          tab.classList.add('active');
+          
+          // Show the corresponding content
+          const targetId = tab.getAttribute('data-tab') + '-content';
+          const targetContent = document.getElementById(targetId);
+          if (targetContent) {
+            targetContent.classList.add('active');
+          }
+        });
+      });
+    } catch (error) {
+      console.error("Error initializing comparison tabs:", error);
     }
   }
   
@@ -623,235 +929,501 @@ class RevenueCalculator {
 
   addCalculatorStyles() {
     const styleId = 'revenue-calculator-styles';
-    if (document.getElementById(styleId)) return;
-
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = `
-      /* General Layout, Form Groups */
+    if (document.getElementById(styleId)) return; // Avoid adding duplicate styles
+    
+    const styles = `
+      .calculator-container {
+        margin: 20px 0;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: #fff;
+      }
+      .calculator-container .card-header {
+        background-color: #2196F3;
+        color: white;
+        padding: 15px 20px;
+      }
+      .calculator-container .card-title {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 500;
+      }
       .calculator-container .card-body { padding: 20px; }
       .calculator-container .settings-section,
       .calculator-container .calculation-section,
       .calculator-container .results-section {
-        margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #e9ecef;
+        padding: 15px 0;
+        border-bottom: 1px solid #e0e0e0;
+        margin-bottom: 20px;
       }
       .calculator-container .results-section { border-bottom: none; }
       .calculator-container h4 {
-        margin-bottom: 20px;
-        color: #0056b3;
-        font-weight: 600;
-        border-bottom: 2px solid #007bff;
-        padding-bottom: 5px;
-        display: inline-block;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        color: #333;
+        font-weight: 500;
       }
-      .grid-3-col, .grid-2-col {
-        display: grid;
-        gap: 20px; /* Increased gap slightly */
+      .calculator-container .form-group {
+        margin-bottom: 15px;
       }
-      .grid-3-col { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
-      .grid-2-col { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-      
-      .form-group { margin-bottom: 15px; }
-      .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #495057; }
-      .form-group input[type="number"], .form-group input[type="range"] {
+      .calculator-container label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+      .calculator-container input[type="number"] {
         width: 100%;
         padding: 8px 12px;
-        border: 1px solid #ced4da;
+        border: 1px solid #ddd;
         border-radius: 4px;
-        box-sizing: border-box; 
+        font-size: 1rem;
       }
-       .form-group input[type="range"] { 
-           padding: 0; 
-           height: 10px; /* Slightly thicker track */
-           cursor: pointer; 
-           margin-top: 5px; margin-bottom: 5px;
-           appearance: none; -webkit-appearance: none; 
-           background: #e9ecef; /* Default track color */
-           border-radius: 5px;
-           outline: none; 
-           position: relative; /* Needed for gradient */
-       }
-      .form-group .form-hint {
+      .calculator-container .form-hint {
         font-size: 0.8rem;
-        color: #6c757d;
-        margin-top: 4px;
+        color: #666;
+        margin-top: 5px;
       }
-      .readonly-group label { display: inline-block; margin-right: 5px; margin-bottom: 0;}
-      .readonly-group .calculated-value {
-          font-weight: bold;
-          color: #0056b3; 
-          font-size: 1.1em;
+      .calculator-container .readonly-group {
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      .calculator-container .calculated-value {
+        font-weight: bold;
+        color: #2196F3;
+      }
+      .calculator-container .error-message {
+        color: #d32f2f;
+        background-color: #ffebee;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+      }
+      .calculator-container .grid-2-col,
+      .calculator-container .grid-3-col {
+        display: grid;
+        gap: 15px;
+      }
+      .calculator-container .grid-2-col {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .calculator-container .grid-3-col {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      @media (max-width: 768px) {
+        .calculator-container .grid-2-col,
+        .calculator-container .grid-3-col {
+          grid-template-columns: 1fr;
+        }
       }
       
-      /* Slider Track Styling */
-      #total-sales-slider {
-          --prepayer-percentage: 0%; 
-          /* Apply gradient via pseudo-element for better compatibility */
+      /* Slider styling */
+      .calculator-container .slider-group {
+        position: relative;
       }
-      /* Webkit - Track Background */
-      #total-sales-slider::-webkit-slider-runnable-track {
-          height: 10px;
-          border-radius: 5px;
-          background: linear-gradient(to right, 
-              #90ee90 var(--prepayer-percentage), /* Light green for prepayers */
-              #e9ecef var(--prepayer-percentage) /* Default track color */
-          );
+      .calculator-container input[type="range"] {
+        --prepayer-percentage: 0%;
+        width: calc(100% - 80px);
+        height: 5px;
+        -webkit-appearance: none;
+        background: linear-gradient(to right, 
+                     #e0e0e0 0%, #e0e0e0 var(--prepayer-percentage), 
+                     #2196F3 var(--prepayer-percentage), #2196F3 100%);
+        border-radius: 5px;
+        outline: none;
+        transition: background 0.3s;
+        margin-right: 10px;
       }
-      /* Mozilla - Track Background */
-       #total-sales-slider::-moz-range-track {
-           height: 10px;
-           border-radius: 5px;
-           background: linear-gradient(to right, 
-               #90ee90 var(--prepayer-percentage), 
-               #e9ecef var(--prepayer-percentage)
-           );
-           border: none; /* Remove default border */
-       }
-       /* MS - Track Background (Might need adjustments) */
-        #total-sales-slider::-ms-track {
-            height: 10px;
-            border-radius: 5px;
-            background: transparent; /* Use background on fill elements */
-            border-color: transparent;
-            color: transparent;
-        }
-        #total-sales-slider::-ms-fill-lower {
-            background: #90ee90; 
-            border-radius: 5px;
-        }
-         #total-sales-slider::-ms-fill-upper {
-            background: #e9ecef;
-            border-radius: 5px;
-        }
-
-        /* Slider Thumb */
-       input[type=range]::-webkit-slider-thumb {
-         -webkit-appearance: none; appearance: none; 
-         width: 20px; height: 20px; 
-         background: #007bff; 
-         border-radius: 50%; 
-         cursor: pointer; 
-         margin-top: -5px; /* Center thumb vertically */
-       }
-       input[type=range]::-moz-range-thumb {
-         width: 20px; height: 20px; 
-         background: #007bff; 
-         border-radius: 50%; 
-         cursor: pointer; 
-         border: none;
-       }
-        input[type=range]::-ms-thumb {
-            width: 20px; height: 20px; 
-            background: #007bff; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            border: none;
-            margin-top: 0; /* Adjust if needed */
-        }
-
-       /* Results Cards */
-       .distribution-cards.results-accrued {
-         display: grid;
-         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-         gap: 15px;
-         margin-bottom: 25px;
-       }
-       .distribution-card {
-         background-color: #f8f9fa;
-         border: 1px solid #dee2e6;
-         border-radius: 8px;
-         padding: 15px; 
-         text-align: center;
-       }
-       .distribution-card .card-label {
-         font-size: 0.95em; 
-         font-weight: 500;
-         color: #495057;
-         margin-bottom: 5px; 
-       }
-       .distribution-card .card-amount {
-         font-size: 1.4em; 
-         font-weight: bold;
-         color: #0056b3; 
-         margin-bottom: 3px; 
-       }
-        .distribution-card .card-detail {
-            font-size: 0.75em;
-            color: #6c757d;
-        }
-        .token-revenue-card.your-token-card-accrued {
-          background-color: #eaf4ff;
-          border: 1px solid #b8d7ff;
-          border-left: 5px solid #007bff;
-          border-radius: 8px;
-          margin-top: 20px;
-          overflow: hidden;
-        }
-        .token-revenue-card .card-header {
-          background-color: #cce5ff;
-          padding: 12px 15px;
-          font-weight: 600;
-          color: #004085;
-          display: flex;
-          align-items: center;
-        }
-        .token-revenue-card .card-header i {
-          margin-right: 10px;
-          font-size: 1.2em;
-        }
-        .token-revenue-card .card-body {
-          padding: 15px 20px;
-        }
-        .token-revenue-card .revenue-amount {
-          font-size: 2em;
-          font-weight: bold;
-          color: #28a745;
-          text-align: center;
-          margin-bottom: 15px;
-        }
-        .token-revenue-card .revenue-details {
-          font-size: 0.95em;
-        }
-        .token-revenue-card .revenue-details .detail {
+      .calculator-container input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #2196F3;
+        cursor: pointer;
+        border: 2px solid white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      }
+      .calculator-container input[type="range"]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #2196F3;
+        cursor: pointer;
+        border: 2px solid white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      }
+      .calculator-container .slider-group input[type="number"] {
+        width: 100px;
+        display: inline-block;
+        text-align: center;
+      }
+      
+      /* Results cards styling */
+      .calculator-container .distribution-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+      .calculator-container .distribution-card {
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+      }
+      .calculator-container .distribution-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      }
+      .calculator-container .distribution-card .card-label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+      }
+      .calculator-container .distribution-card .card-amount {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 10px 0;
+        color: #2196F3;
+      }
+      .calculator-container .distribution-card .card-detail {
+        font-size: 0.85rem;
+        color: #666;
+      }
+      .calculator-container .distribution-card .card-percentage {
+        font-size: 0.85rem;
+        font-style: italic;
+        color: #666;
+        margin-top: 8px;
+      }
+      
+      /* Card styling by type */
+      .calculator-container .distribution-card.creator {
+        background-color: #e3f2fd;
+        border-color: #bbdefb;
+      }
+      .calculator-container .distribution-card.platform {
+        background-color: #e8f5e9;
+        border-color: #c8e6c9;
+      }
+      .calculator-container .distribution-card.promotion {
+        background-color: #fffde7;
+        border-color: #fff9c4;
+      }
+      .calculator-container .distribution-card.buyers {
+        background-color: #fff3e0;
+        border-color: #ffe0b2;
+      }
+      
+      /* Your token revenue card */
+      .calculator-container .token-revenue-section {
+        margin-bottom: 30px;
+      }
+      .calculator-container .token-revenue-card {
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background-color: #f5f5f5;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+      .calculator-container .token-revenue-amount {
         display: flex;
-        justify-content: space-between;
-          padding: 8px 0;
-          border-bottom: 1px solid #cce5ff;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      .calculator-container .amount-label {
+        font-weight: bold;
+        margin-right: 10px;
+      }
+      .calculator-container .amount-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2196F3;
+      }
+      .calculator-container .token-revenue-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+      }
+      .calculator-container .metric {
+        padding: 10px;
+        border-radius: 4px;
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+      }
+      .calculator-container .metric-label {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 5px;
+      }
+      .calculator-container .metric-value {
+        font-weight: bold;
+        color: #333;
+      }
+      .calculator-container .metric.payback-status .metric-value {
+        color: #dc3545;
+      }
+      
+      /* Investor benefits visualization */
+      .calculator-container .investor-benefits {
+        margin-bottom: 30px;
+      }
+      .calculator-container .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+      }
+      .calculator-container .benefit-card {
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+      }
+      .calculator-container .benefit-card:hover {
+        transform: translateY(-5px);
+      }
+      .calculator-container .benefit-card.early-investor {
+        background-color: #e3f2fd;
+        border: 1px solid #bbdefb;
+      }
+      .calculator-container .benefit-card.mid-investor {
+        background-color: #e8f5e9;
+        border: 1px solid #c8e6c9;
+      }
+      .calculator-container .benefit-card.late-investor {
+        background-color: #fff3e0;
+        border: 1px solid #ffe0b2;
+      }
+      .calculator-container .benefit-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+      }
+      .calculator-container .benefit-value {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #2196F3;
+        margin-bottom: 5px;
+      }
+      .calculator-container .benefit-description {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 5px;
+      }
+      .calculator-container .benefit-multiplier {
+        font-size: 0.8rem;
+        font-style: italic;
+        color: #666;
+      }
+      
+      /* Overall statistics styling */
+      .calculator-container .overall-stats {
+        margin-bottom: 30px;
+      }
+      .calculator-container .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+      }
+      .calculator-container .stat-item {
+        padding: 15px;
+        border-radius: 8px;
+        background-color: #f5f5f5;
+        border: 1px solid #e0e0e0;
+        text-align: center;
+      }
+      .calculator-container .stat-label {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 5px;
+      }
+      .calculator-container .stat-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+      }
+      .calculator-container .stat-percentage {
+        font-size: 0.9rem;
+        color: #2196F3;
+        margin-top: 5px;
+      }
+      
+      /* Payback metrics styling */
+      .calculator-container .payback-metrics {
+        margin-top: 20px;
+        margin-bottom: 30px;
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+      }
+      .calculator-container .payback-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+      .calculator-container .payback-item {
+        padding: 10px;
+        border-radius: 4px;
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+      }
+      .calculator-container .payback-label {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 5px;
+      }
+      .calculator-container .payback-value {
+        font-weight: bold;
+        color: #333;
+      }
+      .calculator-container .payback-detail,
+      .calculator-container .payback-percentage {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+      }
+
+      /* Distribution comparison */
+      .calculator-container .distribution-comparison {
+        margin-top: 30px;
+      }
+      .calculator-container .comparison-tabs {
+        display: flex;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 15px;
+      }
+      .calculator-container .comparison-tabs .tab {
+        padding: 10px 15px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        border-bottom: none;
+        border-radius: 4px 4px 0 0;
+        margin-right: 5px;
+        background-color: #f5f5f5;
+        font-size: 0.9rem;
+      }
+      .calculator-container .comparison-tabs .tab:hover {
+        background-color: #e3f2fd;
+      }
+      .calculator-container .comparison-tabs .tab.active {
+        background-color: #fff;
+        border-color: #ddd;
+        border-bottom-color: #fff;
+        margin-bottom: -1px;
+        font-weight: bold;
+      }
+      .calculator-container .comparison-content {
+        display: none;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+      }
+      .calculator-container .comparison-content.active {
+        display: block;
+      }
+      .calculator-container .comparison-description {
+        margin-bottom: 15px;
+      }
+      .calculator-container .comparison-visualization {
+        margin-top: 15px;
+      }
+      .calculator-container .token-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .calculator-container .token-label {
+        width: 120px;
+        font-size: 0.9rem;
+        font-weight: bold;
+      }
+      .calculator-container .payback-bar {
+        height: 25px;
+        background-color: #2196F3;
+        border-radius: 4px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 10px;
+        font-size: 0.85rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+      .calculator-container .token-group.early .payback-bar {
+        background-color: #4caf50;
+      }
+      .calculator-container .token-group.mid .payback-bar {
+        background-color: #ff9800;
+      }
+      .calculator-container .token-group.late .payback-bar {
+        background-color: #f44336;
+      }
+      
+      /* Responsive fixes */
+      @media (max-width: 992px) {
+        .calculator-container .benefits-grid,
+        .calculator-container .stats-grid,
+        .calculator-container .payback-grid {
+          grid-template-columns: repeat(2, 1fr);
         }
-        .token-revenue-card .revenue-details .detail:last-child {
+        .calculator-container .token-revenue-metrics {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 768px) {
+        .calculator-container .benefits-grid,
+        .calculator-container .payback-grid {
+          grid-template-columns: 1fr;
+        }
+        .calculator-container .comparison-tabs {
+          flex-direction: column;
           border-bottom: none;
         }
-        .token-revenue-card .revenue-details .label {
-          color: #343a40;
+        .calculator-container .comparison-tabs .tab {
+          border-radius: 4px;
+          margin-bottom: 5px;
+          border: 1px solid #ddd;
         }
-        .token-revenue-card .revenue-details .value {
-          font-weight: 600;
-          color: #004085;
+        .calculator-container .comparison-tabs .tab.active {
+          margin-bottom: 5px;
         }
-        .error-message {
-            color: #721c24; 
-            font-weight: bold;
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-        border-radius: 4px;
+        .calculator-container .token-group {
+          flex-direction: column;
+          align-items: flex-start;
         }
-         @media (max-width: 600px) {
-            .grid-3-col, .grid-2-col {
-                grid-template-columns: 1fr;
-            }
-             .distribution-cards.results-accrued {
-                 grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
-             }
-             .distribution-card .card-amount {
-                 font-size: 1.2em;
-             }
-         }
+        .calculator-container .token-label {
+          width: 100%;
+          margin-bottom: 5px;
+        }
+        .calculator-container .payback-bar {
+          width: 100% !important;
+        }
+      }
+      @media (max-width: 576px) {
+        .calculator-container .stats-grid {
+          grid-template-columns: 1fr;
+        }
+        .calculator-container .token-revenue-metrics {
+          grid-template-columns: 1fr;
+        }
+      }
     `;
-    document.head.appendChild(style);
+    
+    const styleElem = document.createElement('style');
+    styleElem.id = styleId;
+    styleElem.innerHTML = styles;
+    document.head.appendChild(styleElem);
   }
 
   syncSliderInput(sliderId, inputId, isTotalSales = false) {
@@ -975,83 +1547,119 @@ class RevenueCalculator {
    * Can be run from the browser console: `new RevenueCalculator().runTestSimulation({...})`
    */
   runTestSimulation(params) {
-    const { 
-        initialInvestment = 100000, 
-        tokenPrice = 100, 
-        creatorShare = 10, 
-        platformShare = 10, 
-        promotionShare = 10, 
-        nonPaybackPoolSharePercent = 60, 
-        paybackRatio1 = 1, 
-        paybackRatio2 = 2, 
-        tokensToTrack = [1, 100, 1000],
-        maxSalesToSimulate = MAX_SIMULATED_SALES 
-    } = params;
-
-    console.log(`--- Starting Test Simulation ---`);
-    console.log(`Params: InitialInvestment=${initialInvestment}, TokenPrice=${tokenPrice}`);
-    console.log(`Shares: Creator=${creatorShare}%, Platform=${platformShare}%, Promo=${promotionShare}%, NP Pool Exclusive=${nonPaybackPoolSharePercent}%`);
-    console.log(`Tracking Tokens: ${tokensToTrack.join(', ')}`);
-    console.log(`Simulation Limit: ${maxSalesToSimulate} sales`);
-
-    const results = {}; // To store payback sale numbers
+    // Get parameters or use instance defaults
+    const calc = this;
+    const nonPaybackPoolSharePercent = params?.nonPaybackPoolSharePercent ?? calc.nonPaybackPoolSharePercent;
+    const initialInvestment = params?.initialInvestment ?? calc.initialInvestment;
+    const tokenPrice = params?.tokenPrice ?? 100;
+    const creatorShare = params?.creatorShare ?? calc.creatorShare;
+    const platformShare = params?.platformShare ?? calc.platformShare;
+    const promotionShare = params?.promotionShare ?? calc.promotionShare;
+    const paybackRatio1 = params?.paybackRatio1 ?? 1; // 1x payback
+    const paybackRatio2 = params?.paybackRatio2 ?? 2; // 2x payback
+    const maxSalesToSimulate = params?.maxSalesToSimulate ?? 100000;
     
-    const simulate = (paybackRatio) => {
-        const calc = new RevenueCalculator({
+    // Calculate derived values
+    const numPrepayers = Math.ceil(initialInvestment / tokenPrice);
+    const buyersShare = 100 - creatorShare - platformShare - promotionShare;
+    const tokensToTrack = [1, 100, 1000]; // Track early, mid and late tokens
+    
+    console.log(`\n--- Starting Revenue Distribution Test Simulation ---`);
+    console.log(`Parameters:`);
+    console.log(`- Initial Investment: ${initialInvestment}, Token Price: ${tokenPrice}`);
+    console.log(`- Creator: ${creatorShare}%, Platform: ${platformShare}%, Promotion: ${promotionShare}%, Buyers: ${buyersShare}%`);
+    console.log(`- Non-Payback Pool Share: ${nonPaybackPoolSharePercent}%`);
+    console.log(`- Number of Prepaying Customers: ${numPrepayers}`);
+    console.log(`- Tracked Tokens: ${tokensToTrack.join(', ')}`);
+    
+    // Storage for final results
+    const results = {
+        parameters: {
             initialInvestment,
-            creatorShare, platformShare, promotionShare,
-            paybackRatio,
-            nonPaybackPoolSharePercent
-        });
-        const numPrepayers = calc.calculateNumPrepayers(tokenPrice);
-        const paybackGoal = tokenPrice * paybackRatio;
-        console.log(`\nSimulating for Payback Ratio: ${paybackRatio} (Goal: ${paybackGoal})`);
-        console.log(`Calculated Prepayers: ${numPrepayers}`);
+            tokenPrice,
+            creatorShare, 
+            platformShare,
+            promotionShare,
+            buyersShare,
+            nonPaybackPoolSharePercent,
+            numPrepayers
+        },
+        paybackSales: {},
+    };
+    
+    // Simulation function for each payback ratio
+    const simulate = (paybackRatio) => {
+        console.log(`\nSimulating payback ratio: ${paybackRatio}x`);
         
+        // Payback goal for this ratio simulation
+        const paybackGoal = tokenPrice * paybackRatio;
+        console.log(`- Payback goal per token: ${paybackGoal}`);
+        
+        // Check token tracking validity
         if (Math.max(...tokensToTrack) > maxSalesToSimulate) {
-          console.warn(`Warning: Max sales to simulate (${maxSalesToSimulate}) is less than the highest tracked token number (${Math.max(...tokensToTrack)}). Results for higher tokens might be incomplete.`);
+            console.warn(`Warning: Max sales to simulate (${maxSalesToSimulate}) is less than the highest tracked token number (${Math.max(...tokensToTrack)}). Results for higher tokens might be incomplete.`);
         }
         if (maxSalesToSimulate < numPrepayers) {
-             console.error(`Error: Max sales (${maxSalesToSimulate}) must be >= Prepayers (${numPrepayers})`);
-             return null;
+            console.error(`Error: Max sales (${maxSalesToSimulate}) must be >= Prepayers (${numPrepayers})`);
+            return null;
         }
         
-        let tokenEarnings = new Array(maxSalesToSimulate + 1).fill(0.0);
-        let paybackFound = {}; // { tokenId: saleNumber }
-        tokensToTrack.forEach(id => paybackFound[id] = null);
+        // Track when each target token reaches payback
+        const paybackFound = {};
+        tokensToTrack.forEach(id => { paybackFound[id] = null; });
+        
+        // Initialize token earnings array (1-indexed, position 0 not used)
+        let tokenEarnings = new Array(Math.max(maxSalesToSimulate, Math.max(...tokensToTrack)) + 1).fill(0);
+        
+        // We don't need to simulate prepayment phase
+        console.log(`- Skipping prepayment phase (${numPrepayers} prepayers)`);
+        
+        // Start post-prepayment simulation
         let allTrackedFound = false;
-        const nonPaybackPoolPercent = calc.nonPaybackPoolSharePercent / 100.0;
+        const nonPaybackPoolPercent = nonPaybackPoolSharePercent / 100;
         const sharedPoolPercent = 1.0 - nonPaybackPoolPercent;
-
+  
         for (let currentSaleNum = numPrepayers + 1; currentSaleNum <= maxSalesToSimulate; currentSaleNum++) {
-          const saleTotalBuyersRevenue = tokenPrice * (calc.buyersShare / 100);
-          const numTokensInDistribution = currentSaleNum - 1;
-
-          if (numTokensInDistribution > 0) {
-              let notPaidBackIndices = [];
-              for (let i = 1; i <= numTokensInDistribution; i++) {
-                  if (tokenEarnings[i] < paybackGoal) {
-                      notPaidBackIndices.push(i);
-                  }
+           const saleTotalBuyersRevenue = tokenPrice * (buyersShare / 100);
+           const numTokensInDistribution = currentSaleNum - 1;
+           
+           // Skip distribution if no tokens to distribute to yet
+           if (numTokensInDistribution === 0) continue;
+           
+           // 1. Count tokens in each pool
+           let notPaidBackCount = 0;
+           for (let i = 1; i <= numTokensInDistribution; i++) {
+              if (tokenEarnings[i] < paybackGoal) {
+                  notPaidBackCount++;
               }
-              const actualNotPaidBackCount = notPaidBackIndices.length;
-              const exclusiveNPRevenue = saleTotalBuyersRevenue * nonPaybackPoolPercent;
-              const sharedRevenue = saleTotalBuyersRevenue * sharedPoolPercent;
-              const sharePerNPToken = actualNotPaidBackCount > 0 ? exclusiveNPRevenue / actualNotPaidBackCount : 0;
-              const sharePerSharedToken = numTokensInDistribution > 0 ? sharedRevenue / numTokensInDistribution : 0;
-
-              for (let i = 1; i <= numTokensInDistribution; i++) {
-                  const wasPaidBackBefore = tokenEarnings[i] >= paybackGoal;
-                  let increment = 0;
-                  if (wasPaidBackBefore) {
-                      increment = sharePerSharedToken;
-                  } else {
-                      increment = sharePerNPToken + sharePerSharedToken;
-                  }
-                  tokenEarnings[i] += increment;
-
-                  // Check if a tracked token just achieved payback
-                  if (tokensToTrack.includes(i) && !wasPaidBackBefore && tokenEarnings[i] >= paybackGoal) {
+           }
+           
+           // 2. Calculate the two pools
+           const nonPaybackPoolShare = saleTotalBuyersRevenue * nonPaybackPoolPercent;
+           const sharedPoolShare = saleTotalBuyersRevenue * sharedPoolPercent;
+           
+           // 3. Calculate per-token shares
+           const nonPaybackSharePerToken = notPaidBackCount > 0 ? nonPaybackPoolShare / notPaidBackCount : 0;
+           const sharedSharePerToken = numTokensInDistribution > 0 ? sharedPoolShare / numTokensInDistribution : 0;
+           
+           // 4. Distribute earnings
+           for (let i = 1; i <= numTokensInDistribution; i++) {
+              const wasPaidBackBefore = tokenEarnings[i] >= paybackGoal;
+              
+              // Every token gets a share from the shared pool
+              let earning = sharedSharePerToken;
+              
+              // Tokens that haven't reached payback also get a share from the non-payback pool
+              if (!wasPaidBackBefore) {
+                 earning += nonPaybackSharePerToken;
+              }
+              
+              // Update token earnings
+              tokenEarnings[i] += earning;
+              
+              // Check if any tracked tokens reached payback with this sale
+              if (tokensToTrack.includes(i)) {
+                  if (!wasPaidBackBefore && tokenEarnings[i] >= paybackGoal) {
                       if (paybackFound[i] === null) {
                           paybackFound[i] = currentSaleNum;
                           console.log(`  - Token #${i} reached payback goal ${paybackGoal} at sale #${currentSaleNum}`);
@@ -1060,24 +1668,24 @@ class RevenueCalculator {
                       }
                   }
               }
-          }
-          
-          if (allTrackedFound) {
-              console.log(`All tracked tokens reached payback by sale #${currentSaleNum}. Stopping simulation early for this ratio.`);
-              break; // Optimization: stop if all tracked tokens found payback
-          }
+           }
+           
+           if (allTrackedFound) {
+               console.log(`All tracked tokens reached payback by sale #${currentSaleNum}. Stopping simulation early for this ratio.`);
+               break; // Optimization: stop if all tracked tokens found payback
+           }
         } // End simulation loop
         
         // Store results for this ratio
         const ratioKey = `ratio_${paybackRatio}x`;
         results[ratioKey] = {};
-         tokensToTrack.forEach(id => {
-              results[ratioKey][`token_${id}`] = paybackFound[id];
-              if(paybackFound[id] === null) {
-                   console.log(`  - Token #${id} DID NOT reach payback goal ${paybackGoal} within ${maxSalesToSimulate} sales.`);
-              }
-         });
-         return paybackFound;
+        tokensToTrack.forEach(id => {
+            results[ratioKey][`token_${id}`] = paybackFound[id];
+            if(paybackFound[id] === null) {
+                console.log(`  - Token #${id} DID NOT reach payback goal ${paybackGoal} within ${maxSalesToSimulate} sales.`);
+            }
+        });
+        return paybackFound;
     };
 
     // Run simulation for both ratios

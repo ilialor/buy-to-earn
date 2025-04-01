@@ -3,17 +3,55 @@
  * This file contains functions for interacting with Firestore database
  */
 
-// Collections references
-const usersRef = db.collection('users');
-const ordersRef = db.collection('orders');
-const participationsRef = db.collection('participations');
-const nftsRef = db.collection('nfts');
-const revenuesRef = db.collection('revenues');
-const transactionsRef = db.collection('transactions');
+// Убедимся, что db существует перед использованием
+let dbRef;
+
+// Инициализация ссылок на коллекции
+function initializeCollections() {
+  if (!window.db && typeof localDB === 'undefined') {
+    console.error('Ошибка: объект базы данных недоступен');
+    return false;
+  }
+  
+  // Используем Firestore или локальную БД
+  dbRef = window.db || localDB;
+  
+  // Теперь инициализируем ссылки на коллекции
+  usersRef = dbRef.collection('users');
+  ordersRef = dbRef.collection('orders');
+  participationsRef = dbRef.collection('participations');
+  nftsRef = dbRef.collection('nfts');
+  revenuesRef = dbRef.collection('revenues');
+  transactionsRef = dbRef.collection('transactions');
+  
+  console.log('Коллекции базы данных инициализированы успешно');
+  return true;
+}
+
+// Инициализируем коллекции при загрузке скрипта
+let usersRef, ordersRef, participationsRef, nftsRef, revenuesRef, transactionsRef;
+
+// Попытка инициализации при загрузке
+(function() {
+  // Если db уже доступен, инициализируем сразу
+  if (window.db) {
+    initializeCollections();
+  } else {
+    // Иначе ждем загрузки страницы и пробуем снова
+    window.addEventListener('load', function() {
+      setTimeout(initializeCollections, 500);
+    });
+  }
+})();
 
 // Get collection reference
 function getCollection(collectionName) {
-  return db.collection(collectionName);
+  if (!dbRef) {
+    if (!initializeCollections()) {
+      throw new Error('База данных недоступна');
+    }
+  }
+  return dbRef.collection(collectionName);
 }
 
 // Get all items from a collection with optional query
@@ -41,7 +79,12 @@ async function getCollectionWithQuery(collectionRef, queryFn = null) {
 // Get document by ID
 async function getDocument(collectionName, docId) {
   try {
-    const doc = await db.collection(collectionName).doc(docId).get();
+    if (!dbRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+    const doc = await dbRef.collection(collectionName).doc(docId).get();
     return doc.exists ? { id: doc.id, ...doc.data() } : null;
   } catch (error) {
     console.error('Error getting document:', error);
@@ -52,7 +95,12 @@ async function getDocument(collectionName, docId) {
 // Add document to collection
 async function addDocument(collectionName, data) {
   try {
-    const docRef = await db.collection(collectionName).add({
+    if (!dbRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+    const docRef = await dbRef.collection(collectionName).add({
       ...data,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -66,7 +114,12 @@ async function addDocument(collectionName, data) {
 // Update document
 async function updateDocument(collectionName, docId, data) {
   try {
-    await db.collection(collectionName).doc(docId).update({
+    if (!dbRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+    await dbRef.collection(collectionName).doc(docId).update({
       ...data,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -79,7 +132,12 @@ async function updateDocument(collectionName, docId, data) {
 // Delete document
 async function deleteDocument(collectionName, docId) {
   try {
-    await db.collection(collectionName).doc(docId).delete();
+    if (!dbRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+    await dbRef.collection(collectionName).doc(docId).delete();
   } catch (error) {
     console.error('Error deleting document:', error);
     throw error;
@@ -91,7 +149,12 @@ async function deleteDocument(collectionName, docId) {
 // Get user's NFTs
 async function getUserNFTs(userId) {
   try {
-    const snapshot = await db.collection('nfts')
+    if (!dbRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+    const snapshot = await dbRef.collection('nfts')
       .where('ownerId', '==', userId)
       .get();
     
@@ -108,7 +171,12 @@ async function getUserNFTs(userId) {
 // Get user's orders
 async function getUserOrders(userId) {
   try {
-    const snapshot = await db.collection('orders')
+    if (!dbRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+    const snapshot = await dbRef.collection('orders')
       .where('userId', '==', userId)
       .orderBy('createdAt', 'desc')
       .get();
@@ -126,6 +194,11 @@ async function getUserOrders(userId) {
 // Get user's participations
 async function getUserParticipations(userId) {
   try {
+    if (!participationsRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
     return await getCollectionWithQuery(participationsRef, query => 
       query.where('userId', '==', userId)
     );
@@ -138,7 +211,12 @@ async function getUserParticipations(userId) {
 // Get user's transactions
 async function getUserTransactions(userId) {
   try {
-    const snapshot = await db.collection('transactions')
+    if (!dbRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+    const snapshot = await dbRef.collection('transactions')
       .where('userId', '==', userId)
       .orderBy('createdAt', 'desc')
       .get();
@@ -156,7 +234,12 @@ async function getUserTransactions(userId) {
 // Get user's revenues
 async function getUserRevenues(userId) {
   try {
-    const snapshot = await db.collection('revenues')
+    if (!dbRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+    const snapshot = await dbRef.collection('revenues')
       .where('userId', '==', userId)
       .orderBy('createdAt', 'desc')
       .get();
@@ -210,6 +293,11 @@ async function createOrder(orderData) {
 // Update wallet connection
 async function updateWalletConnection(userId, walletAddress, balance) {
   try {
+    if (!usersRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
     const userRef = usersRef.doc(userId);
     
     await userRef.update({
@@ -229,6 +317,11 @@ async function updateWalletConnection(userId, walletAddress, balance) {
 // Disconnect wallet
 async function disconnectWallet(userId) {
   try {
+    if (!usersRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
     const userRef = usersRef.doc(userId);
     
     await userRef.update({
@@ -244,122 +337,172 @@ async function disconnectWallet(userId) {
 }
 
 // Real-time updates
-
-// Listen for user's NFTs changes
 function listenToUserNFTs(userId, callback) {
-  return nftsRef
-    .where('ownerId', '==', userId)
-    .onSnapshot(snapshot => {
-      const nfts = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      callback(nfts);
-    }, error => {
-      console.error('Error listening to user NFTs:', error);
-    });
-}
-
-// Listen for user's orders changes
-function listenToUserOrders(userId, callback) {
-  return ordersRef
-    .where('userId', '==', userId)
-    .onSnapshot(snapshot => {
-      const orders = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      callback(orders);
-    }, error => {
-      console.error('Error listening to user orders:', error);
-    });
-}
-
-// Listen for user's transactions changes
-function listenToUserTransactions(userId, callback) {
-  return transactionsRef
-    .where('userId', '==', userId)
-    .orderBy('createdAt', 'desc')
-    .onSnapshot(snapshot => {
-      const transactions = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      callback(transactions);
-    }, error => {
-      console.error('Error listening to user transactions:', error);
-    });
-}
-
-// Update user's wallet balance
-async function updateUserWalletBalance(userId, amount, type = 'add') {
   try {
-    const userRef = db.collection('users').doc(userId);
-    const userDoc = await userRef.get();
-    
-    if (!userDoc.exists) {
-      throw new Error('User not found');
+    if (!dbRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
     }
-    
-    const currentBalance = userDoc.data().walletBalance || 0;
-    const newBalance = type === 'add' ? currentBalance + amount : currentBalance - amount;
-    
-    if (newBalance < 0) {
-      throw new Error('Insufficient funds');
-    }
-    
-    await userRef.update({
-      walletBalance: newBalance
-    });
-    
-    return newBalance;
+    return dbRef.collection('nfts')
+      .where('ownerId', '==', userId)
+      .onSnapshot(snapshot => {
+        const nfts = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        callback(nfts);
+      }, error => {
+        console.error('Error listening to user NFTs:', error);
+      });
   } catch (error) {
-    console.error('Error updating wallet balance:', error);
-    throw error;
+    console.error('Error setting up NFT listener:', error);
+    return () => {}; // Return empty unsubscribe function
   }
 }
 
-// Create transaction record
+function listenToUserOrders(userId, callback) {
+  try {
+    if (!dbRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+    return dbRef.collection('orders')
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(snapshot => {
+        const orders = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        callback(orders);
+      }, error => {
+        console.error('Error listening to user orders:', error);
+      });
+  } catch (error) {
+    console.error('Error setting up orders listener:', error);
+    return () => {}; // Return empty unsubscribe function
+  }
+}
+
+function listenToUserTransactions(userId, callback) {
+  try {
+    if (!dbRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+    return dbRef.collection('transactions')
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(snapshot => {
+        const transactions = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        callback(transactions);
+      }, error => {
+        console.error('Error listening to user transactions:', error);
+      });
+  } catch (error) {
+    console.error('Error setting up transactions listener:', error);
+    return () => {}; // Return empty unsubscribe function
+  }
+}
+
+// Update user wallet balance
+async function updateUserWalletBalance(userId, amount, type = 'add') {
+  try {
+    if (!usersRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+    const userRef = usersRef.doc(userId);
+    const userDoc = await userRef.get();
+    
+    if (!userDoc.exists) {
+      throw new Error('Пользователь не найден');
+    }
+    
+    const userData = userDoc.data();
+    let currentBalance = userData.wallet?.balance || 0;
+    let newBalance;
+    
+    if (type === 'add') {
+      newBalance = parseFloat(currentBalance) + parseFloat(amount);
+    } else if (type === 'subtract') {
+      newBalance = parseFloat(currentBalance) - parseFloat(amount);
+      if (newBalance < 0) {
+        throw new Error('Недостаточно средств в кошельке');
+      }
+    } else {
+      newBalance = parseFloat(amount); // Set direct value
+    }
+    
+    await userRef.update({
+      'wallet.balance': newBalance,
+      'wallet.lastUpdated': firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    return newBalance;
+  } catch (err) {
+    console.error('Error updating wallet balance:', err);
+    throw err;
+  }
+}
+
+// Create a transaction
 async function createTransaction(userId, amount, type, description) {
   try {
-    const transactionRef = await db.collection('transactions').add({
+    const transaction = {
       userId,
       amount,
       type,
       description,
+      status: 'completed',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    };
     
-    return transactionRef.id;
-  } catch (error) {
-    console.error('Error creating transaction:', error);
-    throw error;
+    const transactionId = await addDocument('transactions', transaction);
+    
+    return transactionId;
+  } catch (err) {
+    console.error('Error creating transaction:', err);
+    throw err;
   }
 }
 
-// Create revenue record
+// Create a revenue record
 async function createRevenue(userId, amount, source) {
   try {
-    const revenueRef = await db.collection('revenues').add({
+    const revenue = {
       userId,
       amount,
       source,
+      status: 'pending',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    };
     
-    return revenueRef.id;
-  } catch (error) {
-    console.error('Error creating revenue:', error);
-    throw error;
+    const revenueId = await addDocument('revenues', revenue);
+    
+    return revenueId;
+  } catch (err) {
+    console.error('Error creating revenue record:', err);
+    throw err;
   }
 }
 
 // Get all orders
 async function getAllOrders() {
   try {
-    const snapshot = await window.db.collection('orders')
-      .orderBy('createdAt', 'desc')
-      .get();
+    if (!ordersRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+    const snapshot = await ordersRef.orderBy('createdAt', 'desc').get();
     
     return snapshot.docs.map(doc => ({
       id: doc.id,
@@ -369,4 +512,30 @@ async function getAllOrders() {
     console.error('Error getting all orders:', error);
     throw error;
   }
-} 
+}
+
+// Exports
+window.dbFunctions = {
+  getCollection,
+  getCollectionWithQuery,
+  getDocument,
+  addDocument,
+  updateDocument,
+  deleteDocument,
+  getUserNFTs,
+  getUserOrders,
+  getUserParticipations,
+  getUserTransactions,
+  getUserRevenues,
+  createOrder,
+  updateWalletConnection,
+  disconnectWallet,
+  listenToUserNFTs,
+  listenToUserOrders,
+  listenToUserTransactions,
+  updateUserWalletBalance,
+  createTransaction,
+  createRevenue,
+  getAllOrders,
+  initializeCollections
+}; 
