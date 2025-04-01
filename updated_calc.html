@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-Intent: Динамическая настройка и аналитика</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin-bottom: 20px; }
+        label { display: block; margin: 5px 0; }
+        input { padding: 5px; width: 100px; }
+        button { padding: 5px 10px; margin-top: 10px; }
+        canvas { max-width: 600px; }
+    </style>
+</head>
+<body>
+    <!-- Административный интерфейс -->
+    <div class="section">
+        <h2>Динамическая настройка параметров</h2>
+        <div id="adminPanel">
+            <label>Доля создателя (%): <input type="number" id="creatorShare" min="0" max="100" value="20"></label>
+            <label>Доля платформы (%): <input type="number" id="platformShare" min="0" max="100" value="10"></label>
+            <label>Доля продвижения (%): <input type="number" id="promotionShare" min="0" max="100" value="10"></label>
+            <label>Приоритет не окупившихся токенов (%): <input type="number" id="unrecoupedPriority" min="0" max="100" value="60"></label>
+            <button onclick="updateParameters()">Обновить параметры</button>
+            <p id="errorMessage" style="color: red;"></p>
+        </div>
+    </div>
+
+    <!-- Панель аналитики -->
+    <div class="section">
+        <h2>Мониторинг и аналитика</h2>
+        <canvas id="salesChart"></canvas>
+        <p>Общее число продаж: <span id="totalSales">0</span></p>
+        <p>Общий доход: <span id="totalRevenue">0</span> </p>
+        <p>Окупившиеся токены: <span id="recoupedTokens">0</span></p>
+    </div>
+
+    <script>
+        // Firebase конфигурация (замените на свои данные)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Инициализация параметров
+        let params = { creatorShare: 20, platformShare: 10, promotionShare: 10, unrecoupedPriority: 60 };
+        let salesData = { totalSales: 0, totalRevenue: 0, recoupedTokens: 0, salesHistory: [] };
+
+        // Обновление параметров в базе данных
+        function updateParameters() {
+            const creator = parseFloat(document.getElementById('creatorShare').value);
+            const platform = parseFloat(document.getElementById('platformShare').value);
+            const promotion = parseFloat(document.getElementById('promotionShare').value);
+            const unrecouped = parseFloat(document.getElementById('unrecoupedPriority').value);
+            const total = creator + platform + promotion + unrecouped;
+
+            if (total !== 100) {
+                document.getElementById('errorMessage').textContent = 'Сумма долей должна равняться 100%';
+                return;
+            }
+            if ([creator, platform, promotion, unrecouped].some(val => val < 0)) {
+                document.getElementById('errorMessage').textContent = 'Доли не могут быть отрицательными';
+                return;
+            }
+
+            params = { creatorShare: creator, platformShare: platform, promotionShare: promotion, unrecoupedPriority: unrecouped };
+            db.collection('parameters').doc('current').set(params)
+                .then(() => {
+                    document.getElementById('errorMessage').textContent = 'Параметры успешно обновлены';
+                    simulateDistribution(); // Пересчитать распределение
+                })
+                .catch(error => console.error('Ошибка обновления:', error));
+        }
+
+        // Получение параметров из Firestore
+        db.collection('parameters').doc('current').onSnapshot(doc => {
+            if (doc.exists) {
+                params = doc.data();
+                document.getElementById('creatorShare').value = params.creatorShare;
+                document.getElementById('platformShare').value = params.platformShare;
+                document.getElementById('promotionShare').value = params.promotionShare;
+                document.getElementById('unrecoupedPriority').value = params.unrecoupedPriority;
+            }
+        });
+
+        // Симуляция продаж и распределения доходов
+        function simulateDistribution() {
+            // Пример симуляции: 100 продаж по 10 USD каждая
+            const salePrice = 10;
+            salesData.totalSales += 100;
+            salesData.totalRevenue += 100 * salePrice;
+
+            const revenue = 100 * salePrice;
+            const creatorRevenue = revenue * (params.creatorShare / 100);
+            const platformRevenue = revenue * (params.platformShare / 100);
+            const promotionRevenue = revenue * (params.promotionShare / 100);
+            const unrecoupedRevenue = revenue * (params.unrecoupedPriority / 100);
+
+            // Пример подсчета окупившихся токенов (упрощено)
+            salesData.recoupedTokens = Math.min(salesData.totalSales * 0.5, 1000); // 50% токенов окупаются
+
+            // Обновление аналитики
+            salesData.salesHistory.push({ time: new Date(), revenue: revenue });
+            updateAnalytics();
+        }
+
+        // Инициализация графика
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Доход от продаж',
+                    data: [],
+                    borderColor: 'blue',
+                    fill: false
+                }]
+            },
+            options: { scales: { x: { type: 'time', time: { unit: 'minute' } } } }
+        });
+
+        // Обновление аналитики в реальном времени
+        function updateAnalytics() {
+            document.getElementById('totalSales').textContent = salesData.totalSales;
+            document.getElementById('totalRevenue').textContent = salesData.totalRevenue;
+            document.getElementById('recoupedTokens').textContent = salesData.recoupedTokens;
+
+            salesChart.data.labels = salesData.salesHistory.map(sale => sale.time);
+            salesChart.data.datasets[0].data = salesData.salesHistory.map(sale => sale.revenue);
+            salesChart.update();
+        }
+
+        // Слушатель новых продаж из Firestore
+        db.collection('sales').onSnapshot(snapshot => {
+            snapshot.docChanges().forEach(change => {
+                if (change.type === 'added') {
+                    const sale = change.doc.data();
+                    salesData.totalSales += 1;
+                    salesData.totalRevenue += sale.amount;
+                    salesData.salesHistory.push({ time: new Date(), revenue: sale.amount });
+                    salesData.recoupedTokens = Math.min(salesData.totalSales * 0.5, 1000); // Упрощенная логика
+                    updateAnalytics();
+                }
+            });
+        });
+
+        // Инициализация
+        simulateDistribution();
+    </script>
+</body>
+</html>

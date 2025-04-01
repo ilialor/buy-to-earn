@@ -1,8 +1,16 @@
-# Модель распределения доходов Co-Intent
+# Модель распределения доходов Co-Intent 
+
+## Введение
+
+Модель распределения доходов Co-Intent обеспечивает справедливое и прозрачное распределение выручки от продаж токенов между всеми участниками экосистемы: создателями контента, держателями токенов, платформой и партнерами по продвижению.
+
+Ключевой принцип: **справедливое распределение доходов на основе окупаемости вложений**, при котором приоритет получают те держатели токенов, которые еще не окупили свои вложения.
+
+> **Примечание:** Подробные практические примеры работы механизма распределения доходов представлены в документе [Примеры работы системы приоритета неокупившихся токенов](payback-examples.md).
 
 ## Общий обзор
 
-Модель распределения доходов Co-Intent Platform направлена на справедливое вознаграждение всех участников: Создателя продукта, Платформы и Покупателей (держателей токенов/NFT), обеспечивая при этом устойчивость и предотвращая схемы Понци.
+Модель распределения доходов Co-Intent направлена на справедливое вознаграждение всех участников: Создателя продукта, Платформы и Покупателей (держателей токенов/NFT), обеспечивая при этом устойчивость и предотвращая схемы Понци.
 
 ## Этап 1: Первоначальные инвестиции и Предоплата
 
@@ -38,6 +46,32 @@
     *   **Меньшая часть (остаток от доли покупателей)**: Распределяется пропорционально среди **всех** *предыдущих* покупателей (включая уже окупившихся).
 3.  **Динамика:** По мере накопления дохода от последующих продаж, покупатели **фактически** переходят из пула "не окупившихся" в пул "окупившихся". Преимущество ранних покупателей (Заказчиков) заключается в том, что они начинают этот процесс накопления раньше.
 
+**Рекурсивная природа расчета:**
+
+Расчет по своей природе является рекурсивным или итеративным. Доход токена `n` после продажи `k`, обозначаемый как \(E(n, k)\), зависит от его дохода после предыдущей продажи \(E(n, k-1)\) плюс прирост \(\Delta E(n, k)\), полученный от продажи `k`:
+
+\[ E(n, k) = E(n, k-1) + \Delta E(n, k) \quad \text{для } n < k \]
+
+Прирост \(\Delta E(n, k)\) зависит от того, находился ли токен `n` в пуле НО (не окупившихся) или О (окупившихся) *до* продажи `k` (т.е. на основе \(E(n, k-1)\)). Он также зависит от *количества* токенов в пуле НО до продажи `k`, поскольку это определяет долю на токен из Эксклюзивного дохода для не окупившихся.
+
+Обозначения:
+*   \(G\) = Цель окупаемости
+*   \(B_k\) = Сумма Доли Покупателей от продажи \(k\)
+*   \(P_\%\) = Процент Доли Не Окупившихся / 100
+*   \(S_\% = 1 - P_\%\) = Процент Общей Доли / 100
+*   \(НО(k)\) = Множество индексов токенов \(i < k\), где \(E(i, k-1) < G\)
+*   \(О(k)\) = Множество индексов токенов \(i < k\), где \(E(i, k-1) \ge G\)
+*   \(|НО(k)|\), \(|О(k)|\) = Количество токенов в каждом множестве
+*   \(|Н(k)| = k-1\) = Общее количество участвующих токенов
+
+Эксклюзивная доля на один не окупившийся токен: \( \delta_{НО}(k) = (B_k \times P_\%) / |НО(k)| \) (если \(|НО(k)| > 0\), иначе 0)
+Общая доля на токен: \( \delta_О(k) = (B_k \times S_\%) / |Н(k)| \) (если \(|Н(k)| > 0\), иначе 0)
+
+Тогда прирост для токена \(n\) от продажи \(k\) равен:
+\[ \Delta E(n, k) = \begin{cases} \delta_{НО}(k) + \delta_О(k) & \text{если } n \in НО(k) \\ \delta_О(k) & \text{если } n \in О(k) \end{cases} \]
+
+Из-за этой зависимости от состояния *всех* предыдущих токенов на *каждом* шаге, точный расчет требует пошаговой симуляции, как реализовано в калькуляторе.
+
 ## Калькулятор распределения доходов
 
 Интерактивный калькулятор доступен в разделе "Revenue Sharing" и на странице документации. Он позволяет **моделировать накопленный доход** за указанное количество продаж, учитывая фазу предоплаты, путем **точной пошаговой симуляции**.
@@ -57,6 +91,10 @@
 *   **Точное количество** окупившихся токенов на конец симуляции.
 
 **Важно:** Калькулятор выполняет **точную симуляцию** продаж шаг за шагом, отслеживая накопленный доход каждого виртуального токена. Из-за вычислительной сложности, максимальное количество продаж, которое можно симулировать в калькуляторе, ограничено (например, ~20-30 тыс.).
+
+## Тестовые симуляции
+
+Для детального анализа производительности модели распределения мы реализовали как браузерные, так и Node.js тесты, которые вычисляют точки окупаемости для отслеживаемых токенов. Подробную информацию о запуске этих тестов и интерпретации результатов см. в документации [Тесты Распределения Доходов](revenue-tests.md).
 
 ## Преимущества модели
 
@@ -123,4 +161,24 @@ Due to this dependency on the state of *all* previous tokens at *each* step, a p
 
 ### Calculator Usage
 
-// ... existing code ... 
+The interactive revenue distribution calculator is available in the "Revenue Sharing" section and on the documentation page. It allows users to **model accumulated revenue** for a specified number of sales, taking into account the prepayment phase, using **precise step-by-step simulation**.
+
+**Key Input Parameters:**
+* Initial Investment amount
+* Token Price (determines the number of Prepayers)
+* Configurable shares for Creator, Platform, and Promotion (applied to sales *after* the Prepayers)
+* Payback Ratio for buyers (multiplier for their investment target)
+* Percentage of buyers' share directed to the priority "Not Paid Back" pool
+* **Total Number of Sales** (slider/input, minimum = Number of Prepayers, **maximum limited** to maintain calculator performance)
+* **Token Number** for which accumulated revenue is calculated (slider/input)
+
+**Output Data:**
+* **Total accumulated revenue** for Creator (Prepayment + Share from subsequent sales), Platform, Promotion, and the selected Token Number after the specified Total Number of Sales
+* Calculated **Number of Prepayers**
+* **Exact count** of tokens that have reached their payback goal by the end of the simulation
+
+**Important Note:** The calculator performs **exact simulation** of sales step by step, tracking the accumulated revenue of each virtual token. Due to computational complexity, the maximum number of sales that can be simulated in the calculator is limited (approximately 20-30 thousand).
+
+## Test Simulation
+
+For detailed performance analysis of the distribution model, we've implemented both browser-based and Node.js-based test simulations that calculate payback points for tracked tokens. See the [Revenue Tests](revenue-tests.md) documentation for details on running these tests and interpreting results. 
