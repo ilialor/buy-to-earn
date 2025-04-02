@@ -1141,4 +1141,126 @@ textarea {
   font-size: 0.75rem;
   font-weight: 600;
   margin-left: 0.5rem;
+}
+
+/* Стили для заказов пользователя в Портфолио */
+.user-orders-card {
+  margin-bottom: 30px;
+}
+
+.user-orders-card .card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-orders-card .card-title i {
+  color: var(--primary);
+}
+
+.user-orders-card .order-item {
+  margin-bottom: 15px;
+  border-radius: 10px;
+  background-color: var(--bg-secondary, #f8f9fa);
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  transition: all 0.3s ease;
+}
+
+.user-orders-card .order-item:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+}
+
+.user-orders-card .order-title {
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.user-orders-card .order-meta {
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.user-orders-card .user-badge {
+  background-color: var(--primary);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.user-orders-card .empty-message {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Стили для статистики портфолио */
+.statistics-card {
+  margin-bottom: 30px;
+}
+
+.statistics-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.stat-item {
+  margin-bottom: 15px;
+}
+
+.stat-card {
+  background-color: var(--bg-secondary, #f8f9fa);
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  height: 100%;
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.stat-card:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  color: #666;
+  font-size: 0.9rem;
 } 

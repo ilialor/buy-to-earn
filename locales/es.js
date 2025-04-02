@@ -52,6 +52,13 @@ const es = {
   // Portfolio
   portfolio: {
     title: "Mi Portafolio",
+    overview: "Resumen",
+    investments: "Mis Inversiones",
+    revenue: "Ingresos",
+    transactions: "Transacciones",
+    myOrders: "Mis Pedidos",
+    noOrders: "Aún no tienes ningún pedido",
+    statisticsTitle: "Estadísticas",
     subtitle: "Haga seguimiento de sus inversiones, NFTs y propiedad de productos.",
     activeInvestments: "Inversiones Activas",
     completedProducts: "Productos Completados",

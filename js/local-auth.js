@@ -653,6 +653,11 @@ class LocalCollection {
       toDate: () => new Date()
     };
   }
+  
+  // Генерация ID документа
+  _generateId() {
+    return 'local-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+  }
 }
 
 // Эмуляция Firebase провайдера Google Auth

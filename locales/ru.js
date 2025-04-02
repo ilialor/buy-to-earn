@@ -64,6 +64,13 @@ const ru = {
   // Portfolio
   portfolio: {
     title: "Моё портфолио",
+    overview: "Обзор",
+    investments: "Мои инвестиции",
+    revenue: "Доходы",
+    transactions: "Транзакции",
+    myOrders: "Мои заказы",
+    noOrders: "У вас пока нет заказов",
+    statisticsTitle: "Статистика",
     subtitle: "Отслеживайте инвестиции, собранные NFT и права собственности на продукты.",
     activeInvestments: "Активные инвестиции",
     completedProducts: "Завершенные продукты",
@@ -72,7 +79,9 @@ const ru = {
     myNFTs: "Мои NFT",
     viewDetails: "Посмотреть детали",
     trackReturns: "Отслеживать доходы",
-    accessProduct: "Доступ к продукту"
+    accessProduct: "Доступ к продукту",
+    revenue: "Доходы",
+    transactions: "Транзакции"
   },
   
   // Revenue

@@ -97,33 +97,32 @@ async function addDocument(collectionName, data) {
   try {
     if (!dbRef) {
       if (!initializeCollections()) {
-        // В случае отсутствия подключения к базе данных, используем локальное хранилище
-        console.log(`База данных недоступна, используем локальное хранилище для ${collectionName}`);
-        return addLocalDocument(collectionName, data);
+        throw new Error('База данных недоступна');
       }
     }
     
-    // Если dbRef существует и есть Firebase Firestore
-    if (typeof firebase !== 'undefined' && firebase.firestore) {
-      const docRef = await dbRef.collection(collectionName).add({
-        ...data,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      return docRef.id;
-    } else {
-      // Если нет Firebase, но есть dbRef (например, LocalFirestore)
-      const docRef = await dbRef.collection(collectionName).add({
-        ...data,
-        createdAt: new Date()
-      });
-      return docRef.id;
+    const collection = dbRef.collection(collectionName);
+    
+    // Создаем новый документ
+    const docRef = await collection.add({
+      ...data,
+      createdAt: data.createdAt || firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    console.log(`Документ успешно добавлен в коллекцию ${collectionName}:`, docRef.id);
+    return docRef.id;
+  } catch (err) {
+    console.warn(`Предупреждение: проблема при добавлении документа в ${collectionName}:`, err.message);
+    
+    // Сохраняем в локальное хранилище для последующей синхронизации
+    try {
+      saveToLocalStorage(collectionName, data);
+    } catch (localError) {
+      console.warn('Ошибка при сохранении в локальное хранилище:', localError);
     }
-  } catch (error) {
-    // Вместо вывода ошибки в console.error, используем console.warn
-    console.warn('Предупреждение при добавлении документа в Firebase:', error);
-    // В случае ошибки при добавлении в базу, пытаемся сохранить локально
-    console.log('Пытаемся сохранить документ локально после ошибки Firestore');
-    return addLocalDocument(collectionName, data);
+    
+    // Если это критичная ошибка, мы все равно прокидываем ее дальше
+    throw err;
   }
 }
 
@@ -164,6 +163,40 @@ function addLocalDocument(collectionName, data) {
     console.error('Ошибка при добавлении документа в локальное хранилище:', error);
     throw error;
   }
+}
+
+// Функция для сохранения данных в локальное хранилище
+function saveToLocalStorage(collectionName, data) {
+  // Генерируем уникальный ID для документа, если его нет
+  const docId = data.id || 'local_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  
+  // В зависимости от типа коллекции, сохраняем в соответствующий ключ
+  if (collectionName === 'orders') {
+    // Для заказов используем ключ 'orders'
+    try {
+      const ordersJson = localStorage.getItem('orders') || '[]';
+      const orders = JSON.parse(ordersJson);
+      
+      // Добавляем новый заказ с ID
+      const newOrder = {
+        ...data,
+        id: docId,
+        createdAt: data.createdAt || new Date()
+      };
+      
+      orders.push(newOrder);
+      localStorage.setItem('orders', JSON.stringify(orders));
+      console.log(`Заказ сохранен в локальное хранилище, ID: ${docId}`);
+    } catch (e) {
+      console.warn('Ошибка при сохранении заказа в локальное хранилище:', e);
+      throw e;
+    }
+  } else {
+    // Для других коллекций используем общий формат local_{collectionName}
+    return addLocalDocument(collectionName, data);
+  }
+  
+  return docId;
 }
 
 // Update document
@@ -223,27 +256,83 @@ async function getUserNFTs(userId) {
   }
 }
 
-// Get user's orders
+// Получение заказов пользователя (как локальных, так и из Firebase)
 async function getUserOrders(userId) {
+  console.log('Получение заказов пользователя:', userId);
+  if (!userId) {
+    console.error('ID пользователя не указан');
+    return [];
+  }
+
+  let allOrders = [];
+
+  // Пытаемся получить заказы из Firebase Firestore
   try {
+    console.log('Получение заказов из Firebase Firestore...');
     if (!dbRef) {
       if (!initializeCollections()) {
-        throw new Error('База данных недоступна');
+        console.warn('Firebase Firestore недоступен, используем только локальные заказы');
+      }
+    } else {
+      // Используем ordersRef, уже инициализированный в initializeCollections
+      const snapshot = await ordersRef.where('userId', '==', userId).get();
+      
+      if (!snapshot.empty) {
+        snapshot.forEach(doc => {
+          allOrders.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+        console.log(`Получено ${allOrders.length} заказов из Firebase Firestore`);
+      } else {
+        console.log('Заказы в Firebase Firestore не найдены');
       }
     }
-    const snapshot = await dbRef.collection('orders')
-      .where('userId', '==', userId)
-      .orderBy('createdAt', 'desc')
-      .get();
-    
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
   } catch (error) {
-    console.error('Error getting user orders:', error);
-    throw error;
+    console.warn('Ошибка при получении заказов из Firebase Firestore:', error);
+    // Продолжаем выполнение, чтобы получить локальные заказы
   }
+
+  // Получаем локальные заказы
+  try {
+    console.log('Получение локальных заказов...');
+    const localOrdersJson = localStorage.getItem('orders');
+    
+    if (localOrdersJson) {
+      const localOrders = JSON.parse(localOrdersJson);
+      
+      // Фильтруем локальные заказы по userId
+      const userLocalOrders = localOrders.filter(order => order.userId === userId);
+      
+      // Проверяем, что заказы из localStorage еще не добавлены из Firebase
+      const localOrderIds = userLocalOrders.map(order => order.id);
+      const firebaseOrderIds = allOrders.map(order => order.id);
+      
+      const uniqueLocalOrders = userLocalOrders.filter(order => 
+        !firebaseOrderIds.includes(order.id)
+      );
+      
+      console.log(`Получено ${uniqueLocalOrders.length} уникальных локальных заказов`);
+      
+      // Добавляем уникальные локальные заказы
+      allOrders = [...allOrders, ...uniqueLocalOrders];
+    } else {
+      console.log('Локальные заказы не найдены');
+    }
+  } catch (error) {
+    console.warn('Ошибка при получении локальных заказов:', error.message);
+  }
+
+  // Сортируем все заказы по дате создания (от новых к старым)
+  allOrders.sort((a, b) => {
+    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return dateB - dateA;
+  });
+
+  console.log(`Всего получено ${allOrders.length} заказов пользователя`);
+  return allOrders;
 }
 
 // Get user's participations
@@ -350,6 +439,16 @@ async function createOrder(orderData) {
       throw new Error('Пользователь не авторизован');
     }
     
+    // Преобразуем budget в число, если это строка
+    if (typeof orderData.budget === 'string') {
+      orderData.budget = parseFloat(orderData.budget);
+    }
+    
+    // Проверяем, что budget является числом
+    if (isNaN(orderData.budget)) {
+      orderData.budget = 0;
+    }
+    
     // Формируем данные заказа
     const orderWithUser = {
       ...orderData,
@@ -365,6 +464,28 @@ async function createOrder(orderData) {
     
     // Создаем документ заказа
     const orderId = await addDocument('orders', orderWithUser);
+    
+    // Добавляем заказ в локальное хранилище, чтобы он сразу отображался в интерфейсе
+    try {
+      const orderWithId = {
+        ...orderWithUser,
+        id: orderId
+      };
+      
+      // Получаем текущие заказы из localStorage
+      const localOrdersJson = localStorage.getItem('orders') || '[]';
+      const localOrders = JSON.parse(localOrdersJson);
+      
+      // Добавляем новый заказ
+      localOrders.push(orderWithId);
+      
+      // Сохраняем обновленный список заказов
+      localStorage.setItem('orders', JSON.stringify(localOrders));
+      console.log('Заказ сохранен в локальное хранилище');
+    } catch (localStorageError) {
+      console.warn('Ошибка при сохранении заказа в локальное хранилище:', localStorageError);
+      // Не прерываем выполнение, это просто дополнительный функционал для улучшения UX
+    }
     
     // Создаем запись транзакции для лога
     try {

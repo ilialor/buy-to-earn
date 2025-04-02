@@ -64,6 +64,13 @@ const en = {
   // Portfolio
   portfolio: {
     title: "My Portfolio",
+    overview: "Overview",
+    investments: "My Investments",
+    revenue: "Revenue",
+    transactions: "Transactions",
+    myOrders: "My Orders",
+    noOrders: "You don't have any orders yet",
+    statisticsTitle: "Statistics",
     subtitle: "Track your investments, collected NFTs, and product ownership.",
     activeInvestments: "Active Investments",
     completedProducts: "Completed Products",

@@ -53,9 +53,35 @@ function initializeModals() {
 // Show a modal by ID
 function showModal(modalId) {
   const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.style.display = 'flex';
+  if (!modal) {
+    console.error(`Модальное окно с ID "${modalId}" не найдено`);
+    return;
   }
+  
+  modal.style.display = 'flex';
+  
+  // Добавляем обработчик для закрытия модального окна при клике на крестик
+  const closeBtn = modal.querySelector('.modal-close');
+  if (closeBtn) {
+    closeBtn.onclick = function() {
+      closeModal(modalId);
+    };
+  }
+  
+  // Добавляем обработчик для закрытия модального окна при клике на кнопку Отмена/Закрыть
+  const cancelBtn = modal.querySelector('.btn-outline');
+  if (cancelBtn) {
+    cancelBtn.onclick = function() {
+      closeModal(modalId);
+    };
+  }
+  
+  // Добавляем обработчик для закрытия модального окна при клике вне его содержимого
+  window.onclick = function(event) {
+    if (event.target === modal) {
+      closeModal(modalId);
+    }
+  };
 }
 
 // Close a modal by ID
@@ -609,89 +635,111 @@ function setupUIListeners() {
           submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Создание...';
         }
         
-        // Вызываем функцию createOrder из db.js, которая сама определит ID пользователя
-        createOrder(orderData)
-          .then((orderId) => {
-            submitOrderForm.reset();
-            showNotification('Заказ успешно создан', 'success');
-            
-            // Navigate to explore tab
-            const exploreTab = document.querySelector('[data-tab="explore"]');
-            if (exploreTab) {
-              exploreTab.click();
-            }
-            
-            // Создаем локальный объект заказа для мгновенного отображения
-            const currentUser = getCurrentUser();
-            if (currentUser) {
-              // Добавляем созданный заказ на страницу сразу, не дожидаясь перезагрузки
-              const newOrder = {
-                id: orderId,
-                ...orderData,
-                userId: currentUser.uid,
-                userName: currentUser.displayName || currentUser.email || 'Пользователь',
-                status: 'active',
-                currentFunding: 0,
-                participants: 0,
-                createdAt: new Date()
-              };
+        // Используем функцию createOrder из глобального объекта window.dbFunctions
+        if (window.dbFunctions && typeof window.dbFunctions.createOrder === 'function') {
+          window.dbFunctions.createOrder(orderData)
+            .then((orderId) => {
+              submitOrderForm.reset();
+              showNotification('Заказ успешно создан', 'success');
               
-              // Находим существующие пользовательские заказы на странице или создаем раздел
-              let userOrdersSection = document.querySelector('.user-orders-section');
+              // Navigate to explore tab
+              const exploreTab = document.querySelector('[data-tab="explore"]');
+              if (exploreTab) {
+                exploreTab.click();
+              }
               
-              if (!userOrdersSection) {
-                // Создаем раздел "Твои заказы"
-                userOrdersSection = document.createElement('div');
-                userOrdersSection.className = 'user-orders-section';
+              // Создаем локальный объект заказа для мгновенного отображения
+              const currentUser = getCurrentUser();
+              if (currentUser) {
+                // Добавляем созданный заказ на страницу сразу, не дожидаясь перезагрузки
+                const newOrder = {
+                  id: orderId,
+                  ...orderData,
+                  userId: currentUser.uid,
+                  userName: currentUser.displayName || currentUser.email || 'Пользователь',
+                  status: 'active',
+                  currentFunding: 0,
+                  participants: 0,
+                  createdAt: new Date()
+                };
                 
-                // Добавляем заголовок
-                const userOrdersHeader = document.createElement('h3');
-                userOrdersHeader.className = 'section-title';
-                userOrdersHeader.innerHTML = '<i class="fas fa-clipboard-list"></i> Твои заказы';
-                userOrdersSection.appendChild(userOrdersHeader);
+                // Сохраняем заказ в localStorage для гарантии
+                try {
+                  const existingOrdersJson = localStorage.getItem('orders') || '[]';
+                  const existingOrders = JSON.parse(existingOrdersJson);
+                  existingOrders.push(newOrder);
+                  localStorage.setItem('orders', JSON.stringify(existingOrders));
+                  console.log('Заказ сохранен в localStorage:', newOrder);
+                } catch(e) {
+                  console.warn('Не удалось сохранить заказ локально:', e);
+                }
                 
-                // Добавляем в начало контейнера
-                const ordersContainer = document.querySelector('#explore .card');
-                if (ordersContainer) {
-                  const header = ordersContainer.querySelector('.card-header');
-                  ordersContainer.insertBefore(userOrdersSection, header.nextSibling);
+                // Находим существующие пользовательские заказы на странице или создаем раздел
+                let userOrdersSection = document.querySelector('.user-orders-section');
+                
+                if (!userOrdersSection) {
+                  // Создаем раздел "Твои заказы"
+                  userOrdersSection = document.createElement('div');
+                  userOrdersSection.className = 'user-orders-section';
                   
-                  // Добавляем разделитель
-                  const divider = document.createElement('hr');
-                  divider.className = 'section-divider';
-                  userOrdersSection.appendChild(divider);
+                  // Добавляем заголовок
+                  const userOrdersHeader = document.createElement('h3');
+                  userOrdersHeader.className = 'section-title';
+                  userOrdersHeader.innerHTML = '<i class="fas fa-clipboard-list"></i> Твои заказы';
+                  userOrdersSection.appendChild(userOrdersHeader);
+                  
+                  // Добавляем в начало контейнера
+                  const ordersContainer = document.querySelector('#explore .card');
+                  if (ordersContainer) {
+                    const header = ordersContainer.querySelector('.card-header');
+                    ordersContainer.insertBefore(userOrdersSection, header.nextSibling);
+                    
+                    // Добавляем разделитель
+                    const divider = document.createElement('hr');
+                    divider.className = 'section-divider';
+                    userOrdersSection.appendChild(divider);
+                  }
+                }
+                
+                // Добавляем созданный заказ в начало раздела (перед разделителем)
+                if (userOrdersSection) {
+                  const divider = userOrdersSection.querySelector('.section-divider');
+                  const orderElement = createOrderElement(newOrder, true);
+                  if (divider) {
+                    userOrdersSection.insertBefore(orderElement, divider);
+                  } else {
+                    userOrdersSection.appendChild(orderElement);
+                  }
                 }
               }
               
-              // Добавляем созданный заказ в начало раздела (перед разделителем)
-              if (userOrdersSection) {
-                const divider = userOrdersSection.querySelector('.section-divider');
-                const orderElement = createOrderElement(newOrder, true);
-                if (divider) {
-                  userOrdersSection.insertBefore(orderElement, divider);
-                } else {
-                  userOrdersSection.appendChild(orderElement);
-                }
+              // Reload orders для обновления списка с сервера
+              loadMarketplaceOrders();
+            })
+            .catch(error => {
+              console.warn('Предупреждение при создании заказа:', error);
+              showNotification('Ошибка: ' + error.message, 'error');
+            })
+            .finally(() => {
+              // Восстанавливаем кнопку
+              if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Создать заказ';
               }
-            }
-            
-            // Reload orders для обновления списка с сервера
-            loadMarketplaceOrders();
-          })
-          .catch(error => {
-            console.warn('Предупреждение при создании заказа:', error);
-            showNotification('Ошибка: ' + error.message, 'error');
-          })
-          .finally(() => {
-            // Восстанавливаем кнопку
-            if (submitBtn) {
-              submitBtn.disabled = false;
-              submitBtn.innerHTML = 'Создать заказ';
-            }
-          });
+            });
+        } else {
+          throw new Error('Функция создания заказа недоступна');
+        }
       } catch (error) {
         console.warn('Предупреждение при обработке данных заказа:', error);
         showNotification('Произошла ошибка при создании заказа', 'error');
+        
+        // Восстанавливаем кнопку в случае ошибки
+        const submitBtn = submitOrderForm.querySelector('[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Создать заказ';
+        }
       }
     });
   }
@@ -836,40 +884,309 @@ function loadMarketplaceOrders() {
     });
 }
 
-// Load user portfolio data
-function loadUserPortfolio() {
-  // Проверяем, авторизован ли пользователь, но не показываем окно авторизации
-  // если данные о пользователе еще загружаются
-  if (!auth) {
-    console.log("Сервис авторизации не готов");
-    return;
+// Заглушка для функции getUserInvestments, если она не определена
+function getUserInvestments(userId) {
+  return new Promise((resolve, reject) => {
+    // Если функция определена в db.js, используем ее
+    if (typeof window.dbFunctions?.getUserInvestments === 'function') {
+      return window.dbFunctions.getUserInvestments(userId);
+    }
+    
+    // Иначе возвращаем пустой массив
+    console.log('Function getUserInvestments not defined, returning empty array');
+    resolve([]);
+  });
+}
+
+// Функции для отображения и скрытия индикатора загрузки
+function showLoadingIndicator() {
+  console.log('Показ индикатора загрузки');
+  // Проверяем, существует ли уже индикатор загрузки
+  let loadingIndicator = document.getElementById('loading-indicator');
+  
+  // Если индикатора нет, создаем его
+  if (!loadingIndicator) {
+    loadingIndicator = document.createElement('div');
+    loadingIndicator.id = 'loading-indicator';
+    loadingIndicator.className = 'loading-indicator';
+    
+    const spinner = document.createElement('div');
+    spinner.className = 'spinner';
+    
+    const loadingText = document.createElement('div');
+    loadingText.className = 'loading-text';
+    loadingText.textContent = 'Загрузка...';
+    
+    loadingIndicator.appendChild(spinner);
+    loadingIndicator.appendChild(loadingText);
+    
+    document.body.appendChild(loadingIndicator);
   }
   
-  if (!auth.currentUser) {
+  // Показываем индикатор
+  loadingIndicator.style.display = 'flex';
+}
+
+function hideLoadingIndicator() {
+  console.log('Скрытие индикатора загрузки');
+  const loadingIndicator = document.getElementById('loading-indicator');
+  if (loadingIndicator) {
+    loadingIndicator.style.display = 'none';
+  }
+}
+
+// Функция для отображения ошибки
+function showError(message) {
+  console.error(message);
+  showNotification(message, 'error');
+}
+
+// Функция для получения текущего пользователя
+function getCurrentUser() {
+  if (window.auth && window.auth.currentUser) {
+    return window.auth.currentUser;
+  }
+  
+  // Если нет auth объекта или текущего пользователя, проверяем localStorage
+  try {
+    const localAuthKey = 'localAuth_currentUser';
+    const storedUserData = localStorage.getItem(localAuthKey);
+    
+    if (storedUserData) {
+      return JSON.parse(storedUserData);
+    }
+  } catch (e) {
+    console.error('Ошибка при получении данных пользователя из localStorage:', e);
+  }
+  
+  return null;
+}
+
+// Функция для получения ID текущего пользователя
+function getCurrentUserId() {
+  const currentUser = getCurrentUser();
+  return currentUser ? currentUser.uid : null;
+}
+
+// Обновленная функция загрузки портфолио пользователя
+function loadUserPortfolio() {
+  // Проверяем, авторизован ли пользователь
+  if (!isUserAuthenticated()) {
     showNotification('Пожалуйста, войдите в систему', 'error');
     showModal('auth-modal');
     return;
   }
   
-  const userId = auth.currentUser.uid;
+  // Получаем ID текущего пользователя
+  const userId = getCurrentUserId();
+  if (!userId) {
+    showNotification('Не удалось получить данные пользователя', 'error');
+    return;
+  }
   
-  // Get user investments
-  getUserInvestments(userId)
-    .then(investments => {
-      renderInvestments(investments);
-    })
-    .catch(error => {
-      console.error('Error loading investments:', error);
-    });
+  console.log('Загрузка портфолио для пользователя:', userId);
   
-  // Get user NFTs
-  getUserNFTs(userId)
-    .then(nfts => {
-      renderNFTs(nfts);
-    })
-    .catch(error => {
-      console.error('Error loading NFTs:', error);
-    });
+  // Показываем индикатор загрузки
+  showLoadingIndicator();
+  
+  // Загружаем заказы пользователя из window.dbFunctions
+  if (window.dbFunctions && typeof window.dbFunctions.getUserOrders === 'function') {
+    window.dbFunctions.getUserOrders(userId)
+      .then(orders => {
+        console.log('Получены заказы пользователя:', orders.length);
+        renderUserOrders(orders);
+      })
+      .catch(error => {
+        console.error('Ошибка загрузки заказов пользователя:', error);
+        showNotification('Ошибка загрузки заказов пользователя', 'error');
+      })
+      .finally(() => {
+        // Скрываем индикатор загрузки после получения заказов
+        hideLoadingIndicator();
+      });
+  } else {
+    console.error('Функция получения заказов пользователя не найдена');
+    // Пытаемся получить заказы напрямую из локального хранилища
+    try {
+      const localOrdersJson = localStorage.getItem('orders') || '[]';
+      const localOrders = JSON.parse(localOrdersJson);
+      const userOrders = localOrders.filter(order => order.userId === userId);
+      console.log('Получены заказы пользователя из локального хранилища:', userOrders.length);
+      renderUserOrders(userOrders);
+    } catch (error) {
+      console.error('Ошибка при получении заказов из локального хранилища:', error);
+      showNotification('Не удалось загрузить заказы пользователя', 'error');
+    } finally {
+      hideLoadingIndicator();
+    }
+  }
+  
+  // Загружаем инвестиции пользователя
+  if (typeof getUserInvestments === 'function') {
+    getUserInvestments(userId)
+      .then(investments => {
+        if (typeof renderUserInvestments === 'function') {
+          renderUserInvestments(investments);
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка загрузки инвестиций:', error);
+      });
+  }
+  
+  // Загружаем данные о доходах
+  if (typeof getUserRevenue === 'function') {
+    getUserRevenue(userId)
+      .then(revenue => {
+        if (typeof renderUserRevenue === 'function') {
+          renderUserRevenue(revenue);
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка загрузки данных о доходах:', error);
+      });
+  }
+  
+  // Загружаем транзакции
+  if (typeof getUserTransactions === 'function') {
+    getUserTransactions(userId)
+      .then(transactions => {
+        if (typeof renderUserTransactions === 'function') {
+          renderUserTransactions(transactions);
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка загрузки транзакций:', error);
+      });
+  }
+}
+
+// Загрузка статистики портфолио
+async function loadPortfolioStatistics(userId) {
+  try {
+    // Здесь в будущем можно добавить получение реальной статистики
+    // Пока используем тестовые данные
+    const statistics = {
+      totalInvested: 1250.50,
+      activeInvestments: 3,
+      totalReturns: 220.75,
+      pendingOrders: 2
+    };
+    
+    renderPortfolioStatistics(statistics);
+  } catch (error) {
+    console.error('Ошибка при загрузке статистики портфолио:', error);
+    showError('Не удалось загрузить статистику портфолио');
+  }
+}
+
+// Отображение статистики портфолио
+function renderPortfolioStatistics(statistics) {
+  console.log('Отображение статистики портфолио:', statistics);
+  
+  const portfolioPage = document.getElementById('portfolio');
+  if (!portfolioPage) {
+    console.error('Страница портфолио не найдена!');
+    return;
+  }
+  
+  const contentArea = portfolioPage.querySelector('.content-area');
+  if (!contentArea) {
+    console.error('Область контента не найдена на странице портфолио');
+    return;
+  }
+  
+  // Проверяем, существует ли секция для статистики
+  let statsSection = contentArea.querySelector('.statistics-card');
+  
+  // Если секция не существует, создаем её
+  if (!statsSection) {
+    console.log('Создание секции для статистики портфолио');
+    statsSection = document.createElement('div');
+    statsSection.className = 'card statistics-card';
+    
+    const cardHeader = document.createElement('div');
+    cardHeader.className = 'card-header';
+    
+    const cardTitle = document.createElement('h5');
+    cardTitle.className = 'card-title';
+    
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-chart-line';
+    
+    const titleText = document.createElement('span');
+    titleText.setAttribute('data-i18n', 'portfolio.statisticsTitle');
+    titleText.textContent = 'Статистика';
+    
+    cardTitle.appendChild(icon);
+    cardTitle.appendChild(titleText);
+    cardHeader.appendChild(cardTitle);
+    statsSection.appendChild(cardHeader);
+    
+    // Вставляем в начало области контента
+    contentArea.prepend(statsSection);
+  }
+  
+  // Создаем тело карточки
+  let cardBody = statsSection.querySelector('.card-body');
+  if (!cardBody) {
+    cardBody = document.createElement('div');
+    cardBody.className = 'card-body';
+    statsSection.appendChild(cardBody);
+  } else {
+    cardBody.innerHTML = '';
+  }
+  
+  // Создаем сетку для статистики
+  const statsGrid = document.createElement('div');
+  statsGrid.className = 'row statistics-grid';
+  
+  // Добавляем элементы статистики
+  statsGrid.innerHTML = `
+    <div class="col-md-6 col-lg-3 stat-item">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+        <div class="stat-content">
+          <div class="stat-value">$${statistics.totalInvested.toFixed(2)}</div>
+          <div class="stat-label" data-i18n="portfolio.totalInvested">Всего инвестировано</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3 stat-item">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-project-diagram"></i></div>
+        <div class="stat-content">
+          <div class="stat-value">${statistics.activeInvestments}</div>
+          <div class="stat-label" data-i18n="portfolio.activeInvestments">Активные инвестиции</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3 stat-item">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="stat-content">
+          <div class="stat-value">$${statistics.totalReturns.toFixed(2)}</div>
+          <div class="stat-label" data-i18n="portfolio.totalReturns">Общий доход</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3 stat-item">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+        <div class="stat-content">
+          <div class="stat-value">${statistics.pendingOrders}</div>
+          <div class="stat-label" data-i18n="portfolio.pendingOrders">Активные заказы</div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  cardBody.appendChild(statsGrid);
+  
+  // Применяем переводы
+  if (window.applyTranslations) {
+    applyTranslations(statsSection);
+  }
 }
 
 // Load user revenue data
@@ -991,95 +1308,54 @@ function renderOrders(orders, userOrders = null) {
 }
 
 // Create an order element
-function createOrderElement(order, isUserOrder = false) {
+function createOrderElement(order, isInPortfolio = false) {
   const orderItem = document.createElement('div');
-  orderItem.className = 'order-item';
-  if (isUserOrder) {
-    orderItem.classList.add('user-order');
-  }
+  orderItem.className = isInPortfolio ? 'order-item' : 'card mb-3';
+  orderItem.id = `order-${order.id}`;
   
-  // Calculate funding percentage
-  const fundingPercentage = (order.currentFunding / order.budget) * 100;
+  // Убедимся, что у нас есть корректные данные о цене/бюджете
+  const orderPrice = typeof order.budget === 'number' ? order.budget : 
+                    (typeof order.budget === 'string' ? parseFloat(order.budget) : 0);
+  const orderCurrency = order.currency || 'USD';
   
-  // Определяем действия в зависимости от того, чей это заказ
-  let actionButtons = '';
-  if (isUserOrder) {
-    actionButtons = `
-      <button class="btn btn-primary btn-sm btn-order-edit" data-order-id="${order.id}">
-        <i class="fas fa-edit"></i> Редактировать
-      </button>
-      <button class="btn btn-outline btn-sm btn-order-details" data-order-id="${order.id}">
-        <i class="fas fa-info-circle"></i> Детали
-      </button>
-    `;
-  } else {
-    actionButtons = `
-      <button class="btn btn-primary btn-sm btn-participate" data-order-id="${order.id}">
-        <i class="fas fa-plus"></i> Участвовать
-      </button>
-      <button class="btn btn-outline btn-sm btn-order-details" data-order-id="${order.id}">
-        <i class="fas fa-info-circle"></i> Детали
-      </button>
-    `;
-  }
+  let orderContent = '';
   
-  orderItem.innerHTML = `
-    <div class="order-thumbnail">
-      <i class="fas fa-${getCategoryIcon(order.category)}"></i>
-    </div>
-    <div class="order-details">
-      <h4 class="order-title">${order.title}</h4>
+  if (isInPortfolio) {
+    // Упрощенное отображение для портфолио
+    orderContent = `
+      <h6 class="order-title">${order.title}</h6>
       <div class="order-meta">
-        <span><i class="fas fa-tag"></i> ${order.category}</span>
-        <span><i class="fas fa-users"></i> ${order.participants} Участников</span>
-        <span><i class="fas fa-calendar"></i> ${getDeadlineText(order.deadline)}</span>
-        ${isUserOrder ? '<span class="badge user-badge"><i class="fas fa-user"></i> Ваш заказ</span>' : ''}
+        <span><i class="fas fa-coins"></i> ${orderPrice} ${orderCurrency}</span>
+        <span><i class="fas fa-calendar-alt"></i> ${formatDate(order.createdAt)}</span>
+        <span class="user-badge"><i class="fas fa-user"></i> ${getCurrentUserId() === order.userId ? 'Вы' : order.userName || 'Пользователь'}</span>
       </div>
-      <p class="order-description">${order.description}</p>
-      <div class="order-participation">
-        <div class="progress-container">
-          <div class="progress-label">
-            <span>Прогресс финансирования</span>
-            <span>$${order.currentFunding.toFixed(2)} / $${order.budget.toFixed(2)}</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: ${fundingPercentage}%;"></div>
-          </div>
-        </div>
-        <div class="order-actions">
-          ${actionButtons}
-        </div>
-      </div>
-    </div>
-  `;
-  
-  // Add event listeners to the buttons
-  if (isUserOrder) {
-    const editBtn = orderItem.querySelector('.btn-order-edit');
-    if (editBtn) {
-      editBtn.addEventListener('click', function() {
-        // В будущем можно добавить функционал редактирования
-        showNotification('Функция редактирования заказа будет доступна в ближайшем обновлении', 'info');
-      });
-    }
+      <p>${order.description.substring(0, 100)}${order.description.length > 100 ? '...' : ''}</p>
+      <button class="btn btn-sm btn-outline-primary view-order-details" data-order-id="${order.id}" data-i18n="marketplace.viewDetails">Подробнее</button>
+    `;
   } else {
-    const participateBtn = orderItem.querySelector('.btn-participate');
-    if (participateBtn) {
-      participateBtn.addEventListener('click', function() {
-        if (!isUserAuthenticated()) {
-          showModal('auth-modal');
-          return;
-        }
-        
-        showParticipationModal(order.id);
-      });
-    }
+    // Обычное отображение для маркетплейса
+    orderContent = `
+      <div class="card-body">
+        <h5 class="card-title">${order.title}</h5>
+        <p class="card-text">${order.description}</p>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="price-tag">${orderPrice} ${orderCurrency}</span>
+          <button class="btn btn-sm btn-primary view-order-details" data-order-id="${order.id}" data-i18n="marketplace.viewDetails">Подробнее</button>
+        </div>
+        <small class="text-muted">${formatDate(order.createdAt)}</small>
+        ${getCurrentUserId() === order.userId ? '<span class="badge bg-info float-end" data-i18n="marketplace.yourOrder">Ваш заказ</span>' : ''}
+      </div>
+    `;
   }
   
-  const detailsBtn = orderItem.querySelector('.btn-order-details');
-  if (detailsBtn) {
-    detailsBtn.addEventListener('click', function() {
-      showOrderDetailsModal(order);
+  orderItem.innerHTML = orderContent;
+  
+  // Добавляем обработчик событий для кнопки подробностей
+  const viewDetailsBtn = orderItem.querySelector('.view-order-details');
+  if (viewDetailsBtn) {
+    viewDetailsBtn.addEventListener('click', function() {
+      const orderId = this.getAttribute('data-order-id');
+      showOrderDetails(orderId);
     });
   }
   
@@ -1371,40 +1647,6 @@ function isUserAuthenticated() {
   return false;
 }
 
-// Функция для получения данных текущего пользователя
-function getCurrentUser() {
-  // Сначала проверяем Firebase Auth
-  if (window.auth && window.auth.currentUser) {
-    return {
-      uid: window.auth.currentUser.uid,
-      displayName: window.auth.currentUser.displayName || window.auth.currentUser.email || 'Пользователь',
-      email: window.auth.currentUser.email,
-      isLocal: false
-    };
-  }
-  
-  // Если нет Firebase Auth, проверяем localStorage
-  try {
-    const localAuthKey = 'localAuth_currentUser';
-    const storedUserJson = localStorage.getItem(localAuthKey);
-    
-    if (storedUserJson) {
-      const storedUser = JSON.parse(storedUserJson);
-      return {
-        uid: storedUser.uid,
-        displayName: storedUser.displayName || storedUser.email || 'Пользователь',
-        email: storedUser.email,
-        isLocal: true
-      };
-    }
-  } catch (e) {
-    console.error('Error getting user from localStorage:', e);
-  }
-  
-  // Если пользователь не найден
-  return null;
-}
-
 // Document ready
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize UI
@@ -1500,4 +1742,317 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
-}); 
+});
+
+// Заглушки для функций, которые будут реализованы позже
+
+// Получение инвестиций пользователя
+async function getUserInvestments(userId) {
+  console.log('Получение инвестиций пользователя:', userId);
+  // Заглушка, вернет пустой массив
+  return [];
+}
+
+// Отображение инвестиций пользователя
+function renderUserInvestments(investments) {
+  console.log('Отображение инвестиций пользователя:', investments);
+  // Заглушка, пока не отображаем инвестиции
+}
+
+// Получение доходов пользователя
+async function getUserRevenue(userId) {
+  console.log('Получение доходов пользователя:', userId);
+  // Заглушка, возвращает тестовые данные
+  return {
+    totalRevenue: 0,
+    monthlyRevenue: []
+  };
+}
+
+// Отображение доходов пользователя
+function renderUserRevenue(revenue) {
+  console.log('Отображение доходов пользователя:', revenue);
+  // Заглушка, пока не отображаем доходы
+}
+
+// Получение транзакций пользователя
+async function getUserTransactions(userId) {
+  console.log('Получение транзакций пользователя:', userId);
+  // Заглушка, вернет пустой массив
+  return [];
+}
+
+// Отображение транзакций пользователя
+function renderUserTransactions(transactions) {
+  console.log('Отображение транзакций пользователя:', transactions);
+  // Заглушка, пока не отображаем транзакции
+}
+
+// Отображение заказов пользователя
+function renderUserOrders(orders) {
+  console.log('Отображение заказов пользователя:', orders);
+  
+  // Проверяем, что orders есть и это массив
+  if (!orders || !Array.isArray(orders)) {
+    console.error('Передан некорректный массив заказов');
+    orders = [];
+  }
+  
+  // Находим страницу портфолио
+  const portfolioPage = document.getElementById('portfolio');
+  if (!portfolioPage) {
+    console.error('Страница портфолио не найдена');
+    return;
+  }
+  
+  // Находим контейнер для контента
+  const contentArea = portfolioPage.querySelector('.content-area');
+  if (!contentArea) {
+    console.error('Контент-область не найдена на странице портфолио');
+    return;
+  }
+  
+  // Проверяем, существует ли уже секция для заказов пользователя
+  let ordersSection = contentArea.querySelector('.user-orders-card');
+  
+  // Если секции нет, создаем ее
+  if (!ordersSection) {
+    ordersSection = document.createElement('div');
+    ordersSection.className = 'card user-orders-card';
+    
+    // Добавляем заголовок
+    const cardHeader = document.createElement('div');
+    cardHeader.className = 'card-header';
+    
+    const cardTitle = document.createElement('h3');
+    cardTitle.className = 'card-title';
+    cardTitle.setAttribute('data-i18n', 'portfolio.myOrders');
+    cardTitle.innerHTML = '<i class="fas fa-shopping-cart"></i> <span>Мои заказы</span>';
+    
+    cardHeader.appendChild(cardTitle);
+    ordersSection.appendChild(cardHeader);
+    
+    // Размещаем секцию в контент-области после статистики
+    contentArea.appendChild(ordersSection);
+  }
+  
+  // Создаем тело карточки
+  let cardBody = ordersSection.querySelector('.card-body');
+  if (!cardBody) {
+    cardBody = document.createElement('div');
+    cardBody.className = 'card-body';
+    ordersSection.appendChild(cardBody);
+  } else {
+    // Очищаем содержимое тела карточки
+    cardBody.innerHTML = '';
+  }
+  
+  // Если заказов нет, показываем соответствующее сообщение
+  if (orders.length === 0) {
+    const emptyMessage = document.createElement('p');
+    emptyMessage.className = 'empty-message';
+    emptyMessage.setAttribute('data-i18n', 'portfolio.noOrders');
+    emptyMessage.textContent = 'У вас пока нет заказов';
+    cardBody.appendChild(emptyMessage);
+    console.log('Отображено сообщение об отсутствии заказов');
+    return;
+  }
+  
+  console.log(`Отображение ${orders.length} заказов`);
+  
+  // Создаем элементы для каждого заказа
+  orders.forEach((order, index) => {
+    console.log(`Создание элемента для заказа #${index}:`, order);
+    
+    const orderElement = document.createElement('div');
+    orderElement.className = 'order-item';
+    orderElement.setAttribute('data-order-id', order.id);
+    
+    // Формируем содержимое элемента заказа
+    orderElement.innerHTML = `
+      <h5 class="order-title">${order.title || 'Без названия'}</h5>
+      <div class="order-meta">
+        <span><i class="fas fa-tag"></i> ${order.category || 'Категория не указана'}</span>
+        <span><i class="fas fa-coins"></i> ${order.price || 0} ${order.currency || 'USD'}</span>
+        <span><i class="fas fa-calendar"></i> ${formatDate(order.createdAt) || 'Дата не указана'}</span>
+      </div>
+      <p class="order-description">${(order.description || 'Описание отсутствует').substring(0, 150)}${order.description && order.description.length > 150 ? '...' : ''}</p>
+      <div class="order-actions">
+        <button class="btn btn-primary btn-sm view-order-details" data-order-id="${order.id}">
+          <i class="fas fa-eye"></i> <span data-i18n="marketplace.viewDetails">Подробнее</span>
+        </button>
+      </div>
+    `;
+    
+    // Добавляем элемент заказа в карточку
+    cardBody.appendChild(orderElement);
+    
+    // Добавляем обработчик для кнопки просмотра деталей
+    const viewDetailsBtn = orderElement.querySelector('.view-order-details');
+    if (viewDetailsBtn) {
+      viewDetailsBtn.addEventListener('click', function() {
+        const orderId = this.getAttribute('data-order-id');
+        showOrderDetails(orderId);
+      });
+    }
+  });
+  
+  // Применяем переводы к созданным элементам
+  if (typeof applyTranslations === 'function') {
+    applyTranslations(ordersSection);
+  }
+}
+
+// Вспомогательная функция для форматирования даты
+function formatDate(timestamp) {
+  if (!timestamp) return 'Неизвестно';
+  
+  let date;
+  try {
+    // Пытаемся создать объект Date из timestamp
+    if (typeof timestamp === 'object' && timestamp.seconds) {
+      // Формат Firebase Timestamp
+      date = new Date(timestamp.seconds * 1000);
+    } else if (typeof timestamp === 'number') {
+      // Числовой timestamp
+      date = new Date(timestamp);
+    } else {
+      // Строка или другой формат
+      date = new Date(timestamp);
+    }
+    
+    // Проверяем, что получилась валидная дата
+    if (isNaN(date.getTime())) {
+      return 'Неверная дата';
+    }
+    
+    // Форматируем дату
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  } catch (e) {
+    console.error('Ошибка при форматировании даты:', e);
+    return 'Ошибка даты';
+  }
+}
+
+// Функция для отображения деталей заказа
+function showOrderDetails(orderId) {
+  console.log('Отображение деталей заказа:', orderId);
+  
+  if (!orderId) {
+    console.error('ID заказа не указан');
+    showNotification('Ошибка: ID заказа не указан', 'error');
+    return;
+  }
+  
+  // Сначала пытаемся найти заказ в локальном хранилище
+  let order = null;
+  try {
+    const localOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+    order = localOrders.find(o => o.id === orderId);
+  } catch (error) {
+    console.warn('Ошибка при получении заказа из локального хранилища:', error);
+  }
+  
+  if (order) {
+    displayOrderDetailsModal(order);
+    return;
+  }
+  
+  // Если заказ не найден в локальном хранилище, пытаемся получить его из Firebase
+  const db = window.firebase ? window.firebase.firestore() : null;
+  if (db) {
+    db.collection('orders').doc(orderId).get()
+      .then(doc => {
+        if (doc.exists) {
+          order = {
+            id: doc.id,
+            ...doc.data()
+          };
+          displayOrderDetailsModal(order);
+        } else {
+          console.error('Заказ не найден в базе данных');
+          showNotification('Заказ не найден', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка при получении заказа из Firebase:', error);
+        showNotification('Ошибка при загрузке заказа: ' + error.message, 'error');
+      });
+  } else {
+    console.error('Заказ не найден ни в локальном хранилище, ни в Firebase');
+    showNotification('Заказ не найден', 'error');
+  }
+}
+
+// Функция для отображения модального окна с деталями заказа
+function displayOrderDetailsModal(order) {
+  console.log('Отображение модального окна с деталями заказа:', order);
+  
+  // Получаем модальное окно
+  const modal = document.getElementById('order-detail-modal');
+  if (!modal) {
+    console.error('Модальное окно для деталей заказа не найдено');
+    showNotification('Ошибка отображения деталей заказа', 'error');
+    return;
+  }
+  
+  // Убедимся, что у нас есть корректные данные о цене/бюджете
+  const orderPrice = typeof order.budget === 'number' ? order.budget : 
+                    (typeof order.budget === 'string' ? parseFloat(order.budget) : 0);
+  const orderCurrency = order.currency || 'USD';
+  
+  // Заполняем модальное окно данными заказа
+  const modalTitle = modal.querySelector('.modal-title');
+  const modalBody = modal.querySelector('.modal-body');
+  
+  if (modalTitle) {
+    modalTitle.textContent = order.title || 'Детали заказа';
+  }
+  
+  if (modalBody) {
+    // Формируем содержимое модального окна
+    modalBody.innerHTML = `
+      <div class="modal-row">
+        <div class="modal-row-label">Категория:</div>
+        <div class="modal-row-value">${order.category || 'Не указана'}</div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-row-label">Стоимость:</div>
+        <div class="modal-row-value">${orderPrice} ${orderCurrency}</div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-row-label">Дата создания:</div>
+        <div class="modal-row-value">${formatDate(order.createdAt)}</div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-row-label">Описание:</div>
+        <div class="modal-row-value">${order.description || 'Описание отсутствует'}</div>
+      </div>
+    `;
+  }
+  
+  // Настраиваем кнопки модального окна
+  const participateBtn = modal.querySelector('.btn-primary');
+  if (participateBtn) {
+    // Если это заказ текущего пользователя, меняем кнопку на редактирование
+    const isCurrentUserOrder = order.userId === getCurrentUserId();
+    
+    participateBtn.textContent = isCurrentUserOrder ? 'Редактировать' : 'Участвовать';
+    participateBtn.onclick = isCurrentUserOrder 
+      ? function() { editOrder(order.id); } 
+      : function() { participateInOrder(order.id); };
+  }
+  
+  // Показываем модальное окно
+  showModal('order-detail-modal');
+}
+
+// Временная функция для редактирования заказа
+function editOrder(orderId) {
+  showNotification('Функция редактирования заказа будет доступна в ближайшем обновлении', 'info');
+}
+
+// Временная функция для участия в заказе
+function participateInOrder(orderId) {
+  showNotification('Функция участия в заказе будет доступна в ближайшем обновлении', 'info');
+} 
