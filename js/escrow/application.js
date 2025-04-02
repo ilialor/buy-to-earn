@@ -149,7 +149,6 @@ class EscrowApplication {
     const customer = new Customer(name);
     this.users[customer.user_id] = customer;
     this._saveChanges();
-    showNotification(`Пользователь ${name} создан успешно`, 'success');
     return customer;
   }
   
@@ -160,7 +159,6 @@ class EscrowApplication {
     const contractor = new Contractor(name);
     this.users[contractor.user_id] = contractor;
     this._saveChanges();
-    showNotification(`Исполнитель ${name} создан успешно`, 'success');
     return contractor;
   }
   
@@ -171,16 +169,12 @@ class EscrowApplication {
     const customer = this._getUser(customerId);
     if (!customer || !(customer instanceof Customer)) {
       console.log(`Error: Customer ${customerId} not found or invalid type.`);
-      showNotification(`Ошибка: Пользователь не найден или неверный тип`, 'error');
       return false;
     }
     
     const result = customer.deposit(amount);
     if (result) {
       this._saveChanges();
-      showNotification(`Успешно пополнен баланс на ${amount}`, 'success');
-    } else {
-      showNotification(`Ошибка пополнения баланса`, 'error');
     }
     return result;
   }
@@ -194,7 +188,6 @@ class EscrowApplication {
     
     if (!customer || !(customer instanceof Customer)) {
       console.log(`Error: Creator Customer ${customerId} not found or invalid type.`);
-      showNotification(`Ошибка: Заказчик не найден или неверный тип`, 'error');
       return null;
     }
     
@@ -204,14 +197,12 @@ class EscrowApplication {
       
       if (!contractor || !(contractor instanceof Contractor)) {
         console.log(`Error: Contractor ${contractorId} not found or invalid type.`);
-        showNotification(`Ошибка: Исполнитель не найден или неверный тип`, 'error');
         return null;
       }
     }
     
     if (!milestonesData || !milestonesData.length) {
       console.log("Error: Cannot create order with no milestones.");
-      showNotification(`Ошибка: Невозможно создать заказ без этапов`, 'error');
       return null;
     }
     
@@ -232,12 +223,10 @@ class EscrowApplication {
       
       console.log(`Order ${order.order_id} successfully registered in the application.`);
       this._saveChanges();
-      showNotification(`Заказ успешно создан`, 'success');
       return order;
     } catch (error) {
       console.log(`Failed to create order: ${error.message}`);
-      showNotification(`Ошибка создания заказа: ${error.message}`, 'error');
-      return null;
+      throw error;
     }
   }
   
@@ -249,32 +238,29 @@ class EscrowApplication {
     const order = this._getOrder(orderId);
     
     if (!customer || !(customer instanceof Customer)) {
-      showNotification(`Ошибка: Пользователь не найден или неверный тип`, 'error');
+      console.log(`Error: Customer ${customerId} not found or invalid type.`);
       return false;
     }
     
     if (!order) {
-      showNotification(`Ошибка: Заказ не найден`, 'error');
+      console.log(`Error: Order ${orderId} not found.`);
       return false;
     }
     
     amount = parseFloat(amount);
     if (isNaN(amount) || amount <= 0) {
       console.log("Error: Contribution amount must be positive.");
-      showNotification(`Ошибка: Сумма взноса должна быть положительной`, 'error');
       return false;
     }
     
     if (customer.balance < amount) {
       console.log(`Error: Customer ${customer.name} (${customerId}) has insufficient balance (${customer.balance.toFixed(2)}) to contribute ${amount.toFixed(2)}.`);
-      showNotification(`Недостаточный баланс (${customer.balance.toFixed(2)})`, 'error');
       return false;
     }
     
     // Check if order is in pending state BEFORE changing balance
     if (order.status !== OrderStatus.PENDING) {
       console.log(`Error: Order ${orderId} is not in PENDING status (Current: ${order.status}). Cannot add contribution.`);
-      showNotification(`Ошибка: Заказ не находится в статусе ожидания`, 'error');
       return false;
     }
     
@@ -289,7 +275,6 @@ class EscrowApplication {
         customer.orders_joined[orderId] = (customer.orders_joined[orderId] || 0) + amount;
         console.log(`Customer ${customer.name} (${customerId}) successfully joined Order ${orderId}.`);
         this._saveChanges();
-        showNotification(`Пользователь успешно присоединился к заказу`, 'success');
         return true;
       } else {
         // Rollback customer balance if contribution failed
@@ -327,7 +312,6 @@ class EscrowApplication {
     const result = order.markMilestoneCompleteByContractor(milestoneId);
     if (result) {
       this._saveChanges();
-      showNotification(`Этап работы отмечен как выполненный`, 'success');
     }
     return result;
   }
@@ -406,7 +390,6 @@ class EscrowApplication {
       }
       
       this._saveChanges();
-      showNotification(`Акт выполненных работ подписан`, 'success');
       return true;
     } else {
       // Signature was not added
@@ -462,7 +445,6 @@ class EscrowApplication {
     
     if (result) {
       this._saveChanges();
-      showNotification(`Голос за представителя учтен`, 'success');
     }
     
     return result;
@@ -595,7 +577,6 @@ class EscrowApplication {
     this.users = {};
     this.orders = {};
     this.storage.clearAllData();
-    showNotification(`Все данные приложения сброшены`, 'info');
   }
 }
 

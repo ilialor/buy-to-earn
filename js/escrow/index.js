@@ -24,15 +24,33 @@ import escrowUI from './ui.js';
 
 // Initialize the escrow UI when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize escrow UI
-  escrowUI.init();
+  // Проверяем наличие функции локализации, ждем если еще не загружена
+  const checkLocalization = () => {
+    if (typeof window.getCurrentLanguageMessage === 'function') {
+      // Функция локализации загружена, можно инициализировать эскроу-интерфейс
+      initializeEscrow();
+    } else {
+      // Ждем и пробуем еще раз
+      console.log('Waiting for localization functions to load...');
+      setTimeout(checkLocalization, 100);
+    }
+  };
   
-  // Create some test data if needed
-  if (window.location.search.includes('test_escrow=1')) {
-    createTestData();
-  }
+  // Инициализация эскроу-интерфейса
+  const initializeEscrow = () => {
+    // Initialize escrow UI
+    escrowUI.init();
+    
+    // Create some test data if needed
+    if (window.location.search.includes('test_escrow=1')) {
+      createTestData();
+    }
+    
+    console.log('Escrow module initialized');
+  };
   
-  console.log('Escrow module initialized');
+  // Начинаем проверку
+  checkLocalization();
 });
 
 // Function to create test data

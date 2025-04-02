@@ -59,10 +59,11 @@ const ru = {
     fundingProgress: "Прогресс финансирования",
     participate: "Участвовать",
     details: "Подробнее",
-    yourOrders: "Твои заказы",
+    yourOrders: "Ваши заказы",
     allActiveOrders: "Все активные заказы",
     viewDetails: "Подробнее",
-    yourOrder: "Ваш заказ"
+    yourOrder: "Ваш заказ",
+    noActiveOrders: "Нет активных заказов"
   },
   
   // Portfolio
@@ -83,7 +84,9 @@ const ru = {
     myNFTs: "Мои NFT",
     trackReturns: "Отслеживать доходы",
     accessProduct: "Доступ к продукту",
-    transactions: "Транзакции"
+    transactions: "Транзакции",
+    pendingOrders: "Ожидающие заказы"
+
   },
   
   // Revenue
@@ -135,7 +138,9 @@ const ru = {
     transfer: "Перевести",
     transactionHistory: "История транзакций",
     connectWallet: "Подключить кошелек",
-    connectExternalWallet: "Подключить внешний кошелек"
+    connectExternalWallet: "Подключить внешний кошелек",
+    deposit_success: "Успешно пополнен баланс на {amount} USD",
+    deposit_error: "Ошибка при пополнении баланса"
   },
   
   // Documentation
@@ -322,7 +327,13 @@ const ru = {
     orderDescription: 'Описание заказа',
     totalCost: 'Общая стоимость',
     currentFunding: 'Текущее финансирование',
-    contributionAmount: 'Сумма взноса'
+    contributionAmount: 'Сумма взноса',
+    required_fields: 'Пожалуйста, заполните все обязательные поля',
+    invalid_amount: 'Недопустимая сумма',
+    order_created: 'Заказ успешно создан',
+    error_creating: 'Ошибка создания заказа',
+    error_exception: 'Исключение при создании заказа',
+    user_not_found: 'Пользователь не найден в системе'
   },
   
   // Order
@@ -338,7 +349,15 @@ const ru = {
     milestonesHelp: "Определите этапы вашего проекта и их стоимость",
     addMilestone: "Добавить этап",
     createOrder: "Создать заказ",
-    cancel: "Отмена"
+    cancel: "Отмена",
+    max_milestones: "Максимальное количество этапов - 10",
+    milestone_description: "Описание этапа",
+    amount: "Сумма",
+    add_milestone: "Пожалуйста, добавьте хотя бы один этап",
+    invalid_milestone_data: "Данные этапа недействительны",
+    enter_valid_amount: "Сумма этапа должна быть положительной",
+    joined_success: "Успешно присоединился к заказу",
+    join_error: "Ошибка при присоединении к заказу"
   }
 };
 

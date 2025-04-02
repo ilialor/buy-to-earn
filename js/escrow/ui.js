@@ -16,6 +16,71 @@ class EscrowUI {
   }
   
   /**
+   * Helper function to get translated messages
+   */
+  _getCurrentLanguageMessage(key) {
+    // Check if we have global function
+    if (typeof window.getCurrentLanguageMessage === 'function') {
+      return window.getCurrentLanguageMessage(key);
+    }
+    
+    // Fallback translations map for most common messages
+    const fallbackTranslations = {
+      'order.max_milestones': 'Maximum number of milestones is 10',
+      'order.milestone_description': 'Milestone Description',
+      'order.amount': 'Amount',
+      'order.add_milestone': 'Please add at least one milestone',
+      'order.invalid_milestone_data': 'Milestone data is invalid',
+      'order.enter_valid_amount': 'Please enter a valid amount',
+      'order.joined_success': 'Successfully joined the order',
+      'order.join_error': 'Error joining order',
+      'escrow.user_not_found': 'User not found in escrow system',
+      'escrow.order_created': 'Order created successfully',
+      'escrow.error_creating': 'Error creating order'
+    };
+    
+    // Get current language
+    const currentLang = document.documentElement.lang || 'en';
+    
+    if (currentLang === 'ru') {
+      // Russian translations
+      const ruTranslations = {
+        'order.max_milestones': 'Максимальное количество этапов - 10',
+        'order.milestone_description': 'Описание этапа',
+        'order.amount': 'Сумма',
+        'order.add_milestone': 'Пожалуйста, добавьте хотя бы один этап',
+        'order.invalid_milestone_data': 'Данные этапа недействительны',
+        'order.enter_valid_amount': 'Пожалуйста, введите допустимую сумму',
+        'order.joined_success': 'Успешно присоединился к заказу',
+        'order.join_error': 'Ошибка при присоединении к заказу',
+        'escrow.user_not_found': 'Пользователь не найден в системе',
+        'escrow.order_created': 'Заказ успешно создан',
+        'escrow.error_creating': 'Ошибка создания заказа'
+      };
+      return ruTranslations[key] || fallbackTranslations[key] || key;
+    } else if (currentLang === 'es') {
+      // Spanish translations
+      const esTranslations = {
+        'order.max_milestones': 'El número máximo de hitos es 10',
+        'order.milestone_description': 'Descripción del Hito',
+        'order.amount': 'Monto',
+        'order.add_milestone': 'Por favor, añada al menos un hito',
+        'order.invalid_milestone_data': 'Los datos del hito no son válidos',
+        'order.enter_valid_amount': 'Por favor, ingrese un monto válido',
+        'order.joined_success': 'Se unió con éxito a la orden',
+        'order.join_error': 'Error al unirse a la orden',
+        'escrow.user_not_found': 'Usuario no encontrado en el sistema',
+        'escrow.order_created': 'Orden creada con éxito',
+        'escrow.error_creating': 'Error al crear la orden'
+      };
+      return esTranslations[key] || fallbackTranslations[key] || key;
+    }
+    
+    // Default to English or key itself
+    return fallbackTranslations[key] || key;
+  }
+  
+  /**
    * Initialize the UI components
    */
   init() {
@@ -30,6 +95,9 @@ class EscrowUI {
       this._handleUserChange();
     });
     
+    // Initialize contractors dropdown
+    this._populateContractorsDropdown();
+    
     // Show initialization notification
     showNotification('Эскроу-функциональность загружена', 'info');
   }
@@ -38,19 +106,45 @@ class EscrowUI {
    * Set up event listeners for forms and buttons
    */
   _setupEventListeners() {
-    // Add milestone button in order creation form
-    const addMilestoneBtn = document.getElementById('add-milestone-btn');
-    if (addMilestoneBtn) {
-      addMilestoneBtn.addEventListener('click', (e) => {
+    // Обработчик для стандартной формы создания заказа на странице маркетплейса
+    const marketplaceOrderForm = document.getElementById('create-order-form');
+    if (marketplaceOrderForm) {
+      // Добавляем первый milestone при инициализации формы
+      this._addMilestoneField(marketplaceOrderForm.querySelector('#create-order-milestones-container'));
+      
+      // Добавляем обработчик кнопки добавления milestone
+      const addMilestoneBtn = marketplaceOrderForm.querySelector('#create-order-add-milestone-btn');
+      if (addMilestoneBtn) {
+        addMilestoneBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this._addMilestoneField(marketplaceOrderForm.querySelector('#create-order-milestones-container'));
+        });
+      }
+      
+      // Добавляем обработчик отправки формы
+      marketplaceOrderForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        this._addMilestoneField();
+        this._handleOrderCreation(e.target);
       });
     }
     
-    // Order creation form
-    const orderForm = document.getElementById('create-order-form');
-    if (orderForm) {
-      orderForm.addEventListener('submit', (e) => {
+    // Обработчик для модальной формы создания заказа
+    const modalOrderForm = document.getElementById('modal-create-order-form');
+    if (modalOrderForm) {
+      // Добавляем первый milestone при инициализации формы
+      this._addMilestoneField(modalOrderForm.querySelector('#modal-milestones-container'));
+      
+      // Добавляем обработчик кнопки добавления milestone
+      const modalAddMilestoneBtn = document.getElementById('modal-add-milestone-btn');
+      if (modalAddMilestoneBtn) {
+        modalAddMilestoneBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this._addMilestoneField(modalOrderForm.querySelector('#modal-milestones-container'));
+        });
+      }
+      
+      // Добавляем обработчик отправки формы
+      modalOrderForm.addEventListener('submit', (e) => {
         e.preventDefault();
         this._handleOrderCreation(e.target);
       });
@@ -93,6 +187,20 @@ class EscrowUI {
         this._handleVoteSubmission(e.target);
       });
     }
+    
+    // Deposit form
+    const depositForm = document.getElementById('deposit-form');
+    if (depositForm) {
+      depositForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this._handleDeposit(e.target);
+      });
+    }
+    
+    // Обновляем обработчик изменения пользователя, чтобы также обновлять баланс в кошельке
+    document.addEventListener('userChanged', () => {
+      this._updateEscrowBalance();
+    });
   }
   
   /**
@@ -148,7 +256,7 @@ class EscrowUI {
     });
     
     // Update balance display
-    this._updateBalanceDisplay();
+    this._updateEscrowBalance();
     
     // Load user's orders
     this._loadUserOrders();
@@ -165,9 +273,9 @@ class EscrowUI {
   }
   
   /**
-   * Update balance display
+   * Update escrow balance display in wallet
    */
-  _updateBalanceDisplay() {
+  _updateEscrowBalance() {
     if (!this.currentUser) return;
     
     // Find the user in escrow system
@@ -175,7 +283,13 @@ class EscrowUI {
     const escrowUser = escrowUsers.find(eu => eu.name === this.currentUser.email || eu.user_id === this.currentUser.uid);
     
     if (escrowUser) {
-      // Update balance display
+      // Update escrow balance in wallet
+      const escrowBalanceEl = document.getElementById('escrow-balance-value');
+      if (escrowBalanceEl) {
+        escrowBalanceEl.textContent = escrowUser.balance.toFixed(2);
+      }
+      
+      // Also update standard balance display
       const balanceEl = document.getElementById('user-balance');
       if (balanceEl) {
         balanceEl.textContent = `${escrowUser.balance.toFixed(2)} USD`;
@@ -638,7 +752,7 @@ class EscrowUI {
       this._loadUserOrders();
       
       // Update balance display
-      this._updateBalanceDisplay();
+      this._updateEscrowBalance();
     } else {
       window.showNotification('Error signing act. Check console for details.', 'error');
     }
@@ -647,24 +761,25 @@ class EscrowUI {
   /**
    * Add milestone field to order creation form
    */
-  _addMilestoneField() {
-    const milestonesContainer = document.getElementById('milestones-container');
+  _addMilestoneField(milestonesContainer) {
+    if (!milestonesContainer) return;
+    
     const milestoneCount = milestonesContainer.querySelectorAll('.milestone-field').length;
     
     if (milestoneCount >= 10) {
-      showNotification('Максимальное количество этапов - 10', 'warning');
+      window.showNotification(this._getCurrentLanguageMessage('order.max_milestones'), 'warning');
       return;
     }
     
     const milestoneEntry = document.createElement('div');
-    milestoneEntry.className = 'milestone-entry';
+    milestoneEntry.className = 'milestone-entry milestone-field';
     milestoneEntry.innerHTML = `
       <div class="form-row">
         <div class="form-group col-md-8">
-          <input type="text" class="form-control" name="milestone_desc[]" placeholder="Milestone ${milestoneCount + 1} Description" required>
+          <input type="text" class="form-control" name="milestone_desc[]" placeholder="${this._getCurrentLanguageMessage('order.milestone_description')} ${milestoneCount + 1}" required>
         </div>
         <div class="form-group col-md-3">
-          <input type="number" class="form-control" name="milestone_amount[]" placeholder="Amount" min="1" step="0.01" required>
+          <input type="number" class="form-control" name="milestone_amount[]" placeholder="${this._getCurrentLanguageMessage('order.amount')}" min="1" step="0.01" required>
         </div>
         <div class="form-group col-md-1">
           <button type="button" class="btn btn-danger remove-milestone-btn">×</button>
@@ -695,13 +810,21 @@ class EscrowUI {
     const milestoneAmounts = Array.from(form.querySelectorAll('[name="milestone_amount[]"]')).map(el => parseFloat(el.value));
     
     if (milestoneDescs.length === 0 || milestoneAmounts.length === 0) {
-      window.showNotification('Please add at least one milestone', 'error');
+      window.showNotification(this._getCurrentLanguageMessage('order.add_milestone'), 'error');
       return;
     }
     
     if (milestoneDescs.length !== milestoneAmounts.length) {
-      window.showNotification('Milestone data is invalid', 'error');
+      window.showNotification(this._getCurrentLanguageMessage('order.invalid_milestone_data'), 'error');
       return;
+    }
+    
+    // Validate milestone amounts
+    for (let i = 0; i < milestoneAmounts.length; i++) {
+      if (isNaN(milestoneAmounts[i]) || milestoneAmounts[i] <= 0) {
+        window.showNotification(this._getCurrentLanguageMessage('order.enter_valid_amount'), 'error');
+        return;
+      }
     }
     
     // Build milestone data array
@@ -710,37 +833,45 @@ class EscrowUI {
     // Get current user ID
     const currentUserId = this._getCurrentEscrowUserId();
     if (!currentUserId) {
-      window.showNotification('User not found in escrow system', 'error');
+      window.showNotification(this._getCurrentLanguageMessage('escrow.user_not_found'), 'error');
       return;
     }
     
-    // Create the order - передаем contractorId даже если это пустая строка
-    const order = this.escrowApp.createOrder(currentUserId, contractorId, milestonesData);
-    
-    if (order) {
-      // Add title and description to the order (these aren't part of the escrow logic but useful for UI)
-      order.title = title;
-      order.description = description;
-      this.escrowApp.storage.saveOrder(order.toJSON());
+    try {
+      // Create the order - передаем contractorId даже если это пустая строка
+      const order = this.escrowApp.createOrder(currentUserId, contractorId, milestonesData);
       
-      window.showNotification('Order created successfully', 'success');
-      
-      // Clear the form
-      form.reset();
-      document.getElementById('milestones-container').innerHTML = '';
-      
-      // Add one empty milestone field
-      this._addMilestoneField();
-      
-      // Close modal if any
-      if (window.closeModal) {
-        window.closeModal('create-order-modal');
+      if (order) {
+        // Add title and description to the order (these aren't part of the escrow logic but useful for UI)
+        order.title = title;
+        order.description = description;
+        
+        // Сохраняем данные заказа
+        this.escrowApp.storage.saveOrder(order.toJSON());
+        
+        // Выводим уведомление об успехе через i18n
+        window.showNotification(this._getCurrentLanguageMessage('escrow.order_created'), 'success');
+        
+        // Clear the form
+        form.reset();
+        const milestonesContainer = document.getElementById('create-order-milestones-container') || 
+                                   document.getElementById('modal-milestones-container');
+        if (milestonesContainer) {
+          milestonesContainer.innerHTML = '';
+        }
+        
+        // Add one empty milestone field
+        this._addMilestoneField(document.getElementById('create-order-milestones-container') || 
+                                document.getElementById('modal-milestones-container'));
+        
+        // Refresh the orders list
+        this._loadUserOrders();
       }
-      
-      // Refresh the orders list
-      this._loadUserOrders();
-    } else {
-      window.showNotification('Error creating order. Check console for details.', 'error');
+    } catch (error) {
+      console.error("Error creating order:", error);
+      // Просто передаем ошибку выше - не добавляем здесь уведомление, 
+      // оно будет показано в обработчике формы
+      throw error;
     }
   }
   
@@ -752,14 +883,14 @@ class EscrowUI {
     const amount = parseFloat(form.querySelector('[name="contribution_amount"]').value);
     
     if (!orderId || isNaN(amount) || amount <= 0) {
-      window.showNotification('Please enter a valid amount', 'error');
+      window.showNotification(this._getCurrentLanguageMessage('order.enter_valid_amount'), 'error');
       return;
     }
     
     // Get current user ID
     const currentUserId = this._getCurrentEscrowUserId();
     if (!currentUserId) {
-      window.showNotification('User not found in escrow system', 'error');
+      window.showNotification(this._getCurrentLanguageMessage('escrow.user_not_found'), 'error');
       return;
     }
     
@@ -767,7 +898,7 @@ class EscrowUI {
     const result = this.escrowApp.joinOrder(currentUserId, orderId, amount);
     
     if (result) {
-      window.showNotification('Successfully joined the order', 'success');
+      window.showNotification(this._getCurrentLanguageMessage('order.joined_success'), 'success');
       
       // Clear the form
       form.reset();
@@ -778,10 +909,10 @@ class EscrowUI {
       }
       
       // Refresh the UI
-      this._updateBalanceDisplay();
+      this._updateEscrowBalance();
       this._loadUserOrders();
     } else {
-      window.showNotification('Error joining order. Check console for details.', 'error');
+      window.showNotification(this._getCurrentLanguageMessage('order.join_error'), 'error');
     }
   }
   
@@ -809,6 +940,86 @@ class EscrowUI {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
+  }
+  
+  /**
+   * Handle deposit to escrow
+   */
+  _handleDeposit(form) {
+    const amount = parseFloat(form.querySelector('[name="deposit_amount"]').value);
+    
+    if (isNaN(amount) || amount <= 0) {
+      window.showNotification(this._getCurrentLanguageMessage('order.enter_valid_amount'), 'error');
+      return;
+    }
+    
+    // Get current user ID
+    const currentUserId = this._getCurrentEscrowUserId();
+    if (!currentUserId) {
+      window.showNotification(this._getCurrentLanguageMessage('escrow.user_not_found'), 'error');
+      return;
+    }
+    
+    // Deposit funds
+    const result = this.escrowApp.customerDeposit(currentUserId, amount);
+    
+    if (result) {
+      window.showNotification(
+        this._getCurrentLanguageMessage('wallet.deposit_success').replace('{amount}', amount.toFixed(2)),
+        'success'
+      );
+      
+      // Clear the form
+      form.reset();
+      
+      // Close modal if any
+      if (window.closeModal) {
+        window.closeModal('deposit-funds-modal');
+      }
+      
+      // Update balance displays
+      this._updateEscrowBalance();
+    } else {
+      window.showNotification(this._getCurrentLanguageMessage('wallet.deposit_error'), 'error');
+    }
+  }
+
+  /**
+   * Populate the contractors dropdown in the order form
+   */
+  _populateContractorsDropdown() {
+    // Получаем все выпадающие списки контракторов
+    const contractorDropdowns = [
+      document.getElementById('create-order-contractor'),
+      document.getElementById('modal-contractor-id')
+    ].filter(Boolean); // Фильтруем на случай, если какого-то элемента нет
+    
+    if (!contractorDropdowns.length) return;
+    
+    // Get all contractors from escrow app
+    const contractors = this.escrowApp.getAllUsers(UserType.CONTRACTOR);
+    
+    // Для каждого выпадающего списка
+    for (const dropdown of contractorDropdowns) {
+      // Сохраняем первый option (placeholder)
+      const placeholderOption = dropdown.querySelector('option');
+      
+      // Очищаем dropdown
+      dropdown.innerHTML = '';
+      
+      // Возвращаем placeholder option
+      if (placeholderOption) {
+        dropdown.appendChild(placeholderOption);
+      }
+      
+      // Добавляем contractors
+      contractors.forEach(contractor => {
+        const option = document.createElement('option');
+        option.value = contractor.user_id;
+        option.textContent = contractor.name;
+        dropdown.appendChild(option);
+      });
+    }
   }
 }
 

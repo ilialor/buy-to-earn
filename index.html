@@ -72,7 +72,7 @@
                 <button class="btn btn-primary" id="sign-in-btn" data-i18n="auth.signIn"><i class="fas fa-user"></i> Sign In</button>
               </div>
               <div class="user-controls-logged-in">
-                <div class="btn btn-outline" id="wallet-balance-display">
+                <div class="btn btn-outline" id="wallet-balance-display" data-modal="deposit-funds-modal">
                   <i class="fas fa-wallet"></i> <span id="wallet-balance-value">0.00</span> ETH
                 </div>
                 
@@ -133,16 +133,6 @@
                         <div class="stat-label" data-i18n="marketplace.revenueGenerated">Revenue Generated</div>
                     </div>
                 </div>
-                
-                <!-- Добавляем кнопки эскроу-функциональности в главную секцию -->
-                <div class="action-buttons">
-                    <button class="btn btn-primary" id="marketplace-create-group-order-btn" data-modal="create-order-modal">
-                        <i class="fas fa-users"></i> <span data-i18n="escrow.createGroupOrder">Create Group Order</span>
-                    </button>
-                    <button class="btn btn-outline" id="marketplace-deposit-funds-btn" data-modal="deposit-funds-modal">
-                        <i class="fas fa-wallet"></i> <span data-i18n="escrow.depositFunds">Deposit Funds</span>
-                    </button>
-                </div>
 
                 <div class="card">
                     <div class="card-header">
@@ -186,16 +176,16 @@
             <div class="content-area" id="submit">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Submit New Order</h3>
+                        <h3 class="card-title" data-i18n="order.createTitle">Create Order</h3>
                     </div>
-                    <form>
+                    <form id="create-order-form">
                         <div class="form-group">
-                            <label for="order-title">Order Title</label>
-                            <input type="text" id="order-title" placeholder="Enter a descriptive title for your order">
+                            <label for="order-title" data-i18n="order.title">Order Title</label>
+                            <input type="text" id="order-title" name="title" data-i18n-placeholder="order.titlePlaceholder" placeholder="Enter a descriptive title for your order" required>
                         </div>
                         <div class="form-group">
                             <label for="order-category">Category</label>
-                            <select id="order-category">
+                            <select id="order-category" name="category">
                                 <option value="">Select a category</option>
                                 <option value="book">Book</option>
                                 <option value="software">Software</option>
@@ -206,18 +196,31 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="order-description">Description</label>
-                            <textarea id="order-description" placeholder="Describe in detail what you want to be created..."></textarea>
+                            <label for="order-description" data-i18n="order.description">Description</label>
+                            <textarea id="order-description" name="description" data-i18n-placeholder="order.descriptionPlaceholder" placeholder="Describe in detail what you want to be created..."></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="order-budget">Budget (USD)</label>
-                            <input type="number" id="order-budget" placeholder="Estimated budget for the project">
+                            <label for="create-order-contractor" data-i18n="order.selectContractor">Select Contractor (Optional)</label>
+                            <select id="create-order-contractor" name="contractor_id">
+                                <option value="" data-i18n="order.selectContractorPlaceholder">-- Select a contractor --</option>
+                                <!-- Contractors will be loaded dynamically -->
+                            </select>
                         </div>
+                        
                         <div class="form-group">
-                            <label for="order-deadline">Estimated Deadline</label>
-                            <input type="date" id="order-deadline">
+                            <label for="milestones" data-i18n="order.milestones">Milestones</label>
+                            <p class="form-help" data-i18n="order.milestonesHelp">Define the steps of your project and their costs</p>
+                            
+                            <div id="create-order-milestones-container">
+                                <!-- Milestone fields will be added here -->
+                            </div>
+                            
+                            <button type="button" id="create-order-add-milestone-btn" class="btn btn-secondary">
+                                <i class="fas fa-plus"></i> <span data-i18n="order.addMilestone">Add Milestone</span>
+                            </button>
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit Order</button>
+                        
+                        <button type="submit" class="btn btn-primary" data-i18n="order.createOrder">Create Order</button>
                     </form>
                 </div>
             </div>
@@ -263,16 +266,6 @@
                         <div class="stat-value" id="joined-orders-count">0</div>
                         <div class="stat-label">Orders Joined</div>
                     </div>
-                </div>
-                
-                <!-- Button to Create New Order -->
-                <div class="action-buttons escrow-auth-required">
-                    <button class="btn btn-primary" id="create-group-order-btn" data-modal="create-order-modal">
-                        <i class="fas fa-plus"></i> Create Group Order
-                    </button>
-                    <button class="btn btn-primary" id="deposit-funds-btn" data-modal="deposit-funds-modal">
-                        <i class="fas fa-wallet"></i> Deposit Funds
-                    </button>
                 </div>
                 
                 <!-- User's Orders Tabs -->
@@ -506,9 +499,22 @@
                 </div>
                 <div class="wallet-balance">1,250.75 <span class="wallet-currency">ETH</span></div>
                 <div class="wallet-actions">
-                    <button class="btn btn-primary"><i class="fas fa-plus"></i> Deposit</button>
+                    <button class="btn btn-primary" id="wallet-deposit-btn" data-modal="deposit-funds-modal"><i class="fas fa-plus"></i> Deposit</button>
                     <button class="btn btn-outline"><i class="fas fa-arrow-right"></i> Withdraw</button>
                     <button class="btn btn-outline"><i class="fas fa-exchange-alt"></i> Transfer</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Escrow Balance</h3>
+                </div>
+                <div class="wallet-balance">
+                    <span id="escrow-balance-value">0.00</span> <span class="wallet-currency">USD</span>
+                </div>
+                <p class="wallet-info">This balance is used for participating in group orders and is stored in escrow accounts.</p>
+                <div class="wallet-actions">
+                    <button class="btn btn-primary" id="escrow-deposit-btn" data-modal="deposit-funds-modal"><i class="fas fa-plus"></i> Deposit to Escrow</button>
                 </div>
             </div>
 
@@ -869,34 +875,34 @@
         <div class="modal" id="create-order-modal">
             <div class="modal-container">
                 <h3 class="modal-title" data-i18n="order.createTitle">Create Group Order</h3>
-                <form id="create-order-form">
+                <form id="modal-create-order-form">
                     <div class="form-group">
-                        <label for="title" data-i18n="order.title">Order Title</label>
-                        <input type="text" id="title" name="title" data-i18n-placeholder="order.titlePlaceholder" placeholder="Enter a descriptive title" required>
+                        <label for="modal-title" data-i18n="order.title">Order Title</label>
+                        <input type="text" id="modal-title" name="title" data-i18n-placeholder="order.titlePlaceholder" placeholder="Enter a descriptive title" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="description" data-i18n="order.description">Description</label>
-                        <textarea id="description" name="description" data-i18n-placeholder="order.descriptionPlaceholder" placeholder="Describe what you want to create" required></textarea>
+                        <label for="modal-description" data-i18n="order.description">Description</label>
+                        <textarea id="modal-description" name="description" data-i18n-placeholder="order.descriptionPlaceholder" placeholder="Describe what you want to create" required></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label for="contractor_id" data-i18n="order.selectContractor">Select Contractor (Optional)</label>
-                        <select id="contractor_id" name="contractor_id">
+                        <label for="modal-contractor-id" data-i18n="order.selectContractor">Select Contractor (Optional)</label>
+                        <select id="modal-contractor-id" name="contractor_id">
                             <option value="" data-i18n="order.selectContractorPlaceholder">-- Select a contractor --</option>
                             <!-- Contractors will be loaded dynamically -->
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label for="milestones" data-i18n="order.milestones">Milestones</label>
+                        <label for="modal-milestones" data-i18n="order.milestones">Milestones</label>
                         <p class="form-help" data-i18n="order.milestonesHelp">Define the steps of your project and their costs</p>
                         
-                        <div id="milestones-container">
+                        <div id="modal-milestones-container">
                             <!-- Milestone fields will be added here -->
                         </div>
                         
-                        <button type="button" id="add-milestone-btn" class="btn btn-secondary">
+                        <button type="button" id="modal-add-milestone-btn" class="btn btn-secondary">
                             <i class="fas fa-plus"></i> <span data-i18n="order.addMilestone">Add Milestone</span>
                         </button>
                     </div>
@@ -1074,6 +1080,8 @@
         
         function setupModal(triggerSelector, modalId) {
             const modal = document.getElementById(modalId);
+            if (!modal) return;
+            
             const closeBtn = modal.querySelector('.modal-close');
             const cancelBtn = modal.querySelector('.btn-outline');
 
@@ -1083,9 +1091,11 @@
                 });
             });
 
-            closeBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                });
+            }
 
             if (cancelBtn) {
                 cancelBtn.addEventListener('click', () => {
@@ -1104,19 +1114,51 @@
         setupModal('.btn-outline[data-modal="order-detail"]', 'order-detail-modal');
         setupModal('.btn-primary[data-modal="participation"]', 'participation-modal');
         
+        // Setup wallet and deposit modals
+        setupModal('#wallet-balance-display', 'deposit-funds-modal');
+        setupModal('#wallet-deposit-btn', 'deposit-funds-modal');
+        setupModal('#escrow-deposit-btn', 'deposit-funds-modal');
+        
         // Setup escrow modals
-        setupModal('#create-group-order-btn', 'create-order-modal');
-        setupModal('#deposit-funds-btn', 'deposit-funds-modal');
         setupModal('.participate-btn', 'participate-modal');
-        setupModal('#marketplace-create-group-order-btn', 'create-order-modal');
-        setupModal('#marketplace-deposit-funds-btn', 'deposit-funds-modal');
         
         // Notification functionality
         function showNotification(message, type = 'info', duration = 3000) {
+            // Получаем текущий язык интерфейса
+            const currentLang = document.documentElement.lang || 'en';
+            
             // Перевод сообщения, если доступен
             if (typeof getCurrentLanguageMessage === 'function') {
-                if (typeof message === 'string' && message.startsWith('marketplace.') || message.startsWith('escrow.')) {
+                if (typeof message === 'string' && 
+                   (message.startsWith('marketplace.') || 
+                    message.startsWith('escrow.') || 
+                    message.startsWith('order.'))) {
                     message = getCurrentLanguageMessage(message);
+                }
+            }
+            
+            // Проверяем, если сообщение на русском, но язык интерфейса не русский - 
+            // переключаемся на английские эквиваленты
+            if (currentLang !== 'ru' && /[а-яА-ЯёЁ]/.test(message)) {
+                // Словарь русско-английских соответствий для частых уведомлений
+                const translations = {
+                    'Заказ успешно создан': 'Order created successfully',
+                    'Эскроу-функциональность загружена': 'Escrow functionality loaded',
+                    'Максимальное количество этапов - 10': 'Maximum number of milestones is 10',
+                    'Ошибка создания заказа': 'Error creating order',
+                    'Успешно пополнен баланс': 'Successfully deposited funds',
+                    'Пользователь успешно присоединился к заказу': 'Successfully joined the order',
+                    'Этап работы отмечен как выполненный': 'Milestone marked as complete',
+                    'Акт выполненных работ подписан': 'Act signed successfully',
+                    'Голос за представителя учтен': 'Vote for representative submitted'
+                };
+                
+                // Ищем соответствие или используем оригинал
+                for (const [ru, en] of Object.entries(translations)) {
+                    if (message.includes(ru)) {
+                        message = message.replace(ru, en);
+                        break;
+                    }
                 }
             }
             
@@ -1141,33 +1183,43 @@
             
             // Добавляем в DOM
             const container = document.getElementById('notification-container');
-            container.appendChild(notification);
+            if (!container) {
+                // Если контейнер уведомлений не существует, создаем его
+                const notificationContainer = document.createElement('div');
+                notificationContainer.id = 'notification-container';
+                document.body.appendChild(notificationContainer);
+                notificationContainer.appendChild(notification);
+            } else {
+                container.appendChild(notification);
+            }
             
-            // Показываем уведомление с небольшой задержкой для анимации
+            // Показываем уведомление
             setTimeout(() => {
                 notification.classList.add('show');
             }, 10);
             
-            // Кнопка закрытия
+            // Добавляем обработчик закрытия
             const closeBtn = notification.querySelector('.notification-close');
-            closeBtn.addEventListener('click', () => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    notification.remove();
-                }, 300);
-            });
-            
-            // Автоматическое закрытие
-            if (duration) {
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 300);
-                }, duration);
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    closeNotification(notification);
+                });
             }
             
-            return notification;
+            // Автоматически закрываем уведомление через указанное время
+            if (duration > 0) {
+                setTimeout(() => {
+                    closeNotification(notification);
+                }, duration);
+            }
+        }
+
+        // Функция закрытия уведомления
+        function closeNotification(notification) {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
         }
 
         // FAQ toggle
@@ -1189,7 +1241,268 @@
                 mainNav.style.display = '';
             }
         });
+
+        // User orders section rendering with proper i18n and styling
+        function renderOrders(orders, userOrders = null) {
+            const ordersContainer = document.querySelector('#explore .card');
+            if (!ordersContainer) return;
+            
+            // Clear previous orders except the header
+            const header = ordersContainer.querySelector('.card-header');
+            ordersContainer.innerHTML = '';
+            ordersContainer.appendChild(header);
+            
+            // Если у пользователя есть заказы, отображаем их в отдельном разделе
+            if (userOrders && userOrders.length > 0) {
+                // Создаем раздел "Your Orders"
+                const userOrdersSection = document.createElement('div');
+                userOrdersSection.className = 'user-orders-section';
+                
+                // Добавляем заголовок
+                const userOrdersHeader = document.createElement('h3');
+                userOrdersHeader.className = 'section-title';
+                userOrdersHeader.innerHTML = '<i class="fas fa-clipboard-list"></i> <span data-i18n="marketplace.yourOrders">Your Orders</span>';
+                userOrdersSection.appendChild(userOrdersHeader);
+                
+                // Добавляем заказы пользователя
+                userOrders.forEach(order => {
+                    const orderElement = createOrderElement(order, true);
+                    userOrdersSection.appendChild(orderElement);
+                });
+                
+                // Добавляем разделитель
+                const divider = document.createElement('hr');
+                divider.className = 'section-divider';
+                userOrdersSection.appendChild(divider);
+                
+                // Добавляем раздел к контейнеру
+                ordersContainer.appendChild(userOrdersSection);
+            }
+            
+            // Проверяем, есть ли заказы для отображения в общем списке
+            if (orders.length === 0) {
+                const emptyMessage = document.createElement('p');
+                emptyMessage.textContent = 'Нет активных заказов';
+                emptyMessage.setAttribute('data-i18n', 'marketplace.noActiveOrders');
+                emptyMessage.style.textAlign = 'center';
+                emptyMessage.style.padding = '20px';
+                ordersContainer.appendChild(emptyMessage);
+                return;
+            }
+            
+            // Добавляем заголовок для всех заказов, если были показаны заказы пользователя
+            if (userOrders && userOrders.length > 0) {
+                const allOrdersHeader = document.createElement('h3');
+                allOrdersHeader.className = 'section-title';
+                allOrdersHeader.innerHTML = '<i class="fas fa-globe"></i> <span data-i18n="marketplace.allActiveOrders">All Active Orders</span>';
+                ordersContainer.appendChild(allOrdersHeader);
+            }
+            
+            // Добавляем все заказы
+            orders.forEach(order => {
+                // Если это заказ пользователя и он уже был показан в разделе "Твои заказы", не показываем его снова
+                if (userOrders && userOrders.some(userOrder => userOrder.id === order.id)) {
+                    return;
+                }
+                const orderElement = createOrderElement(order);
+                ordersContainer.appendChild(orderElement);
+            });
+        }
+
+        // Create an order element with improved styling
+        function createOrderElement(order, isInPortfolio = false) {
+            const orderItem = document.createElement('div');
+            orderItem.className = isInPortfolio ? 'order-item user-order-card' : 'order-item card mb-3';
+            orderItem.id = `order-${order.id}`;
+            
+            // Убедимся, что у нас есть корректные данные о цене/бюджете
+            const orderPrice = typeof order.budget === 'number' ? order.budget : 
+                              (typeof order.budget === 'string' ? parseFloat(order.budget) : 0);
+            const orderCurrency = order.currency || 'USD';
+            
+            let orderContent = '';
+            
+            if (isInPortfolio) {
+                // Enhanced styling for user orders
+                orderContent = `
+                    <div class="order-card-inner">
+                        <h6 class="order-title">${order.title}</h6>
+                        <div class="order-meta">
+                            <span class="order-price"><i class="fas fa-coins"></i> ${orderPrice} ${orderCurrency}</span>
+                            <span class="order-date"><i class="fas fa-calendar-alt"></i> ${formatDate(order.createdAt)}</span>
+                            <span class="user-badge"><i class="fas fa-user"></i> ${getCurrentUserId() === order.userId ? 'Вы' : order.userName || 'Пользователь'}</span>
+                        </div>
+                        <p class="order-description">${order.description.substring(0, 100)}${order.description.length > 100 ? '...' : ''}</p>
+                        <div class="order-actions">
+                            <button class="btn btn-sm btn-primary view-order-details" data-order-id="${order.id}">
+                                <i class="fas fa-eye"></i> <span data-i18n="marketplace.viewDetails">View Details</span>
+                            </button>
+                            <button class="btn btn-sm btn-success participate-btn" data-order-id="${order.id}">
+                                <i class="fas fa-handshake"></i> <span data-i18n="marketplace.participate">Participate</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Enhanced styling for marketplace orders
+                orderContent = `
+                    <div class="card-body">
+                        <h5 class="card-title">${order.title}</h5>
+                        <p class="card-text">${order.description}</p>
+                        <div class="order-meta">
+                            <span class="price-tag"><i class="fas fa-tag"></i> ${orderPrice} ${orderCurrency}</span>
+                            <span class="order-date"><i class="fas fa-calendar-alt"></i> ${formatDate(order.createdAt)}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <button class="btn btn-sm btn-primary view-order-details" data-order-id="${order.id}">
+                                <i class="fas fa-eye"></i> <span data-i18n="marketplace.viewDetails">View Details</span>
+                            </button>
+                            <button class="btn btn-sm btn-success participate-btn" data-order-id="${order.id}">
+                                <i class="fas fa-handshake"></i> <span data-i18n="marketplace.participate">Participate</span>
+                            </button>
+                        </div>
+                        ${getCurrentUserId() === order.userId ? '<span class="badge bg-info float-end user-order-badge" data-i18n="marketplace.yourOrder">Your Order</span>' : ''}
+                    </div>
+                `;
+            }
+            
+            orderItem.innerHTML = orderContent;
+            
+            // Add styles directly to the order item
+            if (isInPortfolio) {
+                orderItem.style.border = '1px solid #ddd';
+                orderItem.style.borderRadius = '8px';
+                orderItem.style.padding = '15px';
+                orderItem.style.margin = '10px 0';
+                orderItem.style.backgroundColor = '#f8f9fa';
+                orderItem.style.transition = 'transform 0.2s, box-shadow 0.2s';
+                orderItem.style.cursor = 'pointer';
+                
+                // Add hover effect
+                orderItem.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                });
+                
+                orderItem.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            }
+            
+            // Добавляем обработчик событий для кнопки подробностей
+            const viewDetailsBtn = orderItem.querySelector('.view-order-details');
+            if (viewDetailsBtn) {
+                viewDetailsBtn.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    showOrderDetails(orderId);
+                });
+            }
+            
+            // Добавляем обработчик событий для кнопки участия
+            const participateBtn = orderItem.querySelector('.participate-btn');
+            if (participateBtn) {
+                participateBtn.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    // Проверка авторизации
+                    if (!isUserAuthenticated()) {
+                        showModal('auth-modal');
+                        return;
+                    }
+                    showModal('participate-modal');
+                    document.getElementById('order_id').value = orderId;
+                });
+            }
+            
+            return orderItem;
+        }
     </script>
+
+    <style>
+        /* Add styles for order cards */
+        .order-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 15px;
+        }
+        
+        .user-order-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            background: linear-gradient(to right, #f9f9f9, #ffffff);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .order-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .order-title {
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .order-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .order-price {
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .order-description {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .user-badge {
+            background-color: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .user-order-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            color: #495057;
+            padding: 10px 0;
+            border-bottom: 2px solid #f1f1f1;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #007bff;
+        }
+        
+        .section-divider {
+            margin: 20px 0;
+            border-top: 1px dashed #e0e0e0;
+        }
+    </style>
 
     <!-- Firebase Scripts -->
     <script src="js/firebase-config.js"></script>
@@ -1201,6 +1514,76 @@
     
     <!-- Escrow Module -->
     <script type="module" src="js/escrow/index.js"></script>
+
+    <script type="module">
+        import escrowUI from './js/escrow/ui.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Setup modal display for buttons
+            setupModal('#deposit-funds-btn', 'deposit-funds-modal');
+            setupModal('.participate-btn', 'participate-modal');
+            setupModal('#wallet-balance', 'deposit-funds-modal');
+            setupModal('#escrow-deposit-btn', 'deposit-funds-modal');
+            
+            // Модальные окна для создания заказа и другой функциональности
+            function setupModal(buttonSelector, modalId) {
+                document.querySelectorAll(buttonSelector).forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        if (modalId === 'participate-modal' && button.dataset.orderId) {
+                            document.querySelector('#participate-form [name="order_id"]').value = button.dataset.orderId;
+                        }
+                        showModal(modalId);
+                    });
+                });
+            }
+        });
+    </script>
+    
+    <script>
+        // Функция для получения локализованных сообщений
+        window.getCurrentLanguageMessage = function(key) {
+            // Получаем текущий язык
+            const lang = document.documentElement.lang || 'en';
+            
+            // Если есть доступ к переводам, используем их
+            if (window.ru && window.en && window.es) {
+                if (lang === 'ru') {
+                    return getNestedProperty(window.ru, key) || key;
+                } else if (lang === 'es') {
+                    return getNestedProperty(window.es, key) || key;
+                } else {
+                    return getNestedProperty(window.en, key) || key;
+                }
+            }
+            
+            // Функция для получения вложенных свойств объекта
+            function getNestedProperty(obj, path) {
+                const parts = path.split('.');
+                let current = obj;
+                
+                for (const part of parts) {
+                    if (current && typeof current === 'object' && part in current) {
+                        current = current[part];
+                    } else {
+                        return undefined;
+                    }
+                }
+                
+                return current;
+            }
+            
+            // Возвращаем ключ, если нет переводов
+            return key;
+        };
+    
+        // Initialize progress bars
+        document.querySelectorAll('.progress-fill').forEach(bar => {
+            setTimeout(() => {
+                bar.style.width = bar.style.width || '0%';
+            }, 100);
+        });
+    </script>
 </body>
 
 </html> 

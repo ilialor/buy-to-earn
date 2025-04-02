@@ -62,7 +62,9 @@ const en = {
     yourOrders: "Your Orders",
     allActiveOrders: "All Active Orders",
     viewDetails: "View Details",
-    yourOrder: "Your Order"
+    yourOrder: "Your Order",
+    noActiveOrders: "No active orders",
+    pendingOrders: "Pending Orders"
   },
   
   // Portfolio
@@ -134,7 +136,9 @@ const en = {
     transfer: "Transfer",
     transactionHistory: "Transaction History",
     connectWallet: "Connect Wallet",
-    connectExternalWallet: "Connect External Wallet"
+    connectExternalWallet: "Connect External Wallet",
+    deposit_success: "Successfully deposited {amount} USD",
+    deposit_error: "Error depositing funds"
   },
   
   // Documentation
@@ -324,15 +328,36 @@ const en = {
     totalCost: 'Total Cost',
     currentFunding: 'Current Funding',
     contributionAmount: 'Contribution Amount',
+    required_fields: 'Please fill in all required fields',
+    invalid_amount: 'Invalid amount',
+    order_created: 'Order created successfully',
+    error_creating: 'Error creating order',
+    error_exception: 'Exception when creating order',
+    user_not_found: 'User not found in the system'
+  },
+  
+  // Order
+  order: {
     createTitle: "Create Group Order",
     title: "Order Title",
     titlePlaceholder: "Enter a descriptive title",
     description: "Description",
     descriptionPlaceholder: "Describe what you want to create",
+    selectContractor: "Select Contractor (Optional)",
     selectContractorPlaceholder: "-- Select a contractor --",
+    milestones: "Milestones",
     milestonesHelp: "Define the steps of your project and their costs",
+    addMilestone: "Add Milestone",
     createOrder: "Create Order",
-    cancel: "Cancel"
+    cancel: "Cancel",
+    max_milestones: "Maximum number of milestones is 10",
+    milestone_description: "Milestone Description",
+    amount: "Amount",
+    add_milestone: "Please add at least one milestone",
+    invalid_milestone_data: "Milestone data is invalid",
+    enter_valid_amount: "Milestone amount must be positive",
+    joined_success: "Successfully joined the order",
+    join_error: "Error joining order"
   }
 };
 

@@ -46,7 +46,13 @@ const es = {
     revenueGenerated: "Ingresos Generados",
     fundingProgress: "Progreso de Financiación",
     participate: "Participar",
-    details: "Detalles"
+    details: "Detalles",
+    yourOrders: "Sus Órdenes",
+    allActiveOrders: "Todas las Órdenes Activas",
+    viewDetails: "Ver Detalles",
+    yourOrder: "Su Orden",
+    noActiveOrders: "No hay órdenes activas",
+    pendingOrders: "Órdenes Pendientes"
   },
   
   // Portfolio
@@ -119,7 +125,9 @@ const es = {
     transfer: "Transferir",
     transactionHistory: "Historial de Transacciones",
     connectWallet: "Conectar Billetera",
-    connectExternalWallet: "Conectar Billetera Externa"
+    connectExternalWallet: "Conectar Billetera Externa",
+    deposit_success: "Depositado con éxito {amount} USD",
+    deposit_error: "Error al depositar fondos"
   },
   
   // Documentation
@@ -193,24 +201,30 @@ const es = {
   
   // Escrow
   escrow: {
-    createGroupOrder: 'Crear Pedido de Grupo',
+    createGroupOrder: 'Crear Orden Grupal',
     depositFunds: 'Depositar Fondos',
-    participateInOrder: 'Participar en Pedido',
+    participateInOrder: 'Participar en Orden',
     votingForRepresentative: 'Votar por Representante',
     milestones: 'Hitos',
     addMilestone: 'Añadir Hito',
     selectContractor: 'Seleccionar Contratista (Opcional)',
-    orderTitle: 'Título del Pedido',
-    orderDescription: 'Descripción del Pedido',
+    orderTitle: 'Título de la Orden',
+    orderDescription: 'Descripción de la Orden',
     totalCost: 'Costo Total',
     currentFunding: 'Financiación Actual',
-    contributionAmount: 'Cantidad de Contribución'
+    contributionAmount: 'Monto de Contribución',
+    required_fields: 'Por favor, complete todos los campos requeridos',
+    invalid_amount: 'Monto no válido',
+    order_created: 'Orden creada con éxito',
+    error_creating: 'Error al crear la orden',
+    error_exception: 'Excepción al crear la orden',
+    user_not_found: 'Usuario no encontrado en el sistema'
   },
   
   // Order
   order: {
-    createTitle: "Crear Pedido de Grupo",
-    title: "Título del Pedido",
+    createTitle: "Crear Orden Grupal",
+    title: "Título de la Orden",
     titlePlaceholder: "Ingrese un título descriptivo",
     description: "Descripción",
     descriptionPlaceholder: "Describa lo que desea crear",
@@ -219,8 +233,16 @@ const es = {
     milestones: "Hitos",
     milestonesHelp: "Defina las etapas de su proyecto y sus costos",
     addMilestone: "Añadir Hito",
-    createOrder: "Crear Pedido",
-    cancel: "Cancelar"
+    createOrder: "Crear Orden",
+    cancel: "Cancelar",
+    max_milestones: "El número máximo de hitos es 10",
+    milestone_description: "Descripción del Hito",
+    amount: "Monto",
+    add_milestone: "Por favor, añada al menos un hito",
+    invalid_milestone_data: "Los datos del hito no son válidos",
+    enter_valid_amount: "El monto del hito debe ser positivo",
+    joined_success: "Se unió con éxito a la orden",
+    join_error: "Error al unirse a la orden"
   },
   
   // Revenue Calculator
