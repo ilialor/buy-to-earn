@@ -191,6 +191,38 @@ const es = {
     no: "No"
   },
   
+  // Escrow
+  escrow: {
+    createGroupOrder: 'Crear Pedido de Grupo',
+    depositFunds: 'Depositar Fondos',
+    participateInOrder: 'Participar en Pedido',
+    votingForRepresentative: 'Votar por Representante',
+    milestones: 'Hitos',
+    addMilestone: 'Añadir Hito',
+    selectContractor: 'Seleccionar Contratista (Opcional)',
+    orderTitle: 'Título del Pedido',
+    orderDescription: 'Descripción del Pedido',
+    totalCost: 'Costo Total',
+    currentFunding: 'Financiación Actual',
+    contributionAmount: 'Cantidad de Contribución'
+  },
+  
+  // Order
+  order: {
+    createTitle: "Crear Pedido de Grupo",
+    title: "Título del Pedido",
+    titlePlaceholder: "Ingrese un título descriptivo",
+    description: "Descripción",
+    descriptionPlaceholder: "Describa lo que desea crear",
+    selectContractor: "Seleccionar Contratista (Opcional)",
+    selectContractorPlaceholder: "-- Seleccione un contratista --",
+    milestones: "Hitos",
+    milestonesHelp: "Defina las etapas de su proyecto y sus costos",
+    addMilestone: "Añadir Hito",
+    createOrder: "Crear Pedido",
+    cancel: "Cancelar"
+  },
+  
   // Revenue Calculator
   calculator: {
     title: "Calculadora de Ingresos Acumulados (Simulación Precisa)",

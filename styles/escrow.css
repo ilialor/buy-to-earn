@@ -1,0 +1,403 @@
+/**
+ * Escrow Styles
+ */
+
+/* Order Status Colors */
+.order-status-pending {
+  border-left: 3px solid #ffc107;
+}
+
+.order-status-funded {
+  border-left: 3px solid #17a2b8;
+}
+
+.order-status-in_progress {
+  border-left: 3px solid #007bff;
+}
+
+.order-status-completed {
+  border-left: 3px solid #28a745;
+}
+
+.order-status-cancelled {
+  border-left: 3px solid #dc3545;
+}
+
+/* Order Item */
+.order-item {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.order-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.order-title {
+  font-size: 18px;
+  margin: 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.order-status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.order-status-pending .order-status {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.order-status-funded .order-status {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.order-status-in_progress .order-status {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.order-status-completed .order-status {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.order-status-cancelled .order-status {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.order-meta {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #666;
+}
+
+.order-meta > span {
+  display: flex;
+  align-items: center;
+}
+
+.order-meta .user-contribution {
+  font-weight: bold;
+  color: #28a745;
+  grid-column: 1 / -1;
+}
+
+.order-meta .milestone-progress {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.order-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Milestone Styles */
+.milestone-entry {
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.milestones-container {
+  margin-bottom: 20px;
+}
+
+.milestone-item {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-left: 3px solid #dee2e6;
+}
+
+.milestone-status-paid {
+  border-left-color: #28a745;
+  background-color: #f0fff4;
+}
+
+.milestone-status-completed_by_contractor {
+  border-left-color: #fd7e14;
+  background-color: #fff9f0;
+}
+
+.milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.milestone-title {
+  font-size: 16px;
+  margin: 0;
+  font-weight: 500;
+  flex: 1;
+}
+
+.milestone-amount {
+  font-weight: bold;
+  color: #333;
+  margin-right: 12px;
+}
+
+.milestone-status {
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.milestone-status-paid .milestone-status {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.milestone-status-completed_by_contractor .milestone-status {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.milestone-status-pending .milestone-status {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+.act-info {
+  background-color: rgba(255, 255, 255, 0.6);
+  padding: 8px;
+  border-radius: 4px;
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.act-signatures, .act-status {
+  margin-bottom: 6px;
+}
+
+/* Order Details Modal */
+.contributors-section,
+.milestones-section,
+.voting-section {
+  margin-top: 24px;
+}
+
+.contributors-section h4,
+.milestones-section h4,
+.voting-section h4 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.contributors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contributor-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.contributor-amount {
+  font-weight: bold;
+  color: #28a745;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.info-label {
+  font-weight: 600;
+  min-width: 140px;
+  color: #555;
+}
+
+.milestones-list {
+  margin-top: 12px;
+}
+
+/* Vote Representative Modal */
+#vote-representative-form .form-group {
+  margin-bottom: 16px;
+}
+
+#vote-representative-form .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+/* Escrow Balance Display */
+.escrow-balance {
+  padding: 8px 12px;
+  background-color: #f0f8ff;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 16px;
+  font-weight: 500;
+}
+
+.escrow-balance:before {
+  content: '💰';
+  margin-right: 6px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .order-meta {
+    grid-template-columns: 1fr;
+  }
+  
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .order-status {
+    margin-top: 8px;
+  }
+  
+  .milestone-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .milestone-amount, .milestone-status {
+    margin-top: 6px;
+  }
+}
+
+/* Order Sections in User Portfolio */
+.user-orders-section {
+  margin-bottom: 30px;
+}
+
+.user-orders-section h3 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+/* Стили для уведомлений */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.notification {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 350px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease-in-out;
+    background-color: white;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-icon {
+    margin-right: 15px;
+    font-size: 20px;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-message {
+    margin: 0;
+    font-size: 14px;
+}
+
+.notification-close {
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #666;
+}
+
+.notification-success {
+    border-left: 4px solid #4CAF50;
+}
+
+.notification-error {
+    border-left: 4px solid #F44336;
+}
+
+.notification-warning {
+    border-left: 4px solid #FFC107;
+}
+
+.notification-info {
+    border-left: 4px solid #2196F3;
+}
+
+.notification-success .notification-icon {
+    color: #4CAF50;
+}
+
+.notification-error .notification-icon {
+    color: #F44336;
+}
+
+.notification-warning .notification-icon {
+    color: #FFC107;
+}
+
+.notification-info .notification-icon {
+    color: #2196F3;
+} 

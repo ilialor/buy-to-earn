@@ -47,18 +47,22 @@ const ru = {
   // Marketplace
   marketplace: {
     title: "Маркетплейс",
-    subtitle: "Находите проекты, финансируйте идеи и зарабатывайте на будущих продажах.",
+    subtitle: "Открывайте и участвуйте в проектах, финансируйте идеи, и зарабатывайте на будущих продажах.",
     explore: "Обзор",
     submit: "Создать заказ",
     executor: "Стать исполнителем",
     applyExecutor: "Подать заявку исполнителя",
     activeOrders: "Активные заказы",
     totalInvested: "Всего инвестировано",
-    completedProducts: "Завершенные продукты",
-    revenueGenerated: "Полученный доход",
+    completedProducts: "Завершенных продуктов",
+    revenueGenerated: "Сгенерировано дохода",
     fundingProgress: "Прогресс финансирования",
     participate: "Участвовать",
-    details: "Подробности"
+    details: "Подробнее",
+    yourOrders: "Твои заказы",
+    allActiveOrders: "Все активные заказы",
+    viewDetails: "Подробнее",
+    yourOrder: "Ваш заказ"
   },
   
   // Portfolio
@@ -77,10 +81,8 @@ const ru = {
     totalInvested: "Всего инвестировано",
     totalReturns: "Общий доход",
     myNFTs: "Мои NFT",
-    viewDetails: "Посмотреть детали",
     trackReturns: "Отслеживать доходы",
     accessProduct: "Доступ к продукту",
-    revenue: "Доходы",
     transactions: "Транзакции"
   },
   
@@ -305,6 +307,38 @@ const ru = {
       nonPaybackPoolShareError: "Приоритет Не Окупившихся должен быть 0-100%.",
       unexpectedError: "Произошла непредвиденная ошибка при расчете."
     }
+  },
+  
+  // Escrow
+  escrow: {
+    createGroupOrder: 'Создать групповой заказ',
+    depositFunds: 'Пополнить баланс',
+    participateInOrder: 'Участвовать в заказе',
+    votingForRepresentative: 'Голосование за представителя',
+    milestones: 'Этапы работ',
+    addMilestone: 'Добавить этап',
+    selectContractor: 'Выбрать исполнителя (опционально)',
+    orderTitle: 'Название заказа',
+    orderDescription: 'Описание заказа',
+    totalCost: 'Общая стоимость',
+    currentFunding: 'Текущее финансирование',
+    contributionAmount: 'Сумма взноса'
+  },
+  
+  // Order
+  order: {
+    createTitle: "Создать групповой заказ",
+    title: "Название заказа",
+    titlePlaceholder: "Введите описательное название",
+    description: "Описание",
+    descriptionPlaceholder: "Опишите что вы хотите создать",
+    selectContractor: "Выбрать исполнителя (опционально)",
+    selectContractorPlaceholder: "-- Выберите исполнителя --",
+    milestones: "Этапы работы",
+    milestonesHelp: "Определите этапы вашего проекта и их стоимость",
+    addMilestone: "Добавить этап",
+    createOrder: "Создать заказ",
+    cancel: "Отмена"
   }
 };
 

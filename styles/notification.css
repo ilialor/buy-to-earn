@@ -1,5 +1,5 @@
 /* Notification Styles */
-#notifications-container {
+#notification-container {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -11,41 +11,60 @@
 }
 
 .notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
+  margin-bottom: 15px; /* Увеличенный отступ между уведомлениями */
+  position: relative;  /* Обеспечивает правильное позиционирование */
+  color: #333;         /* Темный текст для лучшей читаемости */
   padding: 15px 20px;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  color: #fff;
   font-size: 14px;
   max-width: 300px;
   z-index: 10000; /* Поверх модальных окон */
-  transform: translateY(-20px);
+  transform: translateX(20px); /* Начальное положение слева для анимации */
   opacity: 0;
   transition: all 0.3s ease;
+  background-color: white; /* Белый фон для всех уведомлений */
+  display: flex;  /* Flex-контейнер для лучшего выравнивания */
+  align-items: center;
+  border-left: 4px solid #ccc; /* Базовая граница, переопределяется для типов */
 }
 
 .notification.show {
-  transform: translateY(0);
+  transform: translateX(0);
   opacity: 1;
 }
 
-.notification i {
-  font-size: 1.2rem;
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.notification-icon {
+  margin-right: 15px;
+  font-size: 20px;
   flex-shrink: 0;
 }
 
-.notification span {
+.notification-content {
   flex-grow: 1;
-  font-size: 0.95rem;
+}
+
+.notification-message {
+  margin: 0;
+  font-size: 14px;
+  color: #333; /* Темный текст для лучшей читаемости */
 }
 
 .notification-close {
   background: none;
   border: none;
-  color: var(--text-muted);
-  font-size: 1.2rem;
+  color: #666;
+  font-size: 16px;
   cursor: pointer;
   padding: 0;
   margin-left: 10px;
@@ -53,64 +72,48 @@
 }
 
 .notification-close:hover {
-  color: var(--text-primary);
+  color: #333;
 }
 
 /* Notification types */
 .notification-info {
-  background-color: #2196F3;
+  border-left-color: #2196F3;
 }
 
 .notification-success {
-  background-color: #4CAF50;
+  border-left-color: #4CAF50;
 }
 
 .notification-warning {
-  background-color: #FF9800;
+  border-left-color: #FF9800;
 }
 
 .notification-error {
-  background-color: #F44336;
+  border-left-color: #F44336;
 }
 
-.notification-info::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background-color: #3498db;
+.notification-info .notification-icon {
+  color: #2196F3;
 }
 
-.notification-success::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background-color: #2ecc71;
+.notification-success .notification-icon {
+  color: #4CAF50;
 }
 
-.notification-warning::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background-color: #f39c12;
+.notification-warning .notification-icon {
+  color: #FF9800;
 }
 
-.notification-error::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background-color: #e74c3c;
+.notification-error .notification-icon {
+  color: #F44336;
+}
+
+@media (max-width: 576px) {
+  .notification, .notification-container {
+    width: calc(100% - 40px);
+    max-width: none;
+    right: 20px;
+  }
 }
 
 /* Loading Spinner */
@@ -141,17 +144,6 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 576px) {
-  .notification {
-    top: auto;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
-    max-width: none;
-    transform: translateY(20px);
   }
 }
 

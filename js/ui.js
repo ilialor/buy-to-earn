@@ -685,7 +685,7 @@ function setupUIListeners() {
                   // Добавляем заголовок
                   const userOrdersHeader = document.createElement('h3');
                   userOrdersHeader.className = 'section-title';
-                  userOrdersHeader.innerHTML = '<i class="fas fa-clipboard-list"></i> Твои заказы';
+                  userOrdersHeader.innerHTML = '<i class="fas fa-clipboard-list"></i> <span data-i18n="marketplace.yourOrders">Твои заказы</span>';
                   userOrdersSection.appendChild(userOrdersHeader);
                   
                   // Добавляем в начало контейнера
@@ -994,6 +994,11 @@ function loadUserPortfolio() {
     window.dbFunctions.getUserOrders(userId)
       .then(orders => {
         console.log('Получены заказы пользователя:', orders.length);
+        
+        // Обновляем статистику на основе полученных данных
+        loadPortfolioStatistics(userId, { pendingOrders: orders.length });
+        
+        // Отображаем заказы
         renderUserOrders(orders);
       })
       .catch(error => {
@@ -1012,6 +1017,11 @@ function loadUserPortfolio() {
       const localOrders = JSON.parse(localOrdersJson);
       const userOrders = localOrders.filter(order => order.userId === userId);
       console.log('Получены заказы пользователя из локального хранилища:', userOrders.length);
+      
+      // Обновляем статистику на основе полученных данных
+      loadPortfolioStatistics(userId, { pendingOrders: userOrders.length });
+      
+      // Отображаем заказы
       renderUserOrders(userOrders);
     } catch (error) {
       console.error('Ошибка при получении заказов из локального хранилища:', error);
@@ -1062,15 +1072,15 @@ function loadUserPortfolio() {
 }
 
 // Загрузка статистики портфолио
-async function loadPortfolioStatistics(userId) {
+async function loadPortfolioStatistics(userId, customStats = {}) {
   try {
     // Здесь в будущем можно добавить получение реальной статистики
-    // Пока используем тестовые данные
+    // Пока используем тестовые данные, но учитываем переданные значения
     const statistics = {
       totalInvested: 1250.50,
       activeInvestments: 3,
       totalReturns: 220.75,
-      pendingOrders: 2
+      pendingOrders: customStats.pendingOrders || 0
     };
     
     renderPortfolioStatistics(statistics);
@@ -1292,7 +1302,7 @@ function renderOrders(orders, userOrders = null) {
   if (userOrders && userOrders.length > 0) {
     const allOrdersHeader = document.createElement('h3');
     allOrdersHeader.className = 'section-title';
-    allOrdersHeader.innerHTML = '<i class="fas fa-globe"></i> Все активные заказы';
+    allOrdersHeader.innerHTML = '<i class="fas fa-globe"></i> <span data-i18n="marketplace.allActiveOrders">Все активные заказы</span>';
     ordersContainer.appendChild(allOrdersHeader);
   }
   
@@ -1804,19 +1814,23 @@ function renderUserOrders(orders) {
     console.error('Страница портфолио не найдена');
     return;
   }
+  console.log('Найдена страница портфолио:', portfolioPage);
   
   // Находим контейнер для контента
   const contentArea = portfolioPage.querySelector('.content-area');
   if (!contentArea) {
     console.error('Контент-область не найдена на странице портфолио');
+    console.log('HTML страницы портфолио:', portfolioPage.innerHTML);
     return;
   }
+  console.log('Найдена контент-область:', contentArea);
   
   // Проверяем, существует ли уже секция для заказов пользователя
   let ordersSection = contentArea.querySelector('.user-orders-card');
   
   // Если секции нет, создаем ее
   if (!ordersSection) {
+    console.log('Создаем секцию для заказов пользователя');
     ordersSection = document.createElement('div');
     ordersSection.className = 'card user-orders-card';
     
@@ -1834,6 +1848,9 @@ function renderUserOrders(orders) {
     
     // Размещаем секцию в контент-области после статистики
     contentArea.appendChild(ordersSection);
+    console.log('Секция для заказов добавлена в контент-область');
+  } else {
+    console.log('Найдена существующая секция для заказов');
   }
   
   // Создаем тело карточки
@@ -1864,6 +1881,11 @@ function renderUserOrders(orders) {
   orders.forEach((order, index) => {
     console.log(`Создание элемента для заказа #${index}:`, order);
     
+    // Убедимся, что у нас есть корректные данные о цене/бюджете
+    const orderPrice = typeof order.budget === 'number' ? order.budget : 
+                      (typeof order.budget === 'string' ? parseFloat(order.budget) : 0);
+    const orderCurrency = order.currency || 'USD';
+    
     const orderElement = document.createElement('div');
     orderElement.className = 'order-item';
     orderElement.setAttribute('data-order-id', order.id);
@@ -1873,7 +1895,7 @@ function renderUserOrders(orders) {
       <h5 class="order-title">${order.title || 'Без названия'}</h5>
       <div class="order-meta">
         <span><i class="fas fa-tag"></i> ${order.category || 'Категория не указана'}</span>
-        <span><i class="fas fa-coins"></i> ${order.price || 0} ${order.currency || 'USD'}</span>
+        <span><i class="fas fa-coins"></i> ${orderPrice} ${orderCurrency}</span>
         <span><i class="fas fa-calendar"></i> ${formatDate(order.createdAt) || 'Дата не указана'}</span>
       </div>
       <p class="order-description">${(order.description || 'Описание отсутствует').substring(0, 150)}${order.description && order.description.length > 150 ? '...' : ''}</p>
@@ -1886,6 +1908,7 @@ function renderUserOrders(orders) {
     
     // Добавляем элемент заказа в карточку
     cardBody.appendChild(orderElement);
+    console.log(`Элемент заказа #${index} добавлен в карточку`);
     
     // Добавляем обработчик для кнопки просмотра деталей
     const viewDetailsBtn = orderElement.querySelector('.view-order-details');
@@ -1901,6 +1924,8 @@ function renderUserOrders(orders) {
   if (typeof applyTranslations === 'function') {
     applyTranslations(ordersSection);
   }
+  
+  console.log('Завершено отображение заказов пользователя');
 }
 
 // Вспомогательная функция для форматирования даты

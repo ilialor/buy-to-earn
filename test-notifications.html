@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестирование системы уведомлений</title>
+    <link rel="stylesheet" href="styles/escrow.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .test-panel {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .btn-error {
+            background-color: #F44336;
+        }
+        
+        .btn-error:hover {
+            background-color: #d32f2f;
+        }
+        
+        .btn-warning {
+            background-color: #FFC107;
+            color: #333;
+        }
+        
+        .btn-warning:hover {
+            background-color: #ffb300;
+        }
+        
+        .btn-info {
+            background-color: #2196F3;
+        }
+        
+        .btn-info:hover {
+            background-color: #1976D2;
+        }
+        
+        .custom-message {
+            margin-top: 20px;
+        }
+        
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 60%;
+            margin-right: 10px;
+        }
+        
+        .duration-control {
+            margin: 15px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        input[type="range"] {
+            width: 300px;
+        }
+        
+        .duration-value {
+            display: inline-block;
+            width: 60px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div id="notification-container" class="notification-container"></div>
+    
+    <h1>Тестирование системы уведомлений</h1>
+    
+    <div class="test-panel">
+        <h2>Тесты стандартных уведомлений</h2>
+        <button class="btn-success" onclick="showNotification('Операция выполнена успешно', 'success')">Успешно</button>
+        <button class="btn-error" onclick="showNotification('Произошла ошибка при выполнении операции', 'error')">Ошибка</button>
+        <button class="btn-warning" onclick="showNotification('Внимание! Эта операция необратима', 'warning')">Предупреждение</button>
+        <button class="btn-info" onclick="showNotification('Информационное сообщение для пользователя', 'info')">Информация</button>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Настройка времени показа</h2>
+        <div class="duration-control">
+            <label for="duration-slider">Длительность показа (мс): <span id="duration-value" class="duration-value">3000</span></label>
+            <input type="range" id="duration-slider" min="1000" max="10000" step="1000" value="3000">
+        </div>
+        <button onclick="showNotificationWithDuration()">Показать с выбранной длительностью</button>
+        <button onclick="showNotification('Это уведомление не исчезнет автоматически', 'info', 0)">Постоянное уведомление</button>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Своё сообщение</h2>
+        <div class="custom-message">
+            <input type="text" id="custom-message" placeholder="Введите текст уведомления">
+            <select id="notification-type">
+                <option value="success">Успешно</option>
+                <option value="error">Ошибка</option>
+                <option value="warning">Предупреждение</option>
+                <option value="info">Информация</option>
+            </select>
+            <button onclick="showCustomNotification()">Показать</button>
+        </div>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Множественные уведомления</h2>
+        <button onclick="showMultipleNotifications()">Показать несколько уведомлений</button>
+    </div>
+    
+    <script>
+        // Функция для отображения уведомления
+        function showNotification(message, type = 'info', duration = 3000) {
+            // Контейнер для уведомлений
+            const container = document.getElementById('notification-container');
+            
+            // Создаем элемент уведомления
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            
+            // Добавляем иконку в зависимости от типа
+            let icon = '';
+            switch(type) {
+                case 'success':
+                    icon = '✓';
+                    break;
+                case 'error':
+                    icon = '✕';
+                    break;
+                case 'warning':
+                    icon = '⚠';
+                    break;
+                case 'info':
+                default:
+                    icon = 'ℹ';
+                    break;
+            }
+            
+            // Формируем HTML уведомления
+            notification.innerHTML = `
+                <div class="notification-icon">${icon}</div>
+                <div class="notification-content">
+                    <p class="notification-message">${message}</p>
+                </div>
+                <div class="notification-close" onclick="this.parentElement.remove()">✕</div>
+            `;
+            
+            // Добавляем уведомление в контейнер
+            container.appendChild(notification);
+            
+            // Отображаем уведомление с анимацией
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // Если указана длительность, скрываем уведомление после истечения времени
+            if (duration > 0) {
+                setTimeout(() => {
+                    // Плавно скрываем уведомление
+                    notification.classList.remove('show');
+                    
+                    // Удаляем элемент после завершения анимации
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, duration);
+            }
+        }
+        
+        // Показать уведомление с выбранной длительностью
+        function showNotificationWithDuration() {
+            const duration = parseInt(document.getElementById('duration-slider').value);
+            showNotification(`Уведомление исчезнет через ${duration/1000} сек.`, 'info', duration);
+        }
+        
+        // Показать свое сообщение
+        function showCustomNotification() {
+            const message = document.getElementById('custom-message').value || 'Пользовательское уведомление';
+            const type = document.getElementById('notification-type').value;
+            showNotification(message, type);
+        }
+        
+        // Показать несколько уведомлений
+        function showMultipleNotifications() {
+            showNotification('Первое уведомление', 'success', 3000);
+            
+            setTimeout(() => {
+                showNotification('Второе уведомление', 'warning', 4000);
+            }, 500);
+            
+            setTimeout(() => {
+                showNotification('Третье уведомление', 'error', 5000);
+            }, 1000);
+            
+            setTimeout(() => {
+                showNotification('Четвертое уведомление', 'info', 6000);
+            }, 1500);
+        }
+        
+        // Обновление отображения значения длительности
+        const slider = document.getElementById('duration-slider');
+        const durationValue = document.getElementById('duration-value');
+        
+        slider.addEventListener('input', () => {
+            durationValue.textContent = slider.value;
+        });
+    </script>
+</body>
+</html> 

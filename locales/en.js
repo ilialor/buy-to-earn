@@ -58,7 +58,11 @@ const en = {
     revenueGenerated: "Revenue Generated",
     fundingProgress: "Funding Progress",
     participate: "Participate",
-    details: "Details"
+    details: "Details",
+    yourOrders: "Your Orders",
+    allActiveOrders: "All Active Orders",
+    viewDetails: "View Details",
+    yourOrder: "Your Order"
   },
   
   // Portfolio
@@ -77,7 +81,6 @@ const en = {
     totalInvested: "Total Invested",
     totalReturns: "Total Returns",
     myNFTs: "My NFTs",
-    viewDetails: "View Details",
     trackReturns: "Track Returns",
     accessProduct: "Access Product"
   },
@@ -305,6 +308,31 @@ const en = {
       nonPaybackPoolShareError: "Non-Payback Priority must be 0-100%.",
       unexpectedError: "An unexpected error occurred during calculation."
     }
+  },
+  
+  // Escrow
+  escrow: {
+    createGroupOrder: 'Create Group Order',
+    depositFunds: 'Deposit Funds',
+    participateInOrder: 'Participate in Order',
+    votingForRepresentative: 'Vote for Representative',
+    milestones: 'Milestones',
+    addMilestone: 'Add Milestone',
+    selectContractor: 'Select Contractor (Optional)',
+    orderTitle: 'Order Title',
+    orderDescription: 'Order Description',
+    totalCost: 'Total Cost',
+    currentFunding: 'Current Funding',
+    contributionAmount: 'Contribution Amount',
+    createTitle: "Create Group Order",
+    title: "Order Title",
+    titlePlaceholder: "Enter a descriptive title",
+    description: "Description",
+    descriptionPlaceholder: "Describe what you want to create",
+    selectContractorPlaceholder: "-- Select a contractor --",
+    milestonesHelp: "Define the steps of your project and their costs",
+    createOrder: "Create Order",
+    cancel: "Cancel"
   }
 };
 
