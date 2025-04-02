@@ -145,7 +145,9 @@ function setupAuthFormListeners() {
       
       // Проверяем доступность аутентификации
       if (!window.auth) {
-        showNotification('Система авторизации недоступна', 'error');
+        // Используем t() функцию для перевода, если она доступна
+        const errorMessage = typeof t === 'function' ? t('auth.serviceUnavailable') : 'Система авторизации недоступна';
+        showNotification(errorMessage, 'error');
         return;
       }
       
@@ -153,7 +155,7 @@ function setupAuthFormListeners() {
       const submitBtn = signInForm.querySelector('[type="submit"]');
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Входим...';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (typeof t === 'function' ? t('auth.signingIn') : 'Входим...');
       }
       
       try {
@@ -161,19 +163,19 @@ function setupAuthFormListeners() {
         const password = document.getElementById('sign-in-password').value;
         
         if (!email || !password) {
-          throw new Error('Пожалуйста, введите email и пароль');
+          throw new Error(typeof t === 'function' ? t('auth.emptyCredentials') : 'Пожалуйста, введите email и пароль');
         }
         
         console.log("Попытка входа: ", email);
         await signInWithEmail(email, password);
       } catch (error) {
         console.error('Sign in error:', error);
-        showNotification(getAuthErrorMessage(error.code) || error.message || 'Ошибка входа', 'error');
+        showNotification(getAuthErrorMessage(error.code) || error.message || (typeof t === 'function' ? t('auth.loginError') : 'Ошибка входа'), 'error');
       } finally {
         // Возвращаем кнопку в исходное состояние
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = 'Войти';
+          submitBtn.innerHTML = typeof t === 'function' ? t('auth.signIn') : 'Войти';
         }
       }
     });
@@ -186,7 +188,9 @@ function setupAuthFormListeners() {
       
       // Проверяем доступность аутентификации
       if (!window.auth) {
-        showNotification('Система авторизации недоступна', 'error');
+        // Используем t() функцию для перевода, если она доступна
+        const errorMessage = typeof t === 'function' ? t('auth.serviceUnavailable') : 'Система авторизации недоступна';
+        showNotification(errorMessage, 'error');
         return;
       }
       
@@ -194,7 +198,7 @@ function setupAuthFormListeners() {
       const submitBtn = signUpForm.querySelector('[type="submit"]');
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Регистрируем...';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (typeof t === 'function' ? t('auth.registering') : 'Регистрируем...');
       }
       
       try {
@@ -203,19 +207,19 @@ function setupAuthFormListeners() {
         const password = document.getElementById('sign-up-password').value;
         
         if (!name || !email || !password) {
-          throw new Error('Пожалуйста, заполните все поля');
+          throw new Error(typeof t === 'function' ? t('auth.fillAllFields') : 'Пожалуйста, заполните все поля');
         }
         
         console.log("Попытка регистрации: ", email);
         await signUpWithEmail(email, password, name);
       } catch (error) {
         console.error('Sign up error:', error);
-        showNotification(getAuthErrorMessage(error.code) || error.message || 'Ошибка регистрации', 'error');
+        showNotification(getAuthErrorMessage(error.code) || error.message || (typeof t === 'function' ? t('auth.registerError') : 'Ошибка регистрации'), 'error');
       } finally {
         // Возвращаем кнопку в исходное состояние
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = 'Зарегистрироваться';
+          submitBtn.innerHTML = typeof t === 'function' ? t('auth.signUp') : 'Зарегистрироваться';
         }
       }
     });

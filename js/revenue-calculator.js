@@ -524,14 +524,38 @@ class RevenueCalculator {
   _updateCalculationsInternal() {
     // console.log("Updating calculations V3.3 (Precise)..."); 
     const errorDiv = document.getElementById('calculation-error');
-    errorDiv.textContent = ''; // Clear previous errors
-    errorDiv.style.display = 'none';
+    if (errorDiv) {
+      errorDiv.textContent = ''; // Clear previous errors
+      errorDiv.style.display = 'none';
+    }
+    
     let numPrepayers = 0; // Keep track for UI updates even on error
     let tokenPrice = 0; // Keep track for UI updates
     let currentTotalSales = 0;
     let currentYourToken = 0;
     
+    // Инициализация переменной results до блока try-catch для предотвращения ReferenceError
+    let results = {
+      prepayersCount: 0,
+      actualInitialInvestment: 0,
+      creator: 0,
+      platform: 0,
+      promotion: 0,
+      buyer: 0,
+      paybackGoal: 0,
+      paidBackCount: 0,
+      totalRevenueAtPayback: 0,
+      creatorRevenueAtPayback: 0,
+      platformRevenueAtPayback: 0
+    };
+
     try {
+      // Проверка наличия элементов интерфейса
+      if (!document.getElementById('token-price') || !document.getElementById('initial-investment')) {
+        console.warn('Revenue calculator: interface elements not found. Skipping update.');
+        return;
+      }
+      
       // --- Read All Input Values --- 
       // Use parseFloat consistently and provide defaults
       this.initialInvestment = parseFloat(document.getElementById('initial-investment').value) || 0;
@@ -543,212 +567,143 @@ class RevenueCalculator {
       this.nonPaybackPoolSharePercent = parseFloat(document.getElementById('non-payback-pool-share').value) || 0;
       const totalSalesInput = document.getElementById('total-sales-input');
       const yourTokenInput = document.getElementById('your-token-number-input');
-      // Read current values from inputs
-      currentTotalSales = parseInt(totalSalesInput.value) || 0;
-      currentYourToken = parseInt(yourTokenInput.value) || 1;
+      
+      // Проверяем существование элементов перед чтением их значений
+      if (totalSalesInput && yourTokenInput) {
+        // Read current values from inputs
+        currentTotalSales = parseInt(totalSalesInput.value) || 0;
+        currentYourToken = parseInt(yourTokenInput.value) || 1;
+      } else {
+        console.warn('Revenue calculator: sales inputs not found');
+        return;
+      }
 
       // --- Basic Input Validation --- 
       if (tokenPrice <= 0) {
-          this._showError('tokenPriceError');
-          this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice); // Update prepayers even on error
-          return;
+        this._showError('tokenPriceError');
+        this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice); // Update prepayers even on error
+        return;
       }
       if (this.initialInvestment < 0) {
-          this._showError('negativeInvestmentError');
+        this._showError('negativeInvestmentError');
+        this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice);
+        return;
+      }
+      if (this.creatorShare < 0 || this.platformShare < 0 || this.promotionShare < 0 || 
+          this.creatorShare > 100 || this.platformShare > 100 || this.promotionShare > 100 || 
+          (this.creatorShare + this.platformShare + this.promotionShare) > 100) {
+          this._showError('sharesError');
           this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice);
           return;
       }
-       if (this.creatorShare < 0 || this.platformShare < 0 || this.promotionShare < 0 || 
-           this.creatorShare > 100 || this.platformShare > 100 || this.promotionShare > 100 || 
-           (this.creatorShare + this.platformShare + this.promotionShare) > 100) {
-           this._showError('sharesError');
-           this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice);
-           return;
-       }
-        if (this.paybackRatio < 1) {
-            this._showError('paybackRatioError');
-            this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice);
-            return;
-        }
-        if (this.nonPaybackPoolSharePercent < 0 || this.nonPaybackPoolSharePercent > 100) {
-             this._showError('nonPaybackPoolShareError');
-             this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice);
-             return;
-        }
+      if (this.paybackRatio < 1) {
+        this._showError('paybackRatioError');
+        this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice);
+        return;
+      }
+      if (this.nonPaybackPoolSharePercent < 0 || this.nonPaybackPoolSharePercent > 100) {
+        this._showError('nonPaybackPoolShareError');
+        this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice);
+        return;
+      }
 
       // --- Calculate Dependent Parameters & Update UI --- 
       this.updateBuyersShare();
       this.updatePaybackPoolSharePercent();
-      document.getElementById('calc-buyers-share').textContent = `${this.buyersShare.toFixed(2)}%`;
+      
+      const calcBuyersShare = document.getElementById('calc-buyers-share');
+      if (calcBuyersShare) {
+        calcBuyersShare.textContent = `${this.buyersShare.toFixed(2)}%`;
+      }
+      
       numPrepayers = this.calculateNumPrepayers(tokenPrice);
-      document.getElementById('calc-num-prepayers').textContent = numPrepayers;
+      
+      const calcNumPrepayers = document.getElementById('calc-num-prepayers');
+      if (calcNumPrepayers) {
+        calcNumPrepayers.textContent = numPrepayers;
+      }
       
       // Update sliders' min/max and potentially value
       const totalSalesSlider = document.getElementById('total-sales-slider');
       const yourTokenSlider = document.getElementById('your-token-number-slider');
       const minSalesHint = document.getElementById('min-sales-hint');
-      const effectiveMinSales = numPrepayers > 0 ? numPrepayers : 1;
-      minSalesHint.textContent = numPrepayers; // Show calculated prepayers
-      totalSalesSlider.min = effectiveMinSales;
-      totalSalesInput.min = effectiveMinSales;
-      // Ensure current Total Sales is not less than the effective minimum
-      if (currentTotalSales < effectiveMinSales) {
+      
+      if (totalSalesSlider && yourTokenSlider) {
+        const effectiveMinSales = numPrepayers > 0 ? numPrepayers : 1;
+        
+        if (minSalesHint) {
+          minSalesHint.textContent = numPrepayers; // Show calculated prepayers
+        }
+        
+        totalSalesSlider.min = effectiveMinSales;
+        totalSalesInput.min = effectiveMinSales;
+        
+        // Ensure current Total Sales is not less than the effective minimum
+        if (currentTotalSales < effectiveMinSales) {
           currentTotalSales = effectiveMinSales;
           totalSalesInput.value = currentTotalSales;
           totalSalesSlider.value = currentTotalSales;
-      }
+        }
 
-      const effectiveMaxToken = currentTotalSales > 0 ? currentTotalSales : 1;
-      yourTokenSlider.max = effectiveMaxToken;
-      yourTokenInput.max = effectiveMaxToken;
-      // Ensure current Your Token Number is within valid range [1, effectiveMaxToken]
-       if (currentYourToken > effectiveMaxToken) {
-           currentYourToken = effectiveMaxToken;
-           yourTokenInput.value = currentYourToken;
-           yourTokenSlider.value = currentYourToken;
-       }
-       if (currentYourToken < 1) { 
-            currentYourToken = 1;
-            yourTokenInput.value = 1;
-            yourTokenSlider.value = 1;
-       }
-       yourTokenSlider.disabled = currentTotalSales <= 0; 
-       yourTokenInput.disabled = currentTotalSales <= 0;
-       document.getElementById('your-token-number-display').textContent = currentYourToken;
-       document.getElementById('payback-ratio-display').textContent = this.paybackRatio;
-       
-        // Update slider background gradient
-       this.updateSliderBackground(totalSalesSlider, numPrepayers);
+        const effectiveMaxToken = currentTotalSales > 0 ? currentTotalSales : 1;
+        yourTokenSlider.max = effectiveMaxToken;
+        yourTokenInput.max = effectiveMaxToken;
+        
+        // Ensure current Your Token Number is within valid range [1, effectiveMaxToken]
+        if (currentYourToken > effectiveMaxToken) {
+          currentYourToken = effectiveMaxToken;
+          yourTokenInput.value = currentYourToken;
+          yourTokenSlider.value = currentYourToken;
+        }
+        if (currentYourToken < 1) { 
+          currentYourToken = 1;
+          yourTokenInput.value = 1;
+          yourTokenSlider.value = 1;
+        }
+        
+        yourTokenSlider.disabled = currentTotalSales <= 0; 
+        yourTokenInput.disabled = currentTotalSales <= 0;
+      }
+      
+      const yourTokenNumberDisplay = document.getElementById('your-token-number-display');
+      if (yourTokenNumberDisplay) {
+        yourTokenNumberDisplay.textContent = currentYourToken;
+      }
+      
+      const paybackRatioDisplay = document.getElementById('payback-ratio-display');
+      if (paybackRatioDisplay) {
+        paybackRatioDisplay.textContent = this.paybackRatio;
+      }
+      
+      // Update slider background gradient
+      if (totalSalesSlider) {
+        this.updateSliderBackground(totalSalesSlider, numPrepayers);
+      }
 
       const paybackGoalAmount = tokenPrice * this.paybackRatio;
       const paybackHint = document.querySelector('#payback-ratio + .form-hint');
-      if(paybackHint) paybackHint.textContent = `Цель: ${formatNumber(tokenPrice)} * ${this.paybackRatio} = ${formatNumber(paybackGoalAmount)}`;
+      if(paybackHint) {
+        paybackHint.textContent = `Цель: ${formatNumber(tokenPrice)} * ${this.paybackRatio} = ${formatNumber(paybackGoalAmount)}`;
+      }
       
       // --- Perform Main Calculation --- 
       // Use the potentially adjusted values of totalSales and yourTokenNumber
-      const results = this.calculateAccruedRevenue(tokenPrice, currentTotalSales, currentYourToken);
+      results = this.calculateAccruedRevenue(tokenPrice, currentTotalSales, currentYourToken);
       
       // Check for errors returned from calculation function
       if (results.error) {
-          this._showError(`Ошибка расчета: ${results.error}`);
-          this.clearResults(results.numPrepayers, tokenPrice);
-          return;
+        this._showError(`Ошибка расчета: ${results.error}`);
+        this.clearResults(results.numPrepayers || 0, tokenPrice);
+        return;
       }
 
       // --- Update UI Elements with Results --- 
-      document.getElementById('acc-creator-revenue').textContent = formatNumber(results.creator);
-      document.getElementById('creator-revenue-detail').textContent = `(${formatNumber(results.actualInitialInvestment)} + ${formatNumber(results.creator - results.actualInitialInvestment)})`;
-      document.getElementById('acc-platform-revenue').textContent = formatNumber(results.platform);
-      document.getElementById('acc-promotion-revenue').textContent = formatNumber(results.promotion);
-      document.getElementById('acc-total-buyers-revenue').textContent = formatNumber(results.buyer);
-      document.getElementById('acc-your-token-revenue').textContent = formatNumber(results.buyer);
-      document.getElementById('your-token-payback-goal').textContent = formatNumber(results.paybackGoal);
-      document.getElementById('final-paid-back-estimate').textContent = results.paidBackCount;
-      
-      // Обновляем статус окупаемости
-      const achievedPayback = results.paybackGoal > 0 && results.buyer >= results.paybackGoal;
-      const statusElement = document.getElementById('your-token-payback-status');
-      if (statusElement) {
-        if (typeof t === 'function') {
-          statusElement.textContent = achievedPayback ? t('calculator.yourToken.yes', 'Yes') : t('calculator.yourToken.no', 'No');
-        } else {
-          statusElement.textContent = achievedPayback ? 'Yes' : 'No';
-        }
-        statusElement.style.color = achievedPayback ? '#28a745' : '#dc3545'; 
-        statusElement.style.fontWeight = 'bold';
-      }
-
-      // Calculate total revenue and platform percentage of total
-      const totalRevenue = results.actualInitialInvestment + (currentTotalSales - results.prepayersCount) * tokenPrice;
-      const platformPercentageOfTotal = totalRevenue > 0 ? (results.platform / totalRevenue * 100).toFixed(2) : 0;
-      
-      // Update platform percentage display
-      const platformPercentageElement = document.getElementById('platform-percentage');
-      if (platformPercentageElement) {
-        platformPercentageElement.textContent = `${platformPercentageOfTotal}% от общего дохода`;
-        platformPercentageElement.title = `Платформа получает ${this.platformShare}% только от продаж после предоплаты`;
-      }
-
-      // Update total revenue
-      const totalRevenueElement = document.getElementById('total-revenue');
-      if (totalRevenueElement) {
-        totalRevenueElement.textContent = formatNumber(totalRevenue);
-      }
-      
-      // Calculate percentage of paid back tokens
-      const paidBackPercentage = currentTotalSales > 0 ? (results.paidBackCount / currentTotalSales * 100).toFixed(2) : 0;
-      const paidBackPercentageElement = document.getElementById('paid-back-percentage');
-      if (paidBackPercentageElement) {
-        paidBackPercentageElement.textContent = `(${paidBackPercentage}%)`;
-      }
-      
-      // Update token numbers display
-      const yourTokenDisplay = document.getElementById('your-token-number-display');
-      if (yourTokenDisplay) {
-        yourTokenDisplay.textContent = currentYourToken;
-      }
-      
-      const numPrepayersDisplay = document.getElementById('num-prepayers-display');
-      if (numPrepayersDisplay) {
-        numPrepayersDisplay.textContent = results.prepayersCount;
-      }
-      
-      // Calculate ROI for the current token
-      const roi = tokenPrice > 0 ? ((results.buyer / tokenPrice) * 100 - 100).toFixed(2) : 0;
-      const roiElement = document.getElementById('your-token-roi');
-      if (roiElement) {
-        roiElement.textContent = `${roi}%`;
-        roiElement.style.color = roi >= 0 ? '#28a745' : '#dc3545';
-      }
-      
-      // Update investor benefits section with corrected payback goal
-      this.updateInvestorBenefitsSection(tokenPrice, results.prepayersCount, currentTotalSales, results.paybackGoal);
-      
-      // Initialize the comparison tabs
-      this.initComparisonTabs();
-
-      // Обновляем информацию о моменте окупаемости
-      const paybackInfoDiv = document.getElementById('payback-info');
-      if (results.paybackPoint) {
-          // Calculate financials at payback point
-          const paybackTotalRevenue = results.totalRevenueAtPayback;
-          const paybackCreatorRevenue = results.creatorRevenueAtPayback;
-          const paybackPlatformRevenue = results.platformRevenueAtPayback;
-          const paybackPlatformPercentage = paybackTotalRevenue > 0 ? (paybackPlatformRevenue / paybackTotalRevenue * 100).toFixed(2) : 0;
-          
-          // Update the payback info div with details
-          paybackInfoDiv.innerHTML = `
-              <h4>Информация о моменте окупаемости токена #${currentYourToken}</h4>
-              <div class="payback-grid">
-                <div class="payback-item">
-                  <div class="payback-label">Номер продажи:</div>
-                  <div class="payback-value">#${results.paybackPoint}</div>
-                </div>
-                <div class="payback-item">
-                  <div class="payback-label">Общий доход на момент окупаемости:</div>
-                  <div class="payback-value">${formatNumber(paybackTotalRevenue)}</div>
-                </div>
-                <div class="payback-item">
-                  <div class="payback-label">Доход автора:</div>
-                  <div class="payback-value">${formatNumber(paybackCreatorRevenue)}</div>
-                  <div class="payback-detail">${formatNumber(results.actualInitialInvestment)} (предоплата) + ${formatNumber(paybackCreatorRevenue - results.actualInitialInvestment)} (доля)</div>
-                </div>
-                <div class="payback-item">
-                  <div class="payback-label">Доход платформы:</div>
-                  <div class="payback-value">${formatNumber(paybackPlatformRevenue)}</div>
-                  <div class="payback-percentage">${paybackPlatformPercentage}% от общего дохода</div>
-                </div>
-              </div>
-          `;
-          paybackInfoDiv.style.display = 'block';
-      } else {
-          paybackInfoDiv.style.display = 'none';
-      }
+      this.updateResultsUI(results, tokenPrice, currentYourToken, currentTotalSales);
 
     } catch (error) {
-        console.error("Unhandled error during calculation update:", error);
-        this._showError('unexpectedError');
-        this.clearResults(results?.prepayersCount || 0, tokenPrice); 
+      console.error("Unhandled error during calculation update:", error);
+      this._showError('unexpectedError');
+      this.clearResults(results?.prepayersCount || 0, tokenPrice); 
     }
   }
   
@@ -1765,6 +1720,154 @@ class RevenueCalculator {
     console.table(tableData);
     
     return results; // Return the raw results object
+  }
+
+  // Отдельный метод для обновления UI с результатами расчетов
+  updateResultsUI(results, tokenPrice, currentYourToken, currentTotalSales) {
+    try {
+      // Обновляем основные результаты
+      const accCreatorRevenue = document.getElementById('acc-creator-revenue');
+      if (accCreatorRevenue) {
+        accCreatorRevenue.textContent = formatNumber(results.creator);
+      }
+      
+      const creatorRevenueDetail = document.getElementById('creator-revenue-detail');
+      if (creatorRevenueDetail) {
+        creatorRevenueDetail.textContent = `(${formatNumber(results.actualInitialInvestment)} + ${formatNumber(results.creator - results.actualInitialInvestment)})`;
+      }
+      
+      const accPlatformRevenue = document.getElementById('acc-platform-revenue');
+      if (accPlatformRevenue) {
+        accPlatformRevenue.textContent = formatNumber(results.platform);
+      }
+      
+      const accPromotionRevenue = document.getElementById('acc-promotion-revenue');
+      if (accPromotionRevenue) {
+        accPromotionRevenue.textContent = formatNumber(results.promotion);
+      }
+      
+      const accTotalBuyersRevenue = document.getElementById('acc-total-buyers-revenue');
+      if (accTotalBuyersRevenue) {
+        accTotalBuyersRevenue.textContent = formatNumber(results.buyer);
+      }
+      
+      const accYourTokenRevenue = document.getElementById('acc-your-token-revenue');
+      if (accYourTokenRevenue) {
+        accYourTokenRevenue.textContent = formatNumber(results.yourToken || results.buyer);
+      }
+      
+      const yourTokenPaybackGoal = document.getElementById('your-token-payback-goal');
+      if (yourTokenPaybackGoal) {
+        yourTokenPaybackGoal.textContent = formatNumber(results.paybackGoal);
+      }
+      
+      const finalPaidBackEstimate = document.getElementById('final-paid-back-estimate');
+      if (finalPaidBackEstimate) {
+        finalPaidBackEstimate.textContent = results.paidBackCount;
+      }
+      
+      // Обновляем статус окупаемости
+      const achievedPayback = results.paybackGoal > 0 && (results.yourToken || results.buyer) >= results.paybackGoal;
+      const statusElement = document.getElementById('your-token-payback-status');
+      if (statusElement) {
+        if (typeof t === 'function') {
+          statusElement.textContent = achievedPayback ? t('calculator.yourToken.yes', 'Yes') : t('calculator.yourToken.no', 'No');
+        } else {
+          statusElement.textContent = achievedPayback ? 'Yes' : 'No';
+        }
+        statusElement.style.color = achievedPayback ? '#28a745' : '#dc3545'; 
+        statusElement.style.fontWeight = 'bold';
+      }
+
+      // Calculate total revenue and platform percentage of total
+      const totalRevenue = results.actualInitialInvestment + (currentTotalSales - results.prepayersCount) * tokenPrice;
+      const platformPercentageOfTotal = totalRevenue > 0 ? (results.platform / totalRevenue * 100).toFixed(2) : 0;
+      
+      // Update platform percentage display
+      const platformPercentageElement = document.getElementById('platform-percentage');
+      if (platformPercentageElement) {
+        platformPercentageElement.textContent = `${platformPercentageOfTotal}% от общего дохода`;
+        platformPercentageElement.title = `Платформа получает ${this.platformShare}% только от продаж после предоплаты`;
+      }
+
+      // Update total revenue
+      const totalRevenueElement = document.getElementById('total-revenue');
+      if (totalRevenueElement) {
+        totalRevenueElement.textContent = formatNumber(totalRevenue);
+      }
+      
+      // Calculate percentage of paid back tokens
+      const paidBackPercentage = currentTotalSales > 0 ? (results.paidBackCount / currentTotalSales * 100).toFixed(2) : 0;
+      const paidBackPercentageElement = document.getElementById('paid-back-percentage');
+      if (paidBackPercentageElement) {
+        paidBackPercentageElement.textContent = `(${paidBackPercentage}%)`;
+      }
+      
+      // Update token numbers display
+      const yourTokenDisplay = document.getElementById('your-token-number-display');
+      if (yourTokenDisplay) {
+        yourTokenDisplay.textContent = currentYourToken;
+      }
+      
+      const numPrepayersDisplay = document.getElementById('num-prepayers-display');
+      if (numPrepayersDisplay) {
+        numPrepayersDisplay.textContent = results.prepayersCount;
+      }
+      
+      // Calculate ROI for the current token
+      const roi = tokenPrice > 0 ? (((results.yourToken || results.buyer) / tokenPrice) * 100 - 100).toFixed(2) : 0;
+      const roiElement = document.getElementById('your-token-roi');
+      if (roiElement) {
+        roiElement.textContent = `${roi}%`;
+        roiElement.style.color = roi >= 0 ? '#28a745' : '#dc3545';
+      }
+      
+      // Update investor benefits section with corrected payback goal
+      this.updateInvestorBenefitsSection(tokenPrice, results.prepayersCount, currentTotalSales, results.paybackGoal);
+      
+      // Initialize the comparison tabs
+      this.initComparisonTabs();
+
+      // Обновляем информацию о моменте окупаемости
+      const paybackInfoDiv = document.getElementById('payback-info');
+      if (paybackInfoDiv && results.paybackPoint) {
+        // Calculate financials at payback point
+        const paybackTotalRevenue = results.totalRevenueAtPayback;
+        const paybackCreatorRevenue = results.creatorRevenueAtPayback;
+        const paybackPlatformRevenue = results.platformRevenueAtPayback;
+        const paybackPlatformPercentage = paybackTotalRevenue > 0 ? (paybackPlatformRevenue / paybackTotalRevenue * 100).toFixed(2) : 0;
+        
+        // Update the payback info div with details
+        paybackInfoDiv.innerHTML = `
+            <h4>Информация о моменте окупаемости токена #${currentYourToken}</h4>
+            <div class="payback-grid">
+              <div class="payback-item">
+                <div class="payback-label">Номер продажи:</div>
+                <div class="payback-value">#${results.paybackPoint}</div>
+              </div>
+              <div class="payback-item">
+                <div class="payback-label">Общий доход на момент окупаемости:</div>
+                <div class="payback-value">${formatNumber(paybackTotalRevenue)}</div>
+              </div>
+              <div class="payback-item">
+                <div class="payback-label">Доход автора:</div>
+                <div class="payback-value">${formatNumber(paybackCreatorRevenue)}</div>
+                <div class="payback-detail">${formatNumber(results.actualInitialInvestment)} (предоплата) + ${formatNumber(paybackCreatorRevenue - results.actualInitialInvestment)} (доля)</div>
+              </div>
+              <div class="payback-item">
+                <div class="payback-label">Доход платформы:</div>
+                <div class="payback-value">${formatNumber(paybackPlatformRevenue)}</div>
+                <div class="payback-percentage">${paybackPlatformPercentage}% от общего дохода</div>
+              </div>
+            </div>
+        `;
+        paybackInfoDiv.style.display = 'block';
+      } else if (paybackInfoDiv) {
+        paybackInfoDiv.style.display = 'none';
+      }
+    } catch (error) {
+      console.error("Error updating UI with calculation results:", error);
+    }
   }
 }
 

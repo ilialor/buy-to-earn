@@ -75,13 +75,26 @@ if (USE_LOCAL_AUTH && hasLocalAuth) {
 window.addEventListener('load', () => {
   setTimeout(() => {
     if (!window.auth || !window.db) {
-      console.error('Системы авторизации недоступны после загрузки страницы');
+      console.debug('Системы авторизации недоступны после загрузки страницы, инициализируем локальную систему');
       if (hasLocalAuth) {
-        console.log('Повторная попытка инициализации локального хранилища');
+        console.log('Инициализация локального хранилища');
         useLocalAuthIfAvailable();
+        
+        // Устанавливаем флаг инициализации
+        localStorage.setItem('localAuth_initialized', 'true');
+        
+        // Проверяем еще раз после инициализации
+        setTimeout(() => {
+          if (!window.auth || !window.db) {
+            console.error('Критическая ошибка: авторизация не инициализирована после повторной попытки');
+          } else {
+            console.log('Локальная система авторизации успешно инициализирована');
+          }
+        }, 300);
       }
     } else {
       console.log('Системы авторизации доступны и готовы к использованию');
+      localStorage.setItem('localAuth_initialized', 'true');
     }
   }, 500);
 });

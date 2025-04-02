@@ -133,4 +133,36 @@ button:disabled {
 
 .auth-tab-content.active {
   display: block;
+}
+
+/* Fixes for user dropdown menu */
+.user-info {
+    z-index: 1001;
+    position: relative;
+}
+
+.user-dropdown {
+    z-index: 1000; 
+    pointer-events: auto;
+    overflow: visible;
+    padding: 6px 0;
+}
+
+.user-dropdown-item {
+    pointer-events: auto !important;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.user-dropdown-item:hover,
+.user-dropdown-item:focus,
+.user-dropdown-item:active {
+    background-color: var(--bg-hover, #f0f0f0) !important;
+    color: var(--primary, #007bff) !important;
+}
+
+/* Make sure dropdown items are always clickable */
+.user-dropdown-item *,
+.user-dropdown * {
+    pointer-events: auto !important;
 } 

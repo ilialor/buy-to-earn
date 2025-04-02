@@ -288,7 +288,7 @@ function handleFormSubmit(form, submitHandler) {
       clearForm(form);
       
     } catch (error) {
-      console.error('Form submission error:', error);
+      console.warn('Предупреждение при обработке данных формы:', error);
       showNotification(error.message || 'Произошла ошибка при отправке формы', 'error');
     } finally {
       // Reset loading state
@@ -472,7 +472,7 @@ function setupUIListeners() {
     // Закрытие дропдауна при клике вне него
     document.addEventListener('click', function(e) {
       const dropdown = document.getElementById('user-dropdown');
-      if (dropdown && dropdown.classList.contains('show') && !userAvatar.contains(e.target)) {
+      if (dropdown && dropdown.classList.contains('show') && !userAvatar.contains(e.target) && !dropdown.contains(e.target)) {
         dropdown.classList.remove('show');
       }
     });
@@ -490,12 +490,14 @@ function setupUIListeners() {
   const goToProfile = document.getElementById('go-to-profile');
   const goToWallet = document.getElementById('go-to-wallet');
   const goToPortfolio = document.getElementById('go-to-portfolio');
+  const signOutBtn = document.getElementById('sign-out-btn');
 
   if (goToProfile) {
     goToProfile.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
       navigateToPage('profile');
+      document.getElementById('user-dropdown').classList.remove('show');
     });
   }
 
@@ -504,6 +506,7 @@ function setupUIListeners() {
       e.preventDefault();
       e.stopPropagation();
       navigateToPage('wallet');
+      document.getElementById('user-dropdown').classList.remove('show');
     });
   }
 
@@ -512,7 +515,60 @@ function setupUIListeners() {
       e.preventDefault();
       e.stopPropagation();
       navigateToPage('portfolio');
+      document.getElementById('user-dropdown').classList.remove('show');
     });
+  }
+  
+  if (signOutBtn) {
+    signOutBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (typeof signOut === 'function') {
+        signOut();
+      }
+      document.getElementById('user-dropdown').classList.remove('show');
+    });
+  }
+  
+  // Обработчик кнопки "Apply as Executor"
+  const applyExecutorBtn = document.getElementById('apply-executor-btn');
+  if (applyExecutorBtn) {
+    applyExecutorBtn.addEventListener('click', function() {
+      // Проверка авторизации пользователя
+      if (!isUserAuthenticated()) {
+        showAuthModal('sign-in');
+        // Показываем уведомление на текущем языке интерфейса
+        const authRequiredMessage = getCurrentLanguageMessage({
+          ru: 'Для подачи заявки необходимо авторизоваться',
+          en: 'Authentication required to submit an application',
+          es: 'Se requiere autenticación para enviar una solicitud'
+        });
+        showNotification('warning', authRequiredMessage);
+        return;
+      }
+      
+      // Здесь будет логика отправки заявки на роль исполнителя
+      // Показываем уведомление на текущем языке интерфейса
+      const successMessage = getCurrentLanguageMessage({
+        ru: 'Ваша заявка отправлена на рассмотрение',
+        en: 'Your application has been submitted for review',
+        es: 'Su solicitud ha sido enviada para revisión'
+      });
+      showNotification('success', successMessage);
+      
+      // Можно также открыть модальное окно с формой для заполнения данных исполнителя
+      // showModal('executor-application-modal');
+    });
+  }
+
+  /**
+   * Получает сообщение на текущем языке интерфейса
+   * @param {Object} messages - Объект с сообщениями на разных языках
+   * @returns {string} - Сообщение на текущем языке
+   */
+  function getCurrentLanguageMessage(messages) {
+    const currentLocale = window.getUserLocale ? window.getUserLocale() : 'ru';
+    return messages[currentLocale] || messages.en || Object.values(messages)[0];
   }
 
   // Submit Order Form
@@ -521,36 +577,122 @@ function setupUIListeners() {
     submitOrderForm.addEventListener('submit', function(e) {
       e.preventDefault();
       
-      // Check if user is signed in
-      if (!auth.currentUser) {
+      // Правильная проверка авторизации пользователя с использованием isUserAuthenticated
+      let isAuthenticated = isUserAuthenticated();
+      if (!isAuthenticated) {
+        showNotification('Пожалуйста, войдите в систему для создания заказа', 'error');
         showModal('auth-modal');
         return;
       }
       
-      const orderData = {
-        title: document.getElementById('order-title').value,
-        category: document.getElementById('order-category').value,
-        description: document.getElementById('order-description').value,
-        budget: parseFloat(document.getElementById('order-budget').value),
-        deadline: document.getElementById('order-deadline').value,
-        creatorId: auth.currentUser.uid,
-        creatorName: auth.currentUser.displayName || auth.currentUser.email
-      };
-      
-      createOrder(orderData)
-        .then(() => {
-          submitOrderForm.reset();
-          showNotification('Заказ успешно создан', 'success');
-          
-          // Navigate to explore tab
-          document.querySelector('[data-tab="explore"]').click();
-          
-          // Reload orders
-          loadMarketplaceOrders();
-        })
-        .catch(error => {
-          showNotification('Ошибка: ' + error.message, 'error');
-        });
+      // Получение данных формы
+      try {
+        const orderTitle = document.getElementById('order-title')?.value || '';
+        const orderCategory = document.getElementById('order-category')?.value || '';
+        const orderDescription = document.getElementById('order-description')?.value || '';
+        const orderBudget = parseFloat(document.getElementById('order-budget')?.value || '0');
+        const orderDeadline = document.getElementById('order-deadline')?.value || '';
+        
+        // Собираем данные заказа без привязки к window.auth.currentUser
+        const orderData = {
+          title: orderTitle,
+          category: orderCategory,
+          description: orderDescription,
+          budget: orderBudget,
+          deadline: orderDeadline
+        };
+        
+        // Показываем индикатор загрузки
+        const submitBtn = submitOrderForm.querySelector('[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Создание...';
+        }
+        
+        // Вызываем функцию createOrder из db.js, которая сама определит ID пользователя
+        createOrder(orderData)
+          .then((orderId) => {
+            submitOrderForm.reset();
+            showNotification('Заказ успешно создан', 'success');
+            
+            // Navigate to explore tab
+            const exploreTab = document.querySelector('[data-tab="explore"]');
+            if (exploreTab) {
+              exploreTab.click();
+            }
+            
+            // Создаем локальный объект заказа для мгновенного отображения
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+              // Добавляем созданный заказ на страницу сразу, не дожидаясь перезагрузки
+              const newOrder = {
+                id: orderId,
+                ...orderData,
+                userId: currentUser.uid,
+                userName: currentUser.displayName || currentUser.email || 'Пользователь',
+                status: 'active',
+                currentFunding: 0,
+                participants: 0,
+                createdAt: new Date()
+              };
+              
+              // Находим существующие пользовательские заказы на странице или создаем раздел
+              let userOrdersSection = document.querySelector('.user-orders-section');
+              
+              if (!userOrdersSection) {
+                // Создаем раздел "Твои заказы"
+                userOrdersSection = document.createElement('div');
+                userOrdersSection.className = 'user-orders-section';
+                
+                // Добавляем заголовок
+                const userOrdersHeader = document.createElement('h3');
+                userOrdersHeader.className = 'section-title';
+                userOrdersHeader.innerHTML = '<i class="fas fa-clipboard-list"></i> Твои заказы';
+                userOrdersSection.appendChild(userOrdersHeader);
+                
+                // Добавляем в начало контейнера
+                const ordersContainer = document.querySelector('#explore .card');
+                if (ordersContainer) {
+                  const header = ordersContainer.querySelector('.card-header');
+                  ordersContainer.insertBefore(userOrdersSection, header.nextSibling);
+                  
+                  // Добавляем разделитель
+                  const divider = document.createElement('hr');
+                  divider.className = 'section-divider';
+                  userOrdersSection.appendChild(divider);
+                }
+              }
+              
+              // Добавляем созданный заказ в начало раздела (перед разделителем)
+              if (userOrdersSection) {
+                const divider = userOrdersSection.querySelector('.section-divider');
+                const orderElement = createOrderElement(newOrder, true);
+                if (divider) {
+                  userOrdersSection.insertBefore(orderElement, divider);
+                } else {
+                  userOrdersSection.appendChild(orderElement);
+                }
+              }
+            }
+            
+            // Reload orders для обновления списка с сервера
+            loadMarketplaceOrders();
+          })
+          .catch(error => {
+            console.warn('Предупреждение при создании заказа:', error);
+            showNotification('Ошибка: ' + error.message, 'error');
+          })
+          .finally(() => {
+            // Восстанавливаем кнопку
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = 'Создать заказ';
+            }
+          });
+      } catch (error) {
+        console.warn('Предупреждение при обработке данных заказа:', error);
+        showNotification('Произошла ошибка при создании заказа', 'error');
+      }
     });
   }
   
@@ -670,8 +812,22 @@ function setupUIListeners() {
 
 // Load marketplace orders
 function loadMarketplaceOrders() {
+  // Загружаем все заказы
   getAllOrders()
     .then(orders => {
+      // Проверяем, авторизован ли пользователь
+      if (isUserAuthenticated()) {
+        // Получаем данные текущего пользователя
+        const currentUser = getCurrentUser();
+        if (currentUser) {
+          // Фильтруем заказы пользователя
+          const userOrders = orders.filter(order => order.userId === currentUser.uid);
+          // Отображаем заказы с разделением на "Твои заказы" и "Все заказы"
+          renderOrders(orders, userOrders);
+          return;
+        }
+      }
+      // Если пользователь не авторизован или нет его заказов, отображаем только все заказы
       renderOrders(orders);
     })
     .catch(error => {
@@ -769,7 +925,7 @@ function loadUserTransactions() {
 }
 
 // Render orders in the marketplace
-function renderOrders(orders) {
+function renderOrders(orders, userOrders = null) {
   const ordersContainer = document.querySelector('#explore .card');
   if (!ordersContainer) return;
   
@@ -778,6 +934,34 @@ function renderOrders(orders) {
   ordersContainer.innerHTML = '';
   ordersContainer.appendChild(header);
   
+  // Если у пользователя есть заказы, отображаем их в отдельном разделе
+  if (userOrders && userOrders.length > 0) {
+    // Создаем раздел "Твои заказы"
+    const userOrdersSection = document.createElement('div');
+    userOrdersSection.className = 'user-orders-section';
+    
+    // Добавляем заголовок
+    const userOrdersHeader = document.createElement('h3');
+    userOrdersHeader.className = 'section-title';
+    userOrdersHeader.innerHTML = '<i class="fas fa-clipboard-list"></i> Твои заказы';
+    userOrdersSection.appendChild(userOrdersHeader);
+    
+    // Добавляем заказы пользователя
+    userOrders.forEach(order => {
+      const orderElement = createOrderElement(order, true);
+      userOrdersSection.appendChild(orderElement);
+    });
+    
+    // Добавляем разделитель
+    const divider = document.createElement('hr');
+    divider.className = 'section-divider';
+    userOrdersSection.appendChild(divider);
+    
+    // Добавляем раздел к контейнеру
+    ordersContainer.appendChild(userOrdersSection);
+  }
+  
+  // Проверяем, есть ли заказы для отображения в общем списке
   if (orders.length === 0) {
     const emptyMessage = document.createElement('p');
     emptyMessage.textContent = 'Нет активных заказов';
@@ -787,19 +971,57 @@ function renderOrders(orders) {
     return;
   }
   
+  // Добавляем заголовок для всех заказов, если были показаны заказы пользователя
+  if (userOrders && userOrders.length > 0) {
+    const allOrdersHeader = document.createElement('h3');
+    allOrdersHeader.className = 'section-title';
+    allOrdersHeader.innerHTML = '<i class="fas fa-globe"></i> Все активные заказы';
+    ordersContainer.appendChild(allOrdersHeader);
+  }
+  
+  // Добавляем все заказы
   orders.forEach(order => {
+    // Если это заказ пользователя и он уже был показан в разделе "Твои заказы", не показываем его снова
+    if (userOrders && userOrders.some(userOrder => userOrder.id === order.id)) {
+      return;
+    }
     const orderElement = createOrderElement(order);
     ordersContainer.appendChild(orderElement);
   });
 }
 
 // Create an order element
-function createOrderElement(order) {
+function createOrderElement(order, isUserOrder = false) {
   const orderItem = document.createElement('div');
   orderItem.className = 'order-item';
+  if (isUserOrder) {
+    orderItem.classList.add('user-order');
+  }
   
   // Calculate funding percentage
   const fundingPercentage = (order.currentFunding / order.budget) * 100;
+  
+  // Определяем действия в зависимости от того, чей это заказ
+  let actionButtons = '';
+  if (isUserOrder) {
+    actionButtons = `
+      <button class="btn btn-primary btn-sm btn-order-edit" data-order-id="${order.id}">
+        <i class="fas fa-edit"></i> Редактировать
+      </button>
+      <button class="btn btn-outline btn-sm btn-order-details" data-order-id="${order.id}">
+        <i class="fas fa-info-circle"></i> Детали
+      </button>
+    `;
+  } else {
+    actionButtons = `
+      <button class="btn btn-primary btn-sm btn-participate" data-order-id="${order.id}">
+        <i class="fas fa-plus"></i> Участвовать
+      </button>
+      <button class="btn btn-outline btn-sm btn-order-details" data-order-id="${order.id}">
+        <i class="fas fa-info-circle"></i> Детали
+      </button>
+    `;
+  }
   
   orderItem.innerHTML = `
     <div class="order-thumbnail">
@@ -809,14 +1031,15 @@ function createOrderElement(order) {
       <h4 class="order-title">${order.title}</h4>
       <div class="order-meta">
         <span><i class="fas fa-tag"></i> ${order.category}</span>
-        <span><i class="fas fa-users"></i> ${order.participants} Participants</span>
+        <span><i class="fas fa-users"></i> ${order.participants} Участников</span>
         <span><i class="fas fa-calendar"></i> ${getDeadlineText(order.deadline)}</span>
+        ${isUserOrder ? '<span class="badge user-badge"><i class="fas fa-user"></i> Ваш заказ</span>' : ''}
       </div>
       <p class="order-description">${order.description}</p>
       <div class="order-participation">
         <div class="progress-container">
           <div class="progress-label">
-            <span>Funding Progress</span>
+            <span>Прогресс финансирования</span>
             <span>$${order.currentFunding.toFixed(2)} / $${order.budget.toFixed(2)}</span>
           </div>
           <div class="progress-bar">
@@ -824,32 +1047,41 @@ function createOrderElement(order) {
           </div>
         </div>
         <div class="order-actions">
-          <button class="btn btn-primary btn-sm btn-participate" data-order-id="${order.id}">
-            <i class="fas fa-plus"></i> Participate
-          </button>
-          <button class="btn btn-outline btn-sm btn-order-details" data-order-id="${order.id}">
-            <i class="fas fa-info-circle"></i> Details
-          </button>
+          ${actionButtons}
         </div>
       </div>
     </div>
   `;
   
   // Add event listeners to the buttons
-  const participateBtn = orderItem.querySelector('.btn-participate');
-  participateBtn.addEventListener('click', function() {
-    if (!auth.currentUser) {
-      showModal('auth-modal');
-      return;
+  if (isUserOrder) {
+    const editBtn = orderItem.querySelector('.btn-order-edit');
+    if (editBtn) {
+      editBtn.addEventListener('click', function() {
+        // В будущем можно добавить функционал редактирования
+        showNotification('Функция редактирования заказа будет доступна в ближайшем обновлении', 'info');
+      });
     }
-    
-    showParticipationModal(order.id);
-  });
+  } else {
+    const participateBtn = orderItem.querySelector('.btn-participate');
+    if (participateBtn) {
+      participateBtn.addEventListener('click', function() {
+        if (!isUserAuthenticated()) {
+          showModal('auth-modal');
+          return;
+        }
+        
+        showParticipationModal(order.id);
+      });
+    }
+  }
   
   const detailsBtn = orderItem.querySelector('.btn-order-details');
-  detailsBtn.addEventListener('click', function() {
-    showOrderDetailsModal(order);
-  });
+  if (detailsBtn) {
+    detailsBtn.addEventListener('click', function() {
+      showOrderDetailsModal(order);
+    });
+  }
   
   return orderItem;
 }
@@ -1033,19 +1265,86 @@ function showParticipationModal(orderId) {
 
 // Добавляем новую функцию для навигации
 function navigateToPage(page) {
+  // Проверяем, является ли страница одной из основных страниц с навигационной ссылкой
   const navLink = document.querySelector(`[data-page="${page}"]`);
+  
   if (navLink) {
+    // Если есть ссылка навигации, используем её
     navLink.click();
-    const dropdown = document.getElementById('user-dropdown');
-    if (dropdown) dropdown.classList.remove('show');
+  } else {
+    // Если нет ссылки, переключаем напрямую
+    // Сначала скрываем все страницы
+    document.querySelectorAll('.page-content').forEach(pageContent => {
+      pageContent.classList.remove('active');
+    });
+    
+    // Затем показываем нужную страницу
+    const pageElement = document.getElementById(page);
+    if (pageElement) {
+      pageElement.classList.add('active');
+      
+      // Обновляем активную ссылку в навигации (снимаем активность со всех)
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      
+      // Если страница - профиль или кошелек, нужно загрузить соответствующие данные
+      if (page === 'profile') {
+        console.log('Переход на страницу профиля');
+        // Если есть функция загрузки профиля, вызываем ее
+        if (typeof loadUserProfile === 'function') {
+          loadUserProfile();
+        }
+      } else if (page === 'wallet') {
+        console.log('Переход на страницу кошелька');
+        // Загружаем транзакции для страницы кошелька
+        loadUserTransactions();
+      }
+    } else {
+      console.error(`Страница "${page}" не найдена`);
+      showNotification(`Страница "${page}" не найдена`, 'error');
+    }
   }
+  
+  // Закрываем выпадающее меню, если оно открыто
+  const dropdown = document.getElementById('user-dropdown');
+  if (dropdown) dropdown.classList.remove('show');
 }
 
 // Глобальная функция для проверки авторизации - улучшенная версия
 function isUserAuthenticated() {
   // Проверка наличия глобальных объектов auth и localStorage
   if (!window.auth) {
-    console.warn('Auth service not available yet');
+    // Проверяем локальную авторизацию через localStorage
+    try {
+      const localAuthKey = 'localAuth_currentUser';
+      const storedUser = localStorage.getItem(localAuthKey);
+      
+      if (storedUser) {
+        console.log('User authenticated via localStorage');
+        return true;
+      }
+    } catch (e) {
+      console.error('Error checking localStorage auth:', e);
+    }
+    
+    // Проверяем, была ли уже инициализирована локальная авторизация
+    if (!localStorage.getItem('localAuth_initialized')) {
+      console.debug('Auth service not initialized yet, attempting to initialize local auth');
+      if (typeof initLocalAuth === 'function') {
+        try {
+          initLocalAuth();
+          localStorage.setItem('localAuth_initialized', 'true');
+          
+          // Проверяем еще раз после инициализации
+          const storedUser = localStorage.getItem('localAuth_currentUser');
+          return !!storedUser;
+        } catch (e) {
+          console.error('Failed to initialize local auth:', e);
+        }
+      }
+    }
+    
     return false;
   }
   
@@ -1070,6 +1369,40 @@ function isUserAuthenticated() {
   
   // Если ни один из методов не подтвердил авторизацию
   return false;
+}
+
+// Функция для получения данных текущего пользователя
+function getCurrentUser() {
+  // Сначала проверяем Firebase Auth
+  if (window.auth && window.auth.currentUser) {
+    return {
+      uid: window.auth.currentUser.uid,
+      displayName: window.auth.currentUser.displayName || window.auth.currentUser.email || 'Пользователь',
+      email: window.auth.currentUser.email,
+      isLocal: false
+    };
+  }
+  
+  // Если нет Firebase Auth, проверяем localStorage
+  try {
+    const localAuthKey = 'localAuth_currentUser';
+    const storedUserJson = localStorage.getItem(localAuthKey);
+    
+    if (storedUserJson) {
+      const storedUser = JSON.parse(storedUserJson);
+      return {
+        uid: storedUser.uid,
+        displayName: storedUser.displayName || storedUser.email || 'Пользователь',
+        email: storedUser.email,
+        isLocal: true
+      };
+    }
+  } catch (e) {
+    console.error('Error getting user from localStorage:', e);
+  }
+  
+  // Если пользователь не найден
+  return null;
 }
 
 // Document ready
@@ -1150,8 +1483,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Если пользователь не авторизован и пытается открыть приватную страницу
         console.log('User not authenticated, showing auth dialog');
         
+        // Используем перевод для уведомления
+        const authRequiredMessage = typeof t === 'function' ? t('auth.authRequired') : 'Пожалуйста, войдите в систему';
+        
         // Показываем уведомление только если пользователь не закрывал окно авторизации ранее
-        showNotification('Пожалуйста, войдите в систему', 'error');
+        showNotification(authRequiredMessage, 'error');
         
         // Показываем окно авторизации только если пользователь не закрывал его ранее
         if (!window.authDialogClosed) {

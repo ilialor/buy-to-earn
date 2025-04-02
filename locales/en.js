@@ -29,7 +29,19 @@ const en = {
     enterPassword: "Enter password",
     enterName: "Enter name",
     resetInstructions: "Enter your email to receive reset instructions",
-    sendInstructions: "Send Instructions"
+    sendInstructions: "Send Instructions",
+    serviceUnavailable: "Authentication service is unavailable",
+    signingIn: "Signing in...",
+    registering: "Registering...",
+    emptyCredentials: "Please enter email and password",
+    fillAllFields: "Please fill all fields",
+    loginError: "Login error",
+    registerError: "Registration error",
+    authRequired: "Authentication required",
+    logout: "Logout",
+    profile: "Profile",
+    wallet: "Wallet",
+    portfolio: "Portfolio"
   },
   
   // Marketplace
@@ -39,6 +51,7 @@ const en = {
     explore: "Explore",
     submit: "Submit Order",
     executor: "Become Executor",
+    applyExecutor: "Apply as Executor",
     activeOrders: "Active Orders",
     totalInvested: "Total Invested",
     completedProducts: "Completed Products",
@@ -152,7 +165,16 @@ const en = {
     emailAddress: "Email Address",
     subject: "Subject",
     message: "Message",
-    sendMessage: "Send Message"
+    sendMessage: "Send Message",
+    // FAQ questions and answers
+    faq_what_is_cointent_q: "What is Co-Intent?",
+    faq_what_is_cointent_a: "Co-Intent is a platform that enables collaborative funding of digital products. Users can submit or fund product ideas, while executors create these products. Once completed, products are tokenized as NFTs, and future sales revenue is shared among all participants.",
+    faq_how_earn_q: "How do I earn from my investments?",
+    faq_how_earn_a: "When you invest in a product, you receive an NFT representing your ownership. As the product sells to new customers, you receive a share of the revenue. The revenue sharing model allocates 70% of sales to NFT holders, with the remaining split between creators and the platform.",
+    faq_products_types_q: "What types of products can be created?",
+    faq_products_types_a: "The platform supports various digital products including books, software, online courses, research papers, designs, and more. Any digital product that can be tokenized and distributed is eligible.",
+    faq_become_executor_q: "How do I become an executor?",
+    faq_become_executor_a: "To become an executor, you need to apply through the \"Become Executor\" section. You'll be asked to provide details about your skills, experience, and the types of projects you can execute. Once approved, you can start accepting orders."
   },
   
   // Common

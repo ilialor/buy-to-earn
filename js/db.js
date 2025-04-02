@@ -97,16 +97,71 @@ async function addDocument(collectionName, data) {
   try {
     if (!dbRef) {
       if (!initializeCollections()) {
-        throw new Error('База данных недоступна');
+        // В случае отсутствия подключения к базе данных, используем локальное хранилище
+        console.log(`База данных недоступна, используем локальное хранилище для ${collectionName}`);
+        return addLocalDocument(collectionName, data);
       }
     }
-    const docRef = await dbRef.collection(collectionName).add({
-      ...data,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    return docRef.id;
+    
+    // Если dbRef существует и есть Firebase Firestore
+    if (typeof firebase !== 'undefined' && firebase.firestore) {
+      const docRef = await dbRef.collection(collectionName).add({
+        ...data,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      return docRef.id;
+    } else {
+      // Если нет Firebase, но есть dbRef (например, LocalFirestore)
+      const docRef = await dbRef.collection(collectionName).add({
+        ...data,
+        createdAt: new Date()
+      });
+      return docRef.id;
+    }
   } catch (error) {
-    console.error('Error adding document:', error);
+    // Вместо вывода ошибки в console.error, используем console.warn
+    console.warn('Предупреждение при добавлении документа в Firebase:', error);
+    // В случае ошибки при добавлении в базу, пытаемся сохранить локально
+    console.log('Пытаемся сохранить документ локально после ошибки Firestore');
+    return addLocalDocument(collectionName, data);
+  }
+}
+
+// Функция для добавления документа в локальное хранилище
+function addLocalDocument(collectionName, data) {
+  try {
+    // Генерируем уникальный ID для документа
+    const docId = 'local_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    
+    // Получаем текущую коллекцию из localStorage или создаем новую
+    const storageKey = `local_${collectionName}`;
+    let collection = [];
+    
+    try {
+      const existingData = localStorage.getItem(storageKey);
+      if (existingData) {
+        collection = JSON.parse(existingData);
+      }
+    } catch (e) {
+      console.warn(`Ошибка при чтении локальной коллекции ${collectionName}:`, e);
+    }
+    
+    // Добавляем новый документ
+    const newDoc = {
+      id: docId,
+      ...data,
+      createdAt: new Date()
+    };
+    
+    collection.push(newDoc);
+    
+    // Сохраняем обновленную коллекцию
+    localStorage.setItem(storageKey, JSON.stringify(collection));
+    
+    console.log(`Документ успешно добавлен в локальную коллекцию ${collectionName}, ID: ${docId}`);
+    return docId;
+  } catch (error) {
+    console.error('Ошибка при добавлении документа в локальное хранилище:', error);
     throw error;
   }
 }
@@ -257,31 +312,75 @@ async function getUserRevenues(userId) {
 // Create a new order
 async function createOrder(orderData) {
   try {
-    // Ensure user is authenticated
-    const user = auth.currentUser;
-    if (!user) {
+    // Проверка инициализации базы данных
+    if (!dbRef) {
+      if (!initializeCollections()) {
+        throw new Error('База данных недоступна');
+      }
+    }
+
+    let userId = null;
+    let userName = 'Пользователь';
+
+    // Проверка Firebase-аутентификации
+    if (window.auth && window.auth.currentUser) {
+      userId = window.auth.currentUser.uid;
+      userName = window.auth.currentUser.displayName || window.auth.currentUser.email || 'Пользователь';
+    } 
+    // Проверка локальной аутентификации
+    else {
+      // Попытка получить данные локальной аутентификации
+      try {
+        const localUserJson = localStorage.getItem('localAuth_currentUser');
+        if (localUserJson) {
+          const localUser = JSON.parse(localUserJson);
+          if (localUser && localUser.uid) {
+            userId = localUser.uid;
+            userName = localUser.displayName || localUser.email || 'Пользователь';
+            console.log('Используем данные локальной аутентификации:', userName);
+          }
+        }
+      } catch (e) {
+        console.warn('Ошибка при получении данных локальной аутентификации:', e);
+      }
+    }
+
+    // Убедимся, что у нас есть ID пользователя
+    if (!userId) {
       throw new Error('Пользователь не авторизован');
     }
     
-    // Add user ID to order data
+    // Формируем данные заказа
     const orderWithUser = {
       ...orderData,
-      userId: user.uid,
-      status: 'pending', // Initial status
+      userId: userId,
+      userName: userName,
+      status: 'active',
+      currentFunding: 0,
+      participants: 0,
+      createdAt: new Date()
     };
     
-    // Create order document
+    console.log('Создаем заказ с данными:', orderWithUser);
+    
+    // Создаем документ заказа
     const orderId = await addDocument('orders', orderWithUser);
     
-    // Create transaction record
-    await addDocument('transactions', {
-      userId: user.uid,
-      type: 'purchase',
-      amount: orderData.totalPrice,
-      status: 'pending',
-      orderId: orderId,
-      description: `Покупка NFT: ${orderData.nftName}`,
-    });
+    // Создаем запись транзакции для лога
+    try {
+      await addDocument('transactions', {
+        userId: userId,
+        type: 'order_creation',
+        amount: orderData.budget || 0,
+        status: 'completed',
+        orderId: orderId,
+        description: `Создание заказа: ${orderData.title}`,
+        createdAt: new Date()
+      });
+    } catch (transactionError) {
+      console.warn('Ошибка при создании транзакции заказа:', transactionError);
+      // Не прерываем выполнение, если ошибка только в создании записи транзакции
+    }
     
     return orderId;
   } catch (err) {
@@ -497,20 +596,55 @@ async function createRevenue(userId, amount, source) {
 // Get all orders
 async function getAllOrders() {
   try {
-    if (!ordersRef) {
+    // Проверяем наличие подключения к Firebase
+    if (!dbRef) {
       if (!initializeCollections()) {
-        throw new Error('База данных недоступна');
+        console.log('База данных недоступна, получаем заказы из локального хранилища');
+        return getLocalOrders();
       }
     }
-    const snapshot = await ordersRef.orderBy('createdAt', 'desc').get();
+    
+    // Получаем заказы из Firestore
+    const snapshot = await dbRef.collection('orders')
+      .orderBy('createdAt', 'desc')
+      .get();
     
     return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
   } catch (error) {
-    console.error('Error getting all orders:', error);
-    throw error;
+    console.error('Error getting orders:', error);
+    // В случае ошибки, пытаемся получить из локального хранилища
+    console.log('Ошибка получения заказов из Firebase, пробуем локальное хранилище');
+    return getLocalOrders();
+  }
+}
+
+// Получение заказов из локального хранилища
+function getLocalOrders() {
+  try {
+    const storageKey = 'local_orders';
+    const ordersData = localStorage.getItem(storageKey);
+    
+    if (ordersData) {
+      let orders = JSON.parse(ordersData);
+      
+      // Сортировка по дате создания (от новых к старым)
+      orders = orders.sort((a, b) => {
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+        return dateB - dateA;
+      });
+      
+      console.log(`Получено ${orders.length} заказов из локального хранилища`);
+      return orders;
+    }
+    
+    return []; // Возвращаем пустой массив, если нет сохраненных заказов
+  } catch (error) {
+    console.error('Ошибка при получении заказов из локального хранилища:', error);
+    return []; // Возвращаем пустой массив в случае ошибки
   }
 }
 

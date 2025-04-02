@@ -82,18 +82,18 @@
                   <i class="fas fa-chevron-down"></i>
                   
                   <div class="user-dropdown" id="user-dropdown">
-                    <div class="user-dropdown-item" id="go-to-profile" data-i18n="profile.title">
-                      <i class="fas fa-user-circle"></i> Профиль
+                    <div class="user-dropdown-item" id="go-to-profile" data-i18n="profile.title" tabindex="0">
+                      <i class="fas fa-user-circle"></i> <span>Профиль</span>
                     </div>
-                    <div class="user-dropdown-item" id="go-to-wallet" data-i18n="wallet.title">
-                      <i class="fas fa-wallet"></i> Кошелек
+                    <div class="user-dropdown-item" id="go-to-wallet" data-i18n="wallet.title" tabindex="0">
+                      <i class="fas fa-wallet"></i> <span>Кошелек</span>
                     </div>
-                    <div class="user-dropdown-item" id="go-to-portfolio" data-i18n="portfolio.title">
-                      <i class="fas fa-chart-pie"></i> Портфолио
+                    <div class="user-dropdown-item" id="go-to-portfolio" data-i18n="portfolio.title" tabindex="0">
+                      <i class="fas fa-chart-pie"></i> <span>Портфолио</span>
                     </div>
                     <div class="user-dropdown-divider"></div>
-                    <div class="user-dropdown-item" id="sign-out-btn">
-                      <i class="fas fa-sign-out-alt"></i> Выйти
+                    <div class="user-dropdown-item" id="sign-out-btn" tabindex="0">
+                      <i class="fas fa-sign-out-alt"></i> <span>Выйти</span>
                     </div>
                   </div>
                 </div>
@@ -226,7 +226,7 @@
                             <div class="stat-label">Future Revenue Share</div>
                         </div>
                     </div>
-                    <button class="btn btn-primary">Apply as Executor</button>
+                    <button class="btn btn-primary" id="apply-executor-btn" data-i18n="marketplace.applyExecutor">Apply as Executor</button>
                 </div>
             </div>
         </div>
@@ -589,52 +589,52 @@
 
         <!-- Support Page -->
         <div class="page-content" id="support">
-            <h1 class="main-title">Support</h1>
-            <p class="subtitle">Get help and answers to your questions about the Co-Intent platform.</p>
+            <h1 class="main-title" data-i18n="support.title">Support Center</h1>
+            <p class="subtitle" data-i18n="support.subtitle">Need help? We're here for you.</p>
 
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Frequently Asked Questions</h3>
+                    <div class="card-title" data-i18n="support.faq">Frequently Asked Questions</div>
                 </div>
 
                 <div class="support-faq">
                     <div class="faq-item">
                         <div class="faq-question">
-                            <span>What is Co-Intent?</span>
+                            <span data-i18n="support.faq_what_is_cointent_q">What is Co-Intent?</span>
                             <i class="fas fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            Co-Intent is a platform that enables collaborative funding of digital products. Users can submit or fund product ideas, while executors create these products. Once completed, products are tokenized as NFTs, and future sales revenue is shared among all participants.
+                            <span data-i18n="support.faq_what_is_cointent_a">Co-Intent is a platform that enables collaborative funding of digital products. Users can submit or fund product ideas, while executors create these products. Once completed, products are tokenized as NFTs, and future sales revenue is shared among all participants.</span>
                         </div>
                     </div>
 
                     <div class="faq-item">
                         <div class="faq-question">
-                            <span>How do I earn from my investments?</span>
+                            <span data-i18n="support.faq_how_earn_q">How do I earn from my investments?</span>
                             <i class="fas fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            When you invest in a product, you receive an NFT representing your ownership. As the product sells to new customers, you receive a share of the revenue. The revenue sharing model allocates 70% of sales to NFT holders, with the remaining split between creators and the platform.
+                            <span data-i18n="support.faq_how_earn_a">When you invest in a product, you receive an NFT representing your ownership. As the product sells to new customers, you receive a share of the revenue. The revenue sharing model allocates 70% of sales to NFT holders, with the remaining split between creators and the platform.</span>
                         </div>
                     </div>
 
                     <div class="faq-item">
                         <div class="faq-question">
-                            <span>What types of products can be created?</span>
+                            <span data-i18n="support.faq_products_types_q">What types of products can be created?</span>
                             <i class="fas fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            The platform supports various digital products including books, software, online courses, research papers, designs, and more. Any digital product that can be tokenized and distributed is eligible.
+                            <span data-i18n="support.faq_products_types_a">The platform supports various digital products including books, software, online courses, research papers, designs, and more. Any digital product that can be tokenized and distributed is eligible.</span>
                         </div>
                     </div>
 
                     <div class="faq-item">
                         <div class="faq-question">
-                            <span>How do I become an executor?</span>
+                            <span data-i18n="support.faq_become_executor_q">How do I become an executor?</span>
                             <i class="fas fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                            To become an executor, you need to apply through the "Become Executor" section. You'll be asked to provide details about your skills, experience, and the types of projects you can execute. Once approved, you can start accepting orders.
+                            <span data-i18n="support.faq_become_executor_a">To become an executor, you need to apply through the "Become Executor" section. You'll be asked to provide details about your skills, experience, and the types of projects you can execute. Once approved, you can start accepting orders.</span>
                         </div>
                     </div>
                 </div>
@@ -642,26 +642,26 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Contact Support</h3>
+                    <h3 class="card-title" data-i18n="support.contactSupport">Contact Support</h3>
                 </div>
                 <form>
                     <div class="form-group">
-                        <label for="support-name">Your Name</label>
-                        <input type="text" id="support-name" placeholder="Enter your name">
+                        <label for="support-name" data-i18n="support.yourName">Your Name</label>
+                        <input type="text" id="support-name" data-i18n-placeholder="support.yourName" placeholder="Enter your name">
                     </div>
                     <div class="form-group">
-                        <label for="support-email">Email Address</label>
-                        <input type="email" id="support-email" placeholder="Enter your email">
+                        <label for="support-email" data-i18n="support.emailAddress">Email Address</label>
+                        <input type="email" id="support-email" data-i18n-placeholder="support.emailAddress" placeholder="Enter your email">
                     </div>
                     <div class="form-group">
-                        <label for="support-subject">Subject</label>
-                        <input type="text" id="support-subject" placeholder="What is your query about?">
+                        <label for="support-subject" data-i18n="support.subject">Subject</label>
+                        <input type="text" id="support-subject" data-i18n-placeholder="support.subject" placeholder="What is your query about?">
                     </div>
                     <div class="form-group">
-                        <label for="support-message">Message</label>
-                        <textarea id="support-message" placeholder="Describe your issue or question in detail"></textarea>
+                        <label for="support-message" data-i18n="support.message">Message</label>
+                        <textarea id="support-message" data-i18n-placeholder="support.message" placeholder="Describe your issue or question in detail"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Send Message</button>
+                    <button type="submit" class="btn btn-primary" data-i18n="support.sendMessage">Send Message</button>
                 </form>
             </div>
         </div>

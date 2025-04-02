@@ -39,6 +39,7 @@ const es = {
     explore: "Explorar",
     submit: "Enviar Orden",
     executor: "Convertirse en Ejecutor",
+    applyExecutor: "Aplicar como Ejecutor",
     activeOrders: "Órdenes Activas",
     totalInvested: "Total Invertido",
     completedProducts: "Productos Completados",
@@ -152,7 +153,16 @@ const es = {
     emailAddress: "Correo Electrónico",
     subject: "Asunto",
     message: "Mensaje",
-    sendMessage: "Enviar Mensaje"
+    sendMessage: "Enviar Mensaje",
+    // FAQ preguntas y respuestas
+    faq_what_is_cointent_q: "¿Qué es Co-Intent?",
+    faq_what_is_cointent_a: "Co-Intent es una plataforma que permite la financiación colaborativa de productos digitales. Los usuarios pueden enviar o financiar ideas de productos, mientras que los ejecutores crean estos productos. Una vez completados, los productos se tokenizan como NFT, y los ingresos de ventas futuras se comparten entre todos los participantes.",
+    faq_how_earn_q: "¿Cómo gano con mis inversiones?",
+    faq_how_earn_a: "Cuando inviertes en un producto, recibes un NFT que representa tu propiedad. A medida que el producto se vende a nuevos clientes, recibes una parte de los ingresos. El modelo de distribución de ingresos asigna el 70% de las ventas a los titulares de NFT, y el resto se divide entre creadores y la plataforma.",
+    faq_products_types_q: "¿Qué tipos de productos se pueden crear?",
+    faq_products_types_a: "La plataforma admite varios productos digitales, incluidos libros, software, cursos en línea, trabajos de investigación, diseños y más. Cualquier producto digital que pueda ser tokenizado y distribuido es elegible.",
+    faq_become_executor_q: "¿Cómo me convierto en ejecutor?",
+    faq_become_executor_a: "Para convertirte en ejecutor, debes aplicar a través de la sección \"Convertirse en Ejecutor\". Se te pedirá que proporciones detalles sobre tus habilidades, experiencia y los tipos de proyectos que puedes ejecutar. Una vez aprobado, puedes comenzar a aceptar pedidos."
   },
   
   // Common

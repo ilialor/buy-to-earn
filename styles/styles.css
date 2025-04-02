@@ -91,6 +91,9 @@ nav a:hover {
 
 nav a.active {
     color: var(--primary);
+    position: relative;
+    font-weight: 600;
+    text-decoration: none;
 }
 
 nav a.active:after {
@@ -844,6 +847,9 @@ textarea {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     z-index: 1000;
     min-width: 200px;
+    text-decoration: none;
+    margin-top: 10px;
+    pointer-events: auto;
 }
 
 .user-dropdown.show {
@@ -857,6 +863,8 @@ textarea {
     align-items: center;
     gap: 8px;
     color: #333;
+    text-decoration: none;
+    pointer-events: auto;
 }
 
 .user-dropdown-item:hover {
@@ -872,6 +880,15 @@ textarea {
 .user-info {
     position: relative;
     cursor: pointer;
+    text-decoration: none;
+    z-index: 1001;
+}
+
+/* Добавляем стили для имени пользователя и иконок */
+.user-name, 
+.user-info i,
+.user-dropdown-item i {
+    text-decoration: none;
 }
 
 /* Стили для кнопки баланса */
@@ -1087,4 +1104,41 @@ textarea {
     color: #666;
     font-size: 13px;
     margin-top: 4px;
+}
+
+/* Стили для раздела "Твои заказы" */
+.user-orders-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 1rem 0;
+  color: #333;
+  padding-left: 0.5rem;
+  border-left: 3px solid #007bff;
+}
+
+.section-divider {
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid #e9ecef;
+}
+
+/* Стили для карточек заказов пользователя */
+.user-order {
+  background-color: rgba(0, 123, 255, 0.05);
+  border-left: 3px solid #007bff;
+}
+
+.badge.user-badge {
+  background-color: #007bff;
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
 } 
