@@ -96,6 +96,7 @@ class LocalAuth {
         this.currentUser = { ...newUser };
         delete this.currentUser.password; // Не сохраняем пароль в текущем пользователе
         localStorage.setItem(this.currentUserKey, JSON.stringify(this.currentUser));
+        localStorage.setItem('localAuth_currentUser', JSON.stringify(this.currentUser));
         
         // Отправляем событие авторизации
         this._notifyListeners();
@@ -139,6 +140,7 @@ class LocalAuth {
         this.currentUser = { ...user };
         delete this.currentUser.password; // Не сохраняем пароль в текущем пользователе
         localStorage.setItem(this.currentUserKey, JSON.stringify(this.currentUser));
+        localStorage.setItem('localAuth_currentUser', JSON.stringify(this.currentUser));
         
         // Отправляем событие авторизации
         this._notifyListeners();
@@ -170,6 +172,7 @@ class LocalAuth {
         
         // Сохраняем обновленные данные
         localStorage.setItem(this.currentUserKey, JSON.stringify(this.currentUser));
+        localStorage.setItem('localAuth_currentUser', JSON.stringify(this.currentUser));
         
         // Обновляем пользователя в общем списке
         const users = this._getUsers();
@@ -228,6 +231,7 @@ class LocalAuth {
     return new Promise((resolve) => {
       this.currentUser = null;
       localStorage.removeItem(this.currentUserKey);
+      localStorage.removeItem('localAuth_currentUser');
       
       console.log('LocalAuth: выход из системы');
       
@@ -287,6 +291,7 @@ class LocalAuth {
         // Устанавливаем текущего пользователя
         this.currentUser = existingUser || newUser;
         localStorage.setItem(this.currentUserKey, JSON.stringify(this.currentUser));
+        localStorage.setItem('localAuth_currentUser', JSON.stringify(this.currentUser));
         
         // Отправляем событие авторизации
         this._notifyListeners();

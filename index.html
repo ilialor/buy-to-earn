@@ -33,9 +33,14 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/auth.css">
     <link rel="stylesheet" href="styles/notification.css">   
+    <link rel="stylesheet" href="styles/i18n.css">   
   
     <!-- Local Auth System -->
     <script src="js/local-auth.js"></script>
+    
+    <!-- Internationalization -->
+    <script type="module" src="locales/index.js"></script>
+    <script type="module" src="js/i18n.js"></script>
 </head>
 
 <body>
@@ -52,17 +57,17 @@
 
             <nav id="main-nav">
                 <ul>
-                    <li><a href="#" class="nav-link active" data-page="marketplace">Marketplace</a></li>
-                    <li><a href="#" class="nav-link" data-page="portfolio">My Portfolio</a></li>
-                    <li><a href="#" class="nav-link" data-page="revenue">Revenue Sharing</a></li>
-                    <li><a href="#" class="nav-link" data-page="docs">Documentation</a></li>
-                    <li><a href="#" class="nav-link" data-page="support">Support</a></li>
+                    <li><a href="#" class="nav-link active" data-page="marketplace" data-i18n="nav.marketplace">Marketplace</a></li>
+                    <li><a href="#" class="nav-link" data-page="portfolio" data-i18n="nav.portfolio">My Portfolio</a></li>
+                    <li><a href="#" class="nav-link" data-page="revenue" data-i18n="nav.revenue">Revenue Sharing</a></li>
+                    <li><a href="#" class="nav-link" data-page="docs" data-i18n="nav.docs">Documentation</a></li>
+                    <li><a href="#" class="nav-link" data-page="support" data-i18n="nav.support">Support</a></li>
                 </ul>
             </nav>
 
             <div class="user-controls user-controls-auth">
-                <button class="btn btn-outline" id="connect-wallet-btn"><i class="fas fa-wallet"></i> Connect Wallet</button>
-                <button class="btn btn-primary" id="sign-in-btn"><i class="fas fa-user"></i> Sign In</button>
+                <button class="btn btn-outline" id="connect-wallet-btn" data-i18n="wallet.connectWallet"><i class="fas fa-wallet"></i> Connect Wallet</button>
+                <button class="btn btn-primary" id="sign-in-btn" data-i18n="auth.signIn"><i class="fas fa-user"></i> Sign In</button>
               </div>
               <div class="user-controls-logged-in">
                 <div class="btn btn-outline" id="wallet-balance-display">
@@ -77,13 +82,13 @@
                   <i class="fas fa-chevron-down"></i>
                   
                   <div class="user-dropdown" id="user-dropdown">
-                    <div class="user-dropdown-item" id="go-to-profile">
+                    <div class="user-dropdown-item" id="go-to-profile" data-i18n="profile.title">
                       <i class="fas fa-user-circle"></i> Профиль
                     </div>
-                    <div class="user-dropdown-item" id="go-to-wallet">
+                    <div class="user-dropdown-item" id="go-to-wallet" data-i18n="wallet.title">
                       <i class="fas fa-wallet"></i> Кошелек
                     </div>
-                    <div class="user-dropdown-item" id="go-to-portfolio">
+                    <div class="user-dropdown-item" id="go-to-portfolio" data-i18n="portfolio.title">
                       <i class="fas fa-chart-pie"></i> Портфолио
                     </div>
                     <div class="user-dropdown-divider"></div>
@@ -97,39 +102,39 @@
 
         <!-- Marketplace Page -->
         <div class="page-content active" id="marketplace">
-            <h1 class="main-title">Marketplace</h1>
-            <p class="subtitle">Discover and participate in co-intent projects, fund ideas, and earn from future sales.
+            <h1 class="main-title" data-i18n="marketplace.title">Marketplace</h1>
+            <p class="subtitle" data-i18n="marketplace.subtitle">Discover and participate in co-intent projects, fund ideas, and earn from future sales.
             </p>
 
             <div class="tabs">
-                <div class="tab active" data-tab="explore" data-parent="marketplace">Explore</div>
-                <div class="tab" data-tab="submit" data-parent="marketplace">Submit Order</div>
-                <div class="tab" data-tab="executor" data-parent="marketplace">Become Executor</div>
+                <div class="tab active" data-tab="explore" data-parent="marketplace" data-i18n="marketplace.explore">Explore</div>
+                <div class="tab" data-tab="submit" data-parent="marketplace" data-i18n="marketplace.submit">Submit Order</div>
+                <div class="tab" data-tab="executor" data-parent="marketplace" data-i18n="marketplace.executor">Become Executor</div>
             </div>
 
             <div class="content-area active" id="explore">
                 <div class="stats">
                     <div class="stat-card">
                         <div class="stat-value">235</div>
-                        <div class="stat-label">Active Orders</div>
+                        <div class="stat-label" data-i18n="marketplace.activeOrders">Active Orders</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value">$1.2M</div>
-                        <div class="stat-label">Total Invested</div>
+                        <div class="stat-label" data-i18n="marketplace.totalInvested">Total Invested</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value">42</div>
-                        <div class="stat-label">Completed Products</div>
+                        <div class="stat-label" data-i18n="marketplace.completedProducts">Completed Products</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value">$3.5M</div>
-                        <div class="stat-label">Revenue Generated</div>
+                        <div class="stat-label" data-i18n="marketplace.revenueGenerated">Revenue Generated</div>
                     </div>
                 </div>
 
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Active Orders</h3>
+                        <h3 class="card-title" data-i18n="marketplace.activeOrders">Active Orders</h3>
                     </div>
 
                     <div class="order-item">
@@ -147,7 +152,7 @@
                             <div class="order-participation">
                                 <div class="progress-container">
                                     <div class="progress-label">
-                                        <span>Funding Progress</span>
+                                        <span data-i18n="marketplace.fundingProgress">Funding Progress</span>
                                         <span>$2,400 / $5,000</span>
                                     </div>
                                     <div class="progress-bar">
@@ -155,8 +160,8 @@
                                     </div>
                                 </div>
                                 <div class="order-actions">
-                                    <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Participate</button>
-                                    <button class="btn btn-outline btn-sm"><i class="fas fa-info-circle"></i> Details</button>
+                                    <button class="btn btn-primary btn-sm" data-i18n="marketplace.participate"><i class="fas fa-plus"></i> Participate</button>
+                                    <button class="btn btn-outline btn-sm" data-i18n="marketplace.details"><i class="fas fa-info-circle"></i> Details</button>
                                 </div>
                             </div>
                         </div>
@@ -539,44 +544,44 @@
 
         <!-- Documentation Page -->
         <div class="page-content" id="docs">
-            <h1 class="main-title">Platform Documentation</h1>
-            <p class="subtitle">Learn how the Co-Intent platform works and how to make the most of it.</p>
+            <h1 class="main-title" data-i18n="docs.title">Platform Documentation</h1>
+            <p class="subtitle" data-i18n="docs.subtitle">Learn how the Co-Intent platform works and how to make the most of it.</p>
 
             <div class="card">
                 <div class="doc-section">
-                    <h2 class="doc-section-title">How It Works</h2>
-                    <p class="doc-text">The Co-Intent platform allows customers to jointly fund the creation of digital products, receive ownership NFTs, and earn from future sales revenue. Here's how the process works:</p>
+                    <h2 class="doc-section-title" data-i18n="docs.howItWorks">How It Works</h2>
+                    <p class="doc-text" data-i18n="docs.howItWorksDescription">The Co-Intent platform allows customers to jointly fund the creation of digital products, receive ownership NFTs, and earn from future sales revenue. Here's how the process works:</p>
                     <ol>
-                        <li><strong>Order System:</strong> Customers submit orders; an AI assistant groups similar requests.</li>
-                        <li><strong>Escrow Payments:</strong> Prepayments are stored in an escrow account.</li>
-                        <li><strong>Executor Workflow:</strong> Executors accept orders, create digital products (e.g., books, software, videos), and receive milestone-based payments from escrow.</li>
-                        <li><strong>Tokenization:</strong> Completed products are tokenized; customers receive NFTs with serial numbers.</li>
-                        <li><strong>Revenue Sharing:</strong> Future sales revenues are split (e.g., 10% to creator, 10% to platform, 10% to costs, 70% to buyers—initial and subsequent—in varying proportions).</li>
-                        <li><strong>Customer Returns:</strong> Initial customers recover their investment, receive the product, and earn 100% profit; subsequent buyers get the product and potential compensation.</li>
-                        <li><strong>Sliding Income Window:</strong> Main revenue is distributed among recent buyers (e.g., last 5,000), ensuring most participants can recoup investments.</li>
+                        <li data-i18n="docs.orderSystem"><strong>Order System:</strong> Customers submit orders; an AI assistant groups similar requests.</li>
+                        <li data-i18n="docs.escrowPayments"><strong>Escrow Payments:</strong> Prepayments are stored in an escrow account.</li>
+                        <li data-i18n="docs.executorWorkflow"><strong>Executor Workflow:</strong> Executors accept orders, create digital products (e.g., books, software, videos), and receive milestone-based payments from escrow.</li>
+                        <li data-i18n="docs.tokenization"><strong>Tokenization:</strong> Completed products are tokenized; customers receive NFTs with serial numbers.</li>
+                        <li data-i18n="docs.revenueSharing"><strong>Revenue Sharing:</strong> Future sales revenues are split (e.g., 10% to creator, 10% to platform, 10% to costs, 70% to buyers—initial and subsequent—in varying proportions).</li>
+                        <li data-i18n="docs.customerReturns"><strong>Customer Returns:</strong> Initial customers recover their investment, receive the product, and earn 100% profit; subsequent buyers get the product and potential compensation.</li>
+                        <li data-i18n="docs.slidingIncomeWindow"><strong>Sliding Income Window:</strong> Main revenue is distributed among recent buyers (e.g., last 5,000), ensuring most participants can recoup investments.</li>
                     </ol>
                 </div>
 
                 <div class="doc-section">
-                    <h2 class="doc-section-title">For Customers</h2>
-                    <p class="doc-text">As a customer, you can:</p>
+                    <h2 class="doc-section-title" data-i18n="docs.forCustomers">For Customers</h2>
+                    <p class="doc-text" data-i18n="docs.customersDescription">As a customer, you can:</p>
                     <ul>
-                        <li>Submit orders for digital products you'd like to see created</li>
-                        <li>Participate in funding existing orders</li>
-                        <li>Receive NFTs representing your ownership of completed products</li>
-                        <li>Earn revenue from future sales of products you've invested in</li>
-                        <li>Track your investments and earnings through your portfolio</li>
+                        <li data-i18n="docs.customersSubmit">Submit orders for digital products you'd like to see created</li>
+                        <li data-i18n="docs.customersParticipate">Participate in funding existing orders</li>
+                        <li data-i18n="docs.customersReceiveNFTs">Receive NFTs representing your ownership of completed products</li>
+                        <li data-i18n="docs.customersEarn">Earn revenue from future sales of products you've invested in</li>
+                        <li data-i18n="docs.customersTrack">Track your investments and earnings through your portfolio</li>
                     </ul>
                 </div>
 
                 <div class="doc-section">
-                    <h2 class="doc-section-title">For Executors</h2>
-                    <p class="doc-text">As an executor, you can:</p>
+                    <h2 class="doc-section-title" data-i18n="docs.forExecutors">For Executors</h2>
+                    <p class="doc-text" data-i18n="docs.executorsDescription">As an executor, you can:</p>
                     <ul>
-                        <li>Browse and accept orders that match your skills</li>
-                        <li>Receive milestone-based payments as you complete work</li>
-                        <li>Retain a share of future revenue from products you create</li>
-                        <li>Build a portfolio and reputation on the platform</li>
+                        <li data-i18n="docs.executorsBrowse">Browse and accept orders that match your skills</li>
+                        <li data-i18n="docs.executorsReceive">Receive milestone-based payments as you complete work</li>
+                        <li data-i18n="docs.executorsRetain">Retain a share of future revenue from products you create</li>
+                        <li data-i18n="docs.executorsBuild">Build a portfolio and reputation on the platform</li>
                     </ul>
                 </div>
             </div>
@@ -742,101 +747,101 @@
         <div class="modal auth-modal" id="auth-modal">
           <div class="auth-content">
             <div class="auth-tabs">
-              <div class="auth-tab active" data-target="sign-in-tab">Вход</div>
-              <div class="auth-tab" data-target="sign-up-tab">Регистрация</div>
-              <div class="auth-tab" data-target="reset-password-tab">Сброс пароля</div>
+              <div class="auth-tab active" data-target="sign-in-tab" data-i18n="auth.signIn">Вход</div>
+              <div class="auth-tab" data-target="sign-up-tab" data-i18n="auth.signUp">Регистрация</div>
+              <div class="auth-tab" data-target="reset-password-tab" data-i18n="auth.resetPassword">Сброс пароля</div>
             </div>
             
             <!-- Sign In Tab -->
             <div class="auth-tab-content active" id="sign-in-tab">
               <div class="auth-header">
-                <h3 class="auth-title">Вход в систему</h3>
+                <h3 class="auth-title" data-i18n="auth.signIn">Вход в систему</h3>
                 <p class="auth-subtitle">Войдите в свой аккаунт</p>
               </div>
               
               <div class="social-login-buttons">
                 <button class="btn btn-google" id="google-sign-in">
-                  <i class="fab fa-google"></i> Войти через Google
+                  <i class="fab fa-google"></i> <span data-i18n="auth.signInWith">Войти через</span> Google
                 </button>
               </div>
               
               <div class="auth-divider">
-                <span>или</span>
+                <span data-i18n="auth.or">или</span>
               </div>
               
               <form id="sign-in-form">
                 <div class="form-group">
-                  <label for="sign-in-email">Email</label>
-                  <input type="email" id="sign-in-email" placeholder="Введите email" required>
+                  <label for="sign-in-email" data-i18n="auth.email">Email</label>
+                  <input type="email" id="sign-in-email" data-i18n-placeholder="auth.enterEmail" placeholder="Введите email" required>
                 </div>
                 <div class="form-group">
-                  <label for="sign-in-password">Пароль</label>
-                  <input type="password" id="sign-in-password" placeholder="Введите пароль" required>
+                  <label for="sign-in-password" data-i18n="auth.password">Пароль</label>
+                  <input type="password" id="sign-in-password" data-i18n-placeholder="auth.enterPassword" placeholder="Введите пароль" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Войти</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="auth.signIn">Войти</button>
               </form>
               
               <div class="auth-footer">
-                <p>Нет аккаунта? <a id="switch-to-signup">Зарегистрироваться</a></p>
-                <p>Забыли пароль? <a id="switch-to-reset">Сбросить пароль</a></p>
+                <p><span data-i18n="auth.noAccount">Нет аккаунта?</span> <a id="switch-to-signup" data-i18n="auth.signUp">Зарегистрироваться</a></p>
+                <p><span data-i18n="auth.forgotPassword">Забыли пароль?</span> <a id="switch-to-reset" data-i18n="auth.resetPassword">Сбросить пароль</a></p>
               </div>
             </div>
             
             <!-- Sign Up Tab -->
             <div class="auth-tab-content" id="sign-up-tab">
               <div class="auth-header">
-                <h3 class="auth-title">Регистрация</h3>
+                <h3 class="auth-title" data-i18n="auth.signUp">Регистрация</h3>
                 <p class="auth-subtitle">Создайте новый аккаунт</p>
               </div>
               
               <div class="social-login-buttons">
                 <button class="btn btn-google" id="google-sign-up">
-                  <i class="fab fa-google"></i> Зарегистрироваться через Google
+                  <i class="fab fa-google"></i> <span data-i18n="auth.signUpWith">Зарегистрироваться через</span> Google
                 </button>
               </div>
               
               <div class="auth-divider">
-                <span>или</span>
+                <span data-i18n="auth.or">или</span>
               </div>
               
               <form id="sign-up-form">
                 <div class="form-group">
-                  <label for="sign-up-name">Имя</label>
-                  <input type="text" id="sign-up-name" placeholder="Введите имя" required>
+                  <label for="sign-up-name" data-i18n="auth.name">Имя</label>
+                  <input type="text" id="sign-up-name" data-i18n-placeholder="auth.enterName" placeholder="Введите имя" required>
                 </div>
                 <div class="form-group">
-                  <label for="sign-up-email">Email</label>
-                  <input type="email" id="sign-up-email" placeholder="Введите email" required>
+                  <label for="sign-up-email" data-i18n="auth.email">Email</label>
+                  <input type="email" id="sign-up-email" data-i18n-placeholder="auth.enterEmail" placeholder="Введите email" required>
                 </div>
                 <div class="form-group">
-                  <label for="sign-up-password">Пароль</label>
-                  <input type="password" id="sign-up-password" placeholder="Введите пароль" required>
+                  <label for="sign-up-password" data-i18n="auth.password">Пароль</label>
+                  <input type="password" id="sign-up-password" data-i18n-placeholder="auth.enterPassword" placeholder="Введите пароль" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Зарегистрироваться</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="auth.signUp">Зарегистрироваться</button>
               </form>
               
               <div class="auth-footer">
-                <p>Уже есть аккаунт? <a id="switch-to-signin">Войти</a></p>
+                <p><span data-i18n="auth.haveAccount">Уже есть аккаунт?</span> <a id="switch-to-signin" data-i18n="auth.signIn">Войти</a></p>
               </div>
             </div>
             
             <!-- Reset Password Tab -->
             <div class="auth-tab-content" id="reset-password-tab">
               <div class="auth-header">
-                <h3 class="auth-title">Сброс пароля</h3>
-                <p class="auth-subtitle">Укажите email для получения инструкций</p>
+                <h3 class="auth-title" data-i18n="auth.resetPassword">Сброс пароля</h3>
+                <p class="auth-subtitle" data-i18n="auth.resetInstructions">Укажите email для получения инструкций</p>
               </div>
               
               <form id="reset-password-form">
                 <div class="form-group">
-                  <label for="reset-email">Email</label>
-                  <input type="email" id="reset-email" placeholder="Введите email" required>
+                  <label for="reset-email" data-i18n="auth.email">Email</label>
+                  <input type="email" id="reset-email" data-i18n-placeholder="auth.enterEmail" placeholder="Введите email" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Отправить инструкцию</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="auth.sendInstructions">Отправить инструкцию</button>
               </form>
               
               <div class="auth-footer">
-                <p>Вспомнили пароль? <a id="switch-to-signin-from-reset">Войти</a></p>
+                <p><span data-i18n="auth.haveAccount">Вспомнили пароль?</span> <a id="switch-to-signin-from-reset" data-i18n="auth.signIn">Войти</a></p>
               </div>
             </div>
             
@@ -972,7 +977,7 @@
     <script src="js/db.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/tests.js"></script>
-    <script src="js/revenue-calculator.js"></script>
+    <script type="module" src="js/revenue-calculator.js"></script>
 </body>
 
 </html> 

@@ -1041,29 +1041,99 @@ function navigateToPage(page) {
   }
 }
 
+// Глобальная функция для проверки авторизации - улучшенная версия
+function isUserAuthenticated() {
+  // Проверка наличия глобальных объектов auth и localStorage
+  if (!window.auth) {
+    console.warn('Auth service not available yet');
+    return false;
+  }
+  
+  // Проверка текущего пользователя через глобальный auth объект
+  if (window.auth.currentUser) {
+    return true;
+  }
+  
+  // Дополнительная проверка локальной авторизации через localStorage
+  try {
+    // Проверяем, есть ли в localStorage данные о текущем пользователе
+    const localAuthKey = 'localAuth_currentUser';
+    const storedUser = localStorage.getItem(localAuthKey);
+    
+    if (storedUser) {
+      console.log('User authenticated via localStorage');
+      return true;
+    }
+  } catch (e) {
+    console.error('Error checking localStorage auth:', e);
+  }
+  
+  // Если ни один из методов не подтвердил авторизацию
+  return false;
+}
+
 // Document ready
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize UI
   initializeUI();
   
   // Глобальный метод для проверки авторизации
-  window.checkAuthentication = function() {
-    if (auth && auth.currentUser) {
-      return true;
-    }
-    return false;
-  };
+  window.checkAuthentication = isUserAuthenticated;
   
+  // Добавляем переменную для отслеживания, закрыл ли пользователь окно авторизации
+  window.authDialogClosed = false;
+  
+  // Добавляем обработчик для отслеживания закрытия окна авторизации
+  const authModal = document.getElementById('auth-modal');
+  
+  if (authModal) {
+    // Обработчик закрытия по крестику
+    const authModalClose = authModal.querySelector('.modal-close');
+    if (authModalClose) {
+      authModalClose.addEventListener('click', function() {
+        window.authDialogClosed = true;
+      });
+    }
+    
+    // Обработчик закрытия по кнопке "Отмена" или аналогичной
+    const cancelBtn = authModal.querySelector('.btn-outline');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', function() {
+        window.authDialogClosed = true;
+      });
+    }
+    
+    // Обработчик клика вне модального окна
+    authModal.addEventListener('click', function(e) {
+      if (e.target === authModal) {
+        window.authDialogClosed = true;
+      }
+    });
+  }
+
   // Add navigation event listener for page changes
   document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', function() {
+    link.addEventListener('click', function(event) {
       const page = this.getAttribute('data-page');
       
+      // Используем улучшенную функцию проверки авторизации
+      let isAuthenticated = isUserAuthenticated();
+      console.log(`Page ${page}, auth status: ${isAuthenticated ? 'authenticated' : 'not authenticated'}`);
+      
       // Загружаем данные для страницы, только если пользователь авторизован
-      // или если это маркетплейс (публичная страница)
-      if (page === 'marketplace') {
-        loadMarketplaceOrders();
-      } else if (checkAuthentication()) {
+      // или если это маркетплейс/документация (публичные страницы)
+      if (page === 'marketplace' || page === 'docs') {
+        // Публичные страницы всегда доступны
+        if (page === 'marketplace') {
+          loadMarketplaceOrders();
+        }
+        // Для страницы документации вызываем переводчик, чтобы обеспечить правильный перевод
+        if (page === 'docs' && typeof translateDocument === 'function') {
+          // Даем время на отображение страницы, затем вызываем перевод
+          setTimeout(translateDocument, 100);
+        }
+      } else if (isAuthenticated) {
+        // Приватные страницы доступны только авторизованным пользователям
         if (page === 'portfolio') {
           loadUserPortfolio();
         } else if (page === 'revenue') {
@@ -1076,9 +1146,21 @@ document.addEventListener('DOMContentLoaded', function() {
             loadUserProfile();
           }
         }
-      } else if (page !== 'marketplace') {
+      } else {
+        // Если пользователь не авторизован и пытается открыть приватную страницу
+        console.log('User not authenticated, showing auth dialog');
+        
+        // Показываем уведомление только если пользователь не закрывал окно авторизации ранее
         showNotification('Пожалуйста, войдите в систему', 'error');
-        showModal('auth-modal');
+        
+        // Показываем окно авторизации только если пользователь не закрывал его ранее
+        if (!window.authDialogClosed) {
+          showModal('auth-modal');
+        }
+        
+        // Предотвращаем переключение на приватную страницу
+        event.preventDefault();
+        return false;
       }
     });
   });

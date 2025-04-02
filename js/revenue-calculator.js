@@ -5,6 +5,8 @@
  * Uses precise step-by-step simulation.
  */
 
+import { t, translateNode } from './i18n.js';
+
 // Helper function to format numbers without currency
 function formatNumber(amount) {
     if (typeof amount !== 'number' || isNaN(amount)) {
@@ -50,10 +52,10 @@ class RevenueCalculator {
   }
 
   calculateNumPrepayers(tokenPrice) {
-      if (isNaN(tokenPrice) || tokenPrice <= 0 || this.initialInvestment <= 0) {
-          return 0;
-      }
-      return Math.ceil(this.initialInvestment / tokenPrice);
+    if (isNaN(tokenPrice) || tokenPrice <= 0 || this.initialInvestment <= 0) {
+      return 0;
+    }
+    return Math.ceil(parseFloat(this.initialInvestment) / tokenPrice);
   }
 
   /**
@@ -218,153 +220,153 @@ class RevenueCalculator {
     return `
       <div class="calculator-container card">
         <div class="card-header">
-          <h3 class="card-title">Калькулятор Накопленного Дохода (Точная Симуляция)</h3>
+          <h3 class="card-title" data-i18n="calculator.title">Калькулятор Накопленного Дохода (Точная Симуляция)</h3>
         </div>
         <div class="card-body">
           <!-- Sections: Initial Investment, Distribution Params, Payback Params -->
           <div class="settings-section">
-             <h4>Этап 1: Первоначальные Инвестиции</h4>
+             <h4 data-i18n="calculator.initialInvestment.title">Этап 1: Первоначальные Инвестиции</h4>
               <div class="grid-2-col">
             <div class="form-group">
-                    <label for="initial-investment">Сумма Начальных Инвестиций</label>
+                    <label for="initial-investment" data-i18n="calculator.initialInvestment.amount">Сумма Начальных Инвестиций</label>
                     <input type="number" id="initial-investment" value="${this.initialInvestment}" min="0" step="1000">
             </div>
                    <div class="form-group">
-                    <label for="token-price">Цена Токена</label>
+                    <label for="token-price" data-i18n="calculator.initialInvestment.tokenPrice">Цена Токена</label>
                     <input type="number" id="token-price" value="300" min="1">
               </div>
               </div>
                <div class="form-group readonly-group">
-                    <label>Расчетное Кол-во Заказчиков (Предоплата):</label>
+                    <label data-i18n="calculator.initialInvestment.prepaymentCustomers">Расчетное Кол-во Заказчиков (Предоплата):</label>
                     <span id="calc-num-prepayers" class="calculated-value">${defaultNumPrepayers}</span>
-                    <div class="form-hint">= ОкруглениеВверх(Сумма Инвестиций / Цена Токена). Они покрывают сумму для Создателя.</div>
+                    <div class="form-hint" data-i18n="calculator.initialInvestment.prepaymentHint">= ОкруглениеВверх(Сумма Инвестиций / Цена Токена). Они покрывают сумму для Создателя.</div>
               </div>
             </div>
             
            <div class="settings-section">
-              <h4>Этап 2: Параметры Распределения (для продаж ПОСЛЕ Заказчиков)</h4>
+              <h4 data-i18n="calculator.distribution.title">Этап 2: Параметры Распределения (для продаж ПОСЛЕ Заказчиков)</h4>
               <div class="grid-3-col">
                 <div class="form-group">
-                  <label for="creator-share">Доля Создателя (%)</label>
+                  <label for="creator-share" data-i18n="calculator.distribution.creatorShare">Доля Создателя (%)</label>
                   <input type="number" id="creator-share" value="${this.creatorShare}" min="0" max="100" step="1">
                 </div>
                 <div class="form-group">
-                  <label for="platform-share">Доля Платформы (%)</label>
+                  <label for="platform-share" data-i18n="calculator.distribution.platformShare">Доля Платформы (%)</label>
                   <input type="number" id="platform-share" value="${this.platformShare}" min="0" max="100" step="1">
                 </div>
               <div class="form-group">
-                  <label for="promotion-share">Доля Продвижения (%)</label>
+                  <label for="promotion-share" data-i18n="calculator.distribution.promotionShare">Доля Продвижения (%)</label>
                   <input type="number" id="promotion-share" value="${this.promotionShare}" min="0" max="100" step="1">
                 </div>
               </div>
               <div class="form-group readonly-group">
-                  <label>Доля Покупателей (%):</label>
+                  <label data-i18n="calculator.distribution.buyersShare">Доля Покупателей (%):</label>
                   <span id="calc-buyers-share" class="calculated-value">${this.buyersShare.toFixed(2)}%</span>
-                  <div class="form-hint">= 100% - остальные доли. Распределяется между ВСЕМИ токенами (#1 и далее).</div>
+                  <div class="form-hint" data-i18n="calculator.distribution.buyersShareHint">= 100% - остальные доли. Распределяется между ВСЕМИ токенами (#1 и далее).</div>
               </div>
               
-              <h4>Параметры Окупаемости Покупателей</h4>
+              <h4 data-i18n="calculator.payback.title">Параметры Окупаемости Покупателей</h4>
                <div class="grid-2-col">
                   <div class="form-group">
-                    <label for="payback-ratio">Множитель Окупаемости (X)</label>
+                    <label for="payback-ratio" data-i18n="calculator.payback.multiplier">Множитель Окупаемости (X)</label>
                     <input type="number" id="payback-ratio" value="${this.paybackRatio}" min="1" step="0.1">
-                    <div class="form-hint">Цель: вернуть цену * X</div>
+                    <div class="form-hint" data-i18n="calculator.payback.multiplierHint">Цель: вернуть цену * X</div>
               </div>
               <div class="form-group">
-                    <label for="non-payback-pool-share">Приоритет "Не Окупившихся" (%)</label>
+                    <label for="non-payback-pool-share" data-i18n="calculator.payback.nonPaybackPoolShare">Приоритет "Не Окупившихся" (%)</label>
                     <input type="number" id="non-payback-pool-share" value="${this.nonPaybackPoolSharePercent}" min="0" max="100" step="1">
-                    <div class="form-hint">% от Доли покупателей, идущий только им</div>
+                    <div class="form-hint" data-i18n="calculator.payback.nonPaybackPoolShareHint">% от Доли покупателей, идущий только им</div>
                   </div>
             </div>
           </div>
 
           <!-- Section: Calculation Inputs (Sliders/Numbers) -->
           <div class="calculation-section">
-            <h4>Параметры Расчета (Общее Число Продаж)</h4>
+            <h4 data-i18n="calculator.calculation.title">Параметры Расчета (Общее Число Продаж)</h4>
              <div class="form-group slider-group">
-              <label for="total-sales">Общее Количество Продаж (включая Заказчиков)</label>
+              <label for="total-sales" data-i18n="calculator.calculation.totalSales">Общее Количество Продаж (включая Заказчиков)</label>
               <input type="range" id="total-sales-slider" value="${defaultSales}" min="1" max="${MAX_SIMULATED_SALES}" step="${salesStep}">
               <input type="number" id="total-sales-input" value="${defaultSales}" min="1" max="${MAX_SIMULATED_SALES}">
-               <div class="form-hint">Минимум = Расчетное Кол-во Заказчиков (<span id="min-sales-hint">${defaultNumPrepayers}</span>). Максимум = ${MAX_SIMULATED_SALES} (для производительности).</div>
+               <div class="form-hint"><span data-i18n="calculator.calculation.totalSalesHint1">Минимум = Расчетное Кол-во Заказчиков</span> (<span id="min-sales-hint">${defaultNumPrepayers}</span>). <span data-i18n="calculator.calculation.totalSalesHint2">Максимум = ${MAX_SIMULATED_SALES} (для производительности).</span></div>
             </div>
              <div class="form-group slider-group">
-              <label for="your-token-number">Номер Вашего Токена</label>
+              <label for="your-token-number" data-i18n="calculator.calculation.yourTokenNumber">Номер Вашего Токена</label>
               <input type="range" id="your-token-number-slider" value="${defaultYourToken}" min="1" max="${defaultSales}" step="1">
               <input type="number" id="your-token-number-input" value="${defaultYourToken}" min="1" max="${defaultSales}">
-               <div class="form-hint">Максимум = Общее Кол-во Продаж</div>
+               <div class="form-hint" data-i18n="calculator.calculation.yourTokenNumberHint">Максимум = Общее Кол-во Продаж</div>
             </div>
           </div>
 
           <!-- Section: Results -->
           <div class="results-section">
-            <h4>Результат: Накопленный Доход</h4>
+            <h4 data-i18n="calculator.results.title">Результат: Накопленный Доход</h4>
              <div id="calculation-error" class="error-message" style="display: none;"></div>
             
             <!-- Доход участников (карточки) -->
             <div class="distribution-cards">
               <div class="distribution-card creator">
-                <div class="card-label">Создатель</div>
+                <div class="card-label" data-i18n="calculator.results.creator">Создатель</div>
                 <div class="card-amount" id="acc-creator-revenue">0</div>
                 <div class="card-detail" id="creator-revenue-detail">(0 + 0)</div>
-                <div class="card-percentage">100% начальных инвестиций + доля от продаж</div>
+                <div class="card-percentage" data-i18n="calculator.results.creatorDetail">100% начальных инвестиций + доля от продаж</div>
               </div>
               <div class="distribution-card platform">
-                <div class="card-label">Платформа</div>
+                <div class="card-label" data-i18n="calculator.results.platform">Платформа</div>
                 <div class="card-amount" id="acc-platform-revenue">0</div>
                 <div class="card-percentage" id="platform-percentage">0% от общего дохода</div>
-                <div class="card-detail">Только от продаж после предоплаты</div>
+                <div class="card-detail" data-i18n="calculator.results.platformDetail">Только от продаж после предоплаты</div>
               </div>
               <div class="distribution-card promotion">
-                <div class="card-label">Продвижение</div>
+                <div class="card-label" data-i18n="calculator.results.promotion">Продвижение</div>
                 <div class="card-amount" id="acc-promotion-revenue">0</div>
               </div>
               <div class="distribution-card buyers">
-                <div class="card-label">Покупатели (Распределено)</div>
+                <div class="card-label" data-i18n="calculator.results.buyers">Покупатели (Распределено)</div>
                 <div class="card-amount" id="acc-total-buyers-revenue">0</div>
-                <div class="card-detail">Доход от продаж после Заказчиков</div>
+                <div class="card-detail" data-i18n="calculator.results.buyersDetail">Доход от продаж после Заказчиков</div>
               </div>
             </div>
 
             <!-- Визуализация выгодности для инвесторов -->
             <div class="investor-benefits">
-              <h4>Выгодность для инвесторов</h4>
+              <h4 data-i18n="calculator.benefits.title">Выгодность для инвесторов</h4>
               <div class="benefits-grid">
                 <div class="benefit-card early-investor">
-                  <div class="benefit-title">Ранний инвестор</div>
+                  <div class="benefit-title" data-i18n="calculator.benefits.earlyInvestor">Ранний инвестор</div>
                   <div class="benefit-value" id="early-investor-roi">ROI: 0%</div>
-                  <div class="benefit-description">Инвестиция окупится через <span id="early-investor-payback">0</span> продаж</div>
-                  <div class="benefit-multiplier">При <span id="early-investor-mult">2x</span> окупаемости</div>
+                  <div class="benefit-description"><span data-i18n="calculator.benefits.investmentPaysBack">Инвестиция окупится через</span> <span id="early-investor-payback">0</span> <span data-i18n="calculator.benefits.sales">продаж</span></div>
+                  <div class="benefit-multiplier"><span data-i18n="calculator.benefits.at">При</span> <span id="early-investor-mult">2x</span> <span data-i18n="calculator.benefits.payback">окупаемости</span></div>
                 </div>
                 <div class="benefit-card mid-investor">
-                  <div class="benefit-title">Средний инвестор</div>
+                  <div class="benefit-title" data-i18n="calculator.benefits.midInvestor">Средний инвестор</div>
                   <div class="benefit-value" id="mid-investor-roi">ROI: 0%</div>
-                  <div class="benefit-description">Инвестиция окупится через <span id="mid-investor-payback">0</span> продаж</div>
-                  <div class="benefit-multiplier">При <span id="mid-investor-mult">2x</span> окупаемости</div>
+                  <div class="benefit-description"><span data-i18n="calculator.benefits.investmentPaysBack">Инвестиция окупится через</span> <span id="mid-investor-payback">0</span> <span data-i18n="calculator.benefits.sales">продаж</span></div>
+                  <div class="benefit-multiplier"><span data-i18n="calculator.benefits.at">При</span> <span id="mid-investor-mult">2x</span> <span data-i18n="calculator.benefits.payback">окупаемости</span></div>
                 </div>
                 <div class="benefit-card late-investor">
-                  <div class="benefit-title">Поздний инвестор</div>
+                  <div class="benefit-title" data-i18n="calculator.benefits.lateInvestor">Поздний инвестор</div>
                   <div class="benefit-value" id="late-investor-roi">ROI: 0%</div>
-                  <div class="benefit-description">Инвестиция окупится через <span id="late-investor-payback">0</span> продаж</div>
-                  <div class="benefit-multiplier">При <span id="late-investor-mult">2x</span> окупаемости</div>
+                  <div class="benefit-description"><span data-i18n="calculator.benefits.investmentPaysBack">Инвестиция окупится через</span> <span id="late-investor-payback">0</span> <span data-i18n="calculator.benefits.sales">продаж</span></div>
+                  <div class="benefit-multiplier"><span data-i18n="calculator.benefits.at">При</span> <span id="late-investor-mult">2x</span> <span data-i18n="calculator.benefits.payback">окупаемости</span></div>
                 </div>
               </div>
             </div>
 
             <!-- Доход для вашего токена -->
             <div class="token-revenue-section">
-              <h4>Ваш токен #<span id="your-token-number-display">${defaultYourToken}</span></h4>
+              <h4 data-i18n="calculator.yourToken.title">Ваш токен #<span id="your-token-number-display">${defaultYourToken}</span></h4>
               <div class="token-revenue-card">
                 <div class="token-revenue-amount">
-                  <div class="amount-label">Накопленный доход:</div>
+                  <div class="amount-label" data-i18n="calculator.yourToken.accruedIncome">Накопленный доход:</div>
                   <div class="amount-value" id="acc-your-token-revenue">0</div>
                 </div>
                 <div class="token-revenue-metrics">
                   <div class="metric payback-goal">
-                    <div class="metric-label">Цель окупаемости (<span id="payback-ratio-display">${this.paybackRatio}</span>x):</div>
+                    <div class="metric-label" data-i18n="calculator.yourToken.paybackGoal">Цель окупаемости (<span id="payback-ratio-display">${this.paybackRatio}</span>x):</div>
                     <div class="metric-value" id="your-token-payback-goal">0</div>
                   </div>
                   <div class="metric payback-status">
-                    <div class="metric-label">Достиг цели?</div>
+                    <div class="metric-label" data-i18n="calculator.yourToken.goalReached">Достиг цели?</div>
                     <div class="metric-value" id="your-token-payback-status">Нет</div>
                   </div>
                   <div class="metric roi">
@@ -377,18 +379,18 @@ class RevenueCalculator {
 
             <!-- Общая статистика -->
             <div class="overall-stats">
-              <h4>Общая статистика</h4>
+              <h4 data-i18n="calculator.overallStats.title">Общая статистика</h4>
               <div class="stats-grid">
                 <div class="stat-item">
-                  <div class="stat-label">Общий доход:</div>
+                  <div class="stat-label" data-i18n="calculator.overallStats.totalRevenue">Общий доход:</div>
                   <div class="stat-value" id="total-revenue">0</div>
                 </div>
                 <div class="stat-item">
-                  <div class="stat-label">Предоплаченных токенов:</div>
+                  <div class="stat-label" data-i18n="calculator.overallStats.prepaidTokens">Предоплаченных токенов:</div>
                   <div class="stat-value" id="num-prepayers-display">0</div>
                 </div>
                 <div class="stat-item">
-                  <div class="stat-label">Токенов, достигших окупаемости:</div>
+                  <div class="stat-label" data-i18n="calculator.overallStats.tokensPaidBack">Токенов, достигших окупаемости:</div>
                   <div class="stat-value" id="final-paid-back-estimate">0</div>
                   <div class="stat-percentage" id="paid-back-percentage">0%</div>
                 </div>
@@ -397,23 +399,23 @@ class RevenueCalculator {
 
             <!-- Информация о моменте окупаемости -->
             <div id="payback-info" class="payback-metrics" style="display:none;">
-              <h4>Информация о моменте окупаемости</h4>
+              <h4 data-i18n="calculator.paybackInfo.title">Информация о моменте окупаемости</h4>
               <div class="payback-grid">
                 <div class="payback-item">
-                  <div class="payback-label">Продажа №:</div>
+                  <div class="payback-label" data-i18n="calculator.paybackInfo.saleNumber">Продажа №:</div>
                   <div class="payback-value" id="payback-sale-number">0</div>
                 </div>
                 <div class="payback-item">
-                  <div class="payback-label">Общий доход на момент окупаемости:</div>
+                  <div class="payback-label" data-i18n="calculator.paybackInfo.totalRevenue">Общий доход на момент окупаемости:</div>
                   <div class="payback-value" id="payback-total-revenue">0</div>
                 </div>
                 <div class="payback-item">
-                  <div class="payback-label">Автору:</div>
+                  <div class="payback-label" data-i18n="calculator.paybackInfo.toCreator">Автору:</div>
                   <div class="payback-value" id="payback-creator-revenue">0</div>
                   <div class="payback-detail" id="payback-creator-detail"></div>
                 </div>
                 <div class="payback-item">
-                  <div class="payback-label">Платформе:</div>
+                  <div class="payback-label" data-i18n="calculator.paybackInfo.toPlatform">Платформе:</div>
                   <div class="payback-value" id="payback-platform-revenue">0</div>
                   <div class="payback-percentage" id="payback-platform-percentage">0%</div>
                 </div>
@@ -422,69 +424,75 @@ class RevenueCalculator {
 
             <!-- Графическое сравнение моделей распределения -->
             <div class="distribution-comparison">
-              <h4>Сравнение моделей распределения</h4>
+              <h4 data-i18n="calculator.comparison.title">Сравнение моделей распределения</h4>
               <div class="comparison-tabs">
-                <div class="tab active" data-tab="high-priority">Высокий приоритет неокупившихся (95%)</div>
-                <div class="tab" data-tab="balanced">Сбалансированный (80%)</div>
-                <div class="tab" data-tab="equal">Равноправный (60%)</div>
+                <div class="tab active" data-tab="high-priority" data-i18n="calculator.comparison.highPriority">Высокий приоритет неокупившихся (95%)</div>
+                <div class="tab" data-tab="balanced" data-i18n="calculator.comparison.balanced">Сбалансированный (80%)</div>
+                <div class="tab" data-tab="equal" data-i18n="calculator.comparison.equal">Равноправный (60%)</div>
               </div>
               <div class="comparison-content active" id="high-priority-content">
                 <div class="comparison-description">
-                  <p><strong>Высокий приоритет (95%):</strong> Ранние инвесторы окупаются очень быстро, поздние инвесторы - значительно медленнее. Создает "волны окупаемости".</p>
+                  <p><strong data-i18n="calculator.comparison.highPriorityTitle">Высокий приоритет (95%):</strong> <span data-i18n="calculator.comparison.highPriorityDesc">Ранние инвесторы окупаются очень быстро, поздние инвесторы - значительно медленнее. Создает "волны окупаемости".</span></p>
                 </div>
                 <div class="comparison-visualization">
                   <div class="token-group early">
-                    <div class="token-label">Токен #1-100:</div>
+                    <div class="token-label" data-i18n="calculator.comparison.earlyTokens">Токен #1-100:</div>
                     <div class="payback-bar" style="width: 20%;">1x: ~400 продаж</div>
                   </div>
                   <div class="token-group mid">
-                    <div class="token-label">Токен #500:</div>
+                    <div class="token-label" data-i18n="calculator.comparison.midToken">Токен #500:</div>
                     <div class="payback-bar" style="width: 40%;">1x: ~1200 продаж</div>
                   </div>
                   <div class="token-group late">
-                    <div class="token-label">Токен #1000:</div>
+                    <div class="token-label" data-i18n="calculator.comparison.lateToken">Токен #1000:</div>
                     <div class="payback-bar" style="width: 80%;">1x: ~2500 продаж</div>
                   </div>
                 </div>
               </div>
               <div class="comparison-content" id="balanced-content">
                 <div class="comparison-description">
-                  <p><strong>Сбалансированный (80%):</strong> Умеренное преимущество для ранних инвесторов, разумные сроки окупаемости для поздних. Оптимальный баланс интересов.</p>
+                  <p><strong data-i18n="calculator.comparison.balancedTitle">Сбалансированный (80%):</strong> <span data-i18n="calculator.comparison.balancedDesc">Средняя скорость окупаемости ранних инвесторов, умеренные отличия между ранними и поздними инвесторами.</span></p>
                 </div>
                 <div class="comparison-visualization">
                   <div class="token-group early">
-                    <div class="token-label">Токен #1-100:</div>
-                    <div class="payback-bar" style="width: 40%;">1x: ~800 продаж</div>
+                    <div class="token-label" data-i18n="calculator.comparison.earlyTokens">Токен #1-100:</div>
+                    <div class="payback-bar" style="width: 30%;">1x: ~500 продаж</div>
                   </div>
                   <div class="token-group mid">
-                    <div class="token-label">Токен #500:</div>
-                    <div class="payback-bar" style="width: 50%;">1x: ~1000 продаж</div>
+                    <div class="token-label" data-i18n="calculator.comparison.midToken">Токен #500:</div>
+                    <div class="payback-bar" style="width: 45%;">1x: ~1300 продаж</div>
                   </div>
                   <div class="token-group late">
-                    <div class="token-label">Токен #1000:</div>
-                    <div class="payback-bar" style="width: 60%;">1x: ~1200 продаж</div>
+                    <div class="token-label" data-i18n="calculator.comparison.lateToken">Токен #1000:</div>
+                    <div class="payback-bar" style="width: 60%;">1x: ~1800 продаж</div>
                   </div>
                 </div>
               </div>
               <div class="comparison-content" id="equal-content">
                 <div class="comparison-description">
-                  <p><strong>Равноправный (60%):</strong> Все инвесторы окупаются примерно одновременно, независимо от номера токена. Эгалитарный подход, но без преимуществ для ранних инвесторов.</p>
+                  <p><strong data-i18n="calculator.comparison.equalTitle">Равноправный (60%):</strong> <span data-i18n="calculator.comparison.equalDesc">Менее выраженное преимущество ранних инвесторов. Более справедливое распределение, но медленнее окупаемость.</span></p>
                 </div>
                 <div class="comparison-visualization">
                   <div class="token-group early">
-                    <div class="token-label">Токен #1-100:</div>
-                    <div class="payback-bar" style="width: 60%;">1x: ~4200 продаж</div>
+                    <div class="token-label" data-i18n="calculator.comparison.earlyTokens">Токен #1-100:</div>
+                    <div class="payback-bar" style="width: 40%;">1x: ~700 продаж</div>
                   </div>
                   <div class="token-group mid">
-                    <div class="token-label">Токен #500:</div>
-                    <div class="payback-bar" style="width: 60%;">1x: ~4200 продаж</div>
+                    <div class="token-label" data-i18n="calculator.comparison.midToken">Токен #500:</div>
+                    <div class="payback-bar" style="width: 50%;">1x: ~1400 продаж</div>
                   </div>
                   <div class="token-group late">
-                    <div class="token-label">Токен #1000:</div>
-                    <div class="payback-bar" style="width: 60%;">1x: ~4200 продаж</div>
+                    <div class="token-label" data-i18n="calculator.comparison.lateToken">Токен #1000:</div>
+                    <div class="payback-bar" style="width: 55%;">1x: ~1600 продаж</div>
                   </div>
                 </div>
               </div>
+            </div>
+
+            <!-- График окупаемости разных токенов -->
+            <div class="dynamic-payback-chart" style="display: none;">
+              <h4 data-i18n="calculator.chart.title">График Окупаемости Разных Токенов</h4>
+              <canvas id="payback-chart" width="800" height="400"></canvas>
             </div>
           </div>
         </div>
@@ -494,12 +502,22 @@ class RevenueCalculator {
   
   // Debounced calculation trigger
   triggerUpdateCalculations() {
-      // Clear any existing pending calculation
+    if (this.calculationTimeout) {
       clearTimeout(this.calculationTimeout);
-      // Schedule the actual calculation slightly later
-      this.calculationTimeout = setTimeout(() => {
-          this._updateCalculationsInternal();
-      }, 150); // Adjust debounce time if needed (e.g., 200ms)
+    }
+    
+    this.calculationTimeout = setTimeout(() => {
+      try {
+        this._updateCalculationsInternal();
+      } catch (error) {
+        console.error("Error in calculator:", error);
+        const errorDiv = document.getElementById('calculation-error');
+        if (errorDiv) {
+          errorDiv.textContent = t('calculator.errors.calculationError', 'Ошибка при расчётах. Проверьте введённые значения.');
+          errorDiv.style.display = 'block';
+        }
+      }
+    }, 200);
   }
 
   // Internal calculation logic, called by debounced trigger
@@ -531,29 +549,29 @@ class RevenueCalculator {
 
       // --- Basic Input Validation --- 
       if (tokenPrice <= 0) {
-          this.showError(errorDiv, "Цена токена должна быть > 0.");
+          this._showError('tokenPriceError');
           this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice); // Update prepayers even on error
           return;
       }
       if (this.initialInvestment < 0) {
-          this.showError(errorDiv, "Сумма инвестиций не может быть отрицательной.");
+          this._showError('negativeInvestmentError');
           this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice);
           return;
       }
        if (this.creatorShare < 0 || this.platformShare < 0 || this.promotionShare < 0 || 
            this.creatorShare > 100 || this.platformShare > 100 || this.promotionShare > 100 || 
            (this.creatorShare + this.platformShare + this.promotionShare) > 100) {
-           this.showError(errorDiv, "Доли Создателя, Платформы, Продвижения должны быть 0-100% и в сумме не > 100%.");
+           this._showError('sharesError');
            this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice);
            return;
        }
         if (this.paybackRatio < 1) {
-            this.showError(errorDiv, "Множитель Окупаемости должен быть >= 1.");
+            this._showError('paybackRatioError');
             this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice);
             return;
         }
         if (this.nonPaybackPoolSharePercent < 0 || this.nonPaybackPoolSharePercent > 100) {
-             this.showError(errorDiv, "Приоритет Не Окупившихся должен быть 0-100%.");
+             this._showError('nonPaybackPoolShareError');
              this.clearResults(this.calculateNumPrepayers(tokenPrice), tokenPrice);
              return;
         }
@@ -612,7 +630,7 @@ class RevenueCalculator {
       
       // Check for errors returned from calculation function
       if (results.error) {
-          this.showError(errorDiv, `Ошибка расчета: ${results.error}`);
+          this._showError(`Ошибка расчета: ${results.error}`);
           this.clearResults(results.numPrepayers, tokenPrice);
           return;
       }
@@ -630,9 +648,15 @@ class RevenueCalculator {
       // Обновляем статус окупаемости
       const achievedPayback = results.paybackGoal > 0 && results.buyer >= results.paybackGoal;
       const statusElement = document.getElementById('your-token-payback-status');
-      statusElement.textContent = achievedPayback ? 'Да' : 'Нет';
-      statusElement.style.color = achievedPayback ? '#28a745' : '#dc3545'; 
-      statusElement.style.fontWeight = 'bold';
+      if (statusElement) {
+        if (typeof t === 'function') {
+          statusElement.textContent = achievedPayback ? t('calculator.yourToken.yes', 'Yes') : t('calculator.yourToken.no', 'No');
+        } else {
+          statusElement.textContent = achievedPayback ? 'Yes' : 'No';
+        }
+        statusElement.style.color = achievedPayback ? '#28a745' : '#dc3545'; 
+        statusElement.style.fontWeight = 'bold';
+      }
 
       // Calculate total revenue and platform percentage of total
       const totalRevenue = results.actualInitialInvestment + (currentTotalSales - results.prepayersCount) * tokenPrice;
@@ -723,7 +747,7 @@ class RevenueCalculator {
 
     } catch (error) {
         console.error("Unhandled error during calculation update:", error);
-        this.showError(errorDiv, "Произошла непредвиденная ошибка при расчете.");
+        this._showError('unexpectedError');
         this.clearResults(results?.prepayersCount || 0, tokenPrice); 
     }
   }
@@ -887,12 +911,28 @@ class RevenueCalculator {
   }
   
   // Helper to display errors
-  showError(errorDiv, message) {
-      if (errorDiv) {
-          errorDiv.textContent = message;
-          errorDiv.style.display = 'block';
+  _showError(message) {
+    const errorDiv = document.getElementById('calculation-error');
+    if (errorDiv) {
+      // Проверяем, доступна ли функция t(), если нет - используем сообщение напрямую
+      if (typeof t === 'function') {
+        errorDiv.textContent = t('calculator.errors.' + message) || message;
+      } else {
+        // Резервные сообщения на английском, если функция t() недоступна
+        const fallbackMessages = {
+          'tokenPriceError': 'Token price must be > 0.',
+          'negativeInvestmentError': 'Investment amount cannot be negative.',
+          'sharesError': 'Creator, Platform, and Promotion shares must be 0-100% and sum to <= 100%.',
+          'paybackRatioError': 'Payback Multiplier must be >= 1.',
+          'nonPaybackPoolShareError': 'Non-Payback Priority must be 0-100%.',
+          'unexpectedError': 'An unexpected error occurred during calculation.',
+          'initError': 'Error initializing calculator.'
+        };
+        
+        errorDiv.textContent = fallbackMessages[message] || message;
       }
-      console.warn("Calculation Error:", message); // Also log error
+      errorDiv.style.display = 'block';
+    }
   }
   
   // Helper to update slider gradient background
@@ -910,12 +950,9 @@ class RevenueCalculator {
       document.getElementById('creator-revenue-detail').textContent = '(0 + 0)';
       document.getElementById('acc-platform-revenue').textContent = '0.00';
       document.getElementById('acc-promotion-revenue').textContent = '0.00';
-      document.getElementById('acc-total-buyers-revenue').textContent = '0.00';
-      document.getElementById('acc-your-token-revenue').textContent = '0.00';
-      // Calculate goal even when clearing, if possible
-      const paybackGoal = (parseFloat(tokenPrice) || 0) * (this.paybackRatio || 1);
-      document.getElementById('your-token-payback-goal').textContent = formatNumber(paybackGoal);
-      document.getElementById('final-paid-back-estimate').textContent = '0';
+      document.getElementById('acc-buyers-revenue').textContent = '0.00';
+      document.getElementById('your-token-accrued-revenue').textContent = '0.00';
+      document.getElementById('your-token-goal').textContent = '0.00';
       document.getElementById('your-token-payback-status').textContent = '-';
       document.getElementById('your-token-payback-status').style.color = 'inherit';
       document.getElementById('your-token-payback-status').style.fontWeight = 'normal';
@@ -1488,19 +1525,31 @@ class RevenueCalculator {
     let containerFound = false;
     const targets = ['#revenue .content-area.active', '#docs .card']; 
     for (const selector of targets) {
-        const container = document.querySelector(selector);
-        if (container) {
-            if (!container.querySelector('.calculator-container')) {
-                container.insertAdjacentHTML(selector.includes('#revenue') ? 'afterbegin' : 'beforeend', calculatorHTML);
-                console.log(`Calculator added to ${selector}`);
-                containerFound = true;
-                break; 
-            } else {
-                 console.log(`Calculator already exists in ${selector}. Skipping.`);
-                 containerFound = true; 
-                 break;
+      const container = document.querySelector(selector);
+      if (container) {
+        if (!container.querySelector('.calculator-container')) {
+          container.insertAdjacentHTML(selector.includes('#revenue') ? 'afterbegin' : 'beforeend', calculatorHTML);
+          console.log(`Calculator added to ${selector}`);
+          containerFound = true;
+          
+          // Translate the calculator once it's added to the DOM
+          const calculatorContainer = container.querySelector('.calculator-container');
+          if (calculatorContainer) {
+            try {
+              console.log("Attempting to translate calculator container...");
+              translateNode(calculatorContainer);
+            } catch (error) {
+              console.error("Error translating calculator:", error);
             }
+          }
+          
+          break; 
+        } else {
+          console.log(`Calculator already exists in ${selector}. Skipping.`);
+          containerFound = true; 
+          break;
         }
+      }
     }
 
     if (!containerFound) {
@@ -1526,18 +1575,26 @@ class RevenueCalculator {
     this.syncSliderInput('your-token-number-slider', 'your-token-number-input');
 
     setTimeout(() => {
-        try {
-            this._updateCalculationsInternal(); 
-            console.log("Initial calculation complete V3.3.");
-        } catch (error) {
-            console.error("Error during initial calculation:", error);
-             const errorDiv = document.getElementById('calculation-error');
-             if (errorDiv) {
-                 errorDiv.textContent = "Ошибка при инициализации калькулятора.";
-                 errorDiv.style.display = 'block';
-             }
+      try {
+        this._updateCalculationsInternal(); 
+        console.log("Initial calculation complete V3.3.");
+      } catch (error) {
+        console.error("Error during initial calculation:", error);
+        const errorDiv = document.getElementById('calculation-error');
+        if (errorDiv) {
+          // Проверяем наличие функции t()
+          if (typeof t === 'function') {
+            errorDiv.textContent = t('calculator.errors.initError', 'Error initializing calculator.');
+          } else {
+            errorDiv.textContent = 'Error initializing calculator.';
+          }
+          errorDiv.style.display = 'block';
         }
+      }
     }, 250); 
+    
+    // Initialize comparison tabs
+    this.initComparisonTabs();
     
     console.log("Revenue Calculator Initialized V3.3.");
   }
@@ -1711,14 +1768,13 @@ class RevenueCalculator {
   }
 }
 
-// Initialize calculator when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-      try {
-  const calculator = new RevenueCalculator();
-  calculator.init();
-      } catch (error) { 
-          console.error("Failed to initialize Revenue Calculator:", error);
-      }
-  }, 300); 
-}); 
+// Add class initialization at the end of the file for the module
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("DOMContentLoaded event fired, initializing Revenue Calculator");
+  try {
+    window.revenueCalculator = new RevenueCalculator();
+    window.revenueCalculator.init();
+  } catch (error) {
+    console.error("Failed to initialize Revenue Calculator:", error);
+  }
+});
