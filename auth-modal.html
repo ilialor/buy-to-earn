@@ -1,0 +1,105 @@
+<!-- Auth Modal -->
+<div class="modal auth-modal" id="auth-modal">
+  <div class="auth-content">
+    <div class="auth-tabs">
+      <div class="auth-tab active" data-target="sign-in-tab">Вход</div>
+      <div class="auth-tab" data-target="sign-up-tab">Регистрация</div>
+      <div class="auth-tab" data-target="reset-password-tab">Сброс пароля</div>
+    </div>
+    
+    <!-- Sign In Tab -->
+    <div class="auth-tab-content active" id="sign-in-tab">
+      <div class="auth-header">
+        <h3 class="auth-title">Вход в систему</h3>
+        <p class="auth-subtitle">Войдите в свой аккаунт</p>
+      </div>
+      
+      <div class="social-login-buttons">
+        <button class="btn btn-google" id="google-sign-in">
+          <i class="fab fa-google"></i> Войти через Google
+        </button>
+      </div>
+      
+      <div class="auth-divider">
+        <span>или</span>
+      </div>
+      
+      <form id="sign-in-form">
+        <div class="form-group">
+          <label for="sign-in-email">Email</label>
+          <input type="email" id="sign-in-email" placeholder="Введите email" required>
+        </div>
+        <div class="form-group">
+          <label for="sign-in-password">Пароль</label>
+          <input type="password" id="sign-in-password" placeholder="Введите пароль" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Войти</button>
+      </form>
+      
+      <div class="auth-footer">
+        <p>Нет аккаунта? <a id="switch-to-signup">Зарегистрироваться</a></p>
+        <p>Забыли пароль? <a id="switch-to-reset">Сбросить пароль</a></p>
+      </div>
+    </div>
+    
+    <!-- Sign Up Tab -->
+    <div class="auth-tab-content" id="sign-up-tab">
+      <div class="auth-header">
+        <h3 class="auth-title">Регистрация</h3>
+        <p class="auth-subtitle">Создайте новый аккаунт</p>
+      </div>
+      
+      <div class="social-login-buttons">
+        <button class="btn btn-google" id="google-sign-up">
+          <i class="fab fa-google"></i> Зарегистрироваться через Google
+        </button>
+      </div>
+      
+      <div class="auth-divider">
+        <span>или</span>
+      </div>
+      
+      <form id="sign-up-form">
+        <div class="form-group">
+          <label for="sign-up-name">Имя</label>
+          <input type="text" id="sign-up-name" placeholder="Введите имя" required>
+        </div>
+        <div class="form-group">
+          <label for="sign-up-email">Email</label>
+          <input type="email" id="sign-up-email" placeholder="Введите email" required>
+        </div>
+        <div class="form-group">
+          <label for="sign-up-password">Пароль</label>
+          <input type="password" id="sign-up-password" placeholder="Введите пароль" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Зарегистрироваться</button>
+      </form>
+      
+      <div class="auth-footer">
+        <p>Уже есть аккаунт? <a id="switch-to-signin">Войти</a></p>
+      </div>
+    </div>
+    
+    <!-- Reset Password Tab -->
+    <div class="auth-tab-content" id="reset-password-tab">
+      <div class="auth-header">
+        <h3 class="auth-title">Сброс пароля</h3>
+        <p class="auth-subtitle">Укажите email для получения инструкций</p>
+      </div>
+      
+      <form id="reset-password-form">
+        <div class="form-group">
+          <label for="reset-email">Email</label>
+          <input type="email" id="reset-email" placeholder="Введите email" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Отправить инструкцию</button>
+      </form>
+      
+      <div class="auth-footer">
+        <p>Вспомнили пароль? <a id="switch-to-signin-from-reset">Войти</a></p>
+      </div>
+    </div>
+    
+    <button class="modal-close">&times;</button>
+  </div>
+</div> 

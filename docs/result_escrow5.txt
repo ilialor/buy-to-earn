@@ -1,0 +1,669 @@
+Escrow Application Initialized.
+
+--- Step 1: Create Users ---
+Customer 'Alice' created with ID: customer_1d52dd7a
+Customer 'Bob' created with ID: customer_6cccf6b1
+Customer 'Charlie' created with ID: customer_c6542d57
+Contractor 'Dave' created with ID: contractor_3d0cbb91
+Contractor 'Eve' created with ID: contractor_c5d09854
+
+--- Step 2: Customers Deposit Funds ---
+Attempting deposit of 1000.00 for Alice...
+Balance updated for Alice (customer_1d52dd7a): 1000.00
+Attempting deposit of 600.00 for Bob...
+Balance updated for Bob (customer_6cccf6b1): 600.00
+Attempting deposit of 400.00 for Charlie...
+Balance updated for Charlie (customer_c6542d57): 400.00
+
+--- Step 3: Create Order 1 (Alice for Dave) ---
+Creating Order ord_9ef8097b by Customer customer_1d52dd7a for Contractor contractor_3d0cbb91.
+  Added Milestone: P1: Design (200.00) ID: ms_391f9ad2
+  Added Milestone: P2: Backend (800.00) ID: ms_255eccfd
+  Added Milestone: P3: Frontend (500.00) ID: ms_33a08302
+Order ord_9ef8097b created. Total Cost: 1500.00, Representative: customer_1d52dd7a
+Order ord_9ef8097b successfully registered in the application.
+
+--- Test Case: Create Order with Zero Amount Milestone ---
+Creating Order ord_019245ec by Customer customer_1d52dd7a for Contractor contractor_3d0cbb91.
+  Added Milestone: Valid (100.00) ID: ms_bf795ebc
+  Error adding milestone 'Invalid': Milestone amount must be positive.
+Failed to create order: Milestone amount must be positive.
+
+--- Test Case: Create Order with No Milestones ---
+Error: Cannot create order with no milestones.
+
+--- Status for Order ord_9ef8097b ---
+Status: PENDING
+Creator: customer_1d52dd7a
+Contractor: contractor_3d0cbb91
+Representative: customer_1d52dd7a
+Total Cost: 1500.00
+Escrow Balance: 0.00
+Funding Progress: 0.0% funded
+Contributions:
+  (No contributions yet)
+Current Votes for Representative:
+  (No active votes)
+-------------------------------------
+--- Milestones for Order ord_9ef8097b ---
+  - ID: ms_391f9ad2
+    Desc: P1: Design
+    Amount: 200.00
+    Status: PENDING
+  - ID: ms_255eccfd
+    Desc: P2: Backend
+    Amount: 800.00
+    Status: PENDING
+  - ID: ms_33a08302
+    Desc: P3: Frontend
+    Amount: 500.00
+    Status: PENDING
+-----------------------------------------
+
+--- Step 4: Funding Order ord_9ef8097b ---
+
+--- Test Case: Charlie tries to join with too much ---
+Error: Customer Charlie (customer_c6542d57) has insufficient balance (400.00) to contribute 500.00.
+--- Balance for Charlie (customer_c6542d57) ---
+Current Balance: 400.00
+------------------------------
+
+--- Funding Order 1 - Attempt 1 ---
+Order 1 Total Cost: 1500.00
+Balance updated for Alice (customer_1d52dd7a): 500.00
+Contribution of 500.00 from Customer customer_1d52dd7a added to Order ord_9ef8097b.
+  Order ord_9ef8097b Escrow: 500.00 / 1500.00
+Customer Alice (customer_1d52dd7a) successfully joined Order ord_9ef8097b.
+--- Balance for Alice (customer_1d52dd7a) ---
+Current Balance: 500.00
+------------------------------
+Balance updated for Bob (customer_6cccf6b1): 0.00
+Contribution of 600.00 from Customer customer_6cccf6b1 added to Order ord_9ef8097b.
+  Order ord_9ef8097b Escrow: 1100.00 / 1500.00
+Customer Bob (customer_6cccf6b1) successfully joined Order ord_9ef8097b.
+--- Balance for Bob (customer_6cccf6b1) ---
+Current Balance: 0.00
+------------------------------
+
+--- Status for Order ord_9ef8097b ---
+Status: PENDING
+Creator: customer_1d52dd7a
+Contractor: contractor_3d0cbb91
+Representative: customer_1d52dd7a
+Total Cost: 1500.00
+Escrow Balance: 1100.00
+Funding Progress: 73.3% funded
+Contributions:
+  - customer_1d52dd7a: 500.00
+  - customer_6cccf6b1: 600.00
+Current Votes for Representative:
+  (No active votes)
+-------------------------------------
+--- Milestones for Order ord_9ef8097b ---
+  - ID: ms_391f9ad2
+    Desc: P1: Design
+    Amount: 200.00
+    Status: PENDING
+  - ID: ms_255eccfd
+    Desc: P2: Backend
+    Amount: 800.00
+    Status: PENDING
+  - ID: ms_33a08302
+    Desc: P3: Frontend
+    Amount: 500.00
+    Status: PENDING
+-----------------------------------------
+
+--- Funding Order 1 - Attempt 2 (Charlie completes funding) ---
+Funding needed for Order ord_9ef8097b: 400.00
+Balance updated for Charlie (customer_c6542d57): 0.00
+Contribution of 400.00 from Customer customer_c6542d57 added to Order ord_9ef8097b.
+  Order ord_9ef8097b Escrow: 1500.00 / 1500.00
+Order ord_9ef8097b is now fully FUNDED!
+Customer Charlie (customer_c6542d57) successfully joined Order ord_9ef8097b.
+--- Balance for Charlie (customer_c6542d57) ---
+Current Balance: 0.00
+------------------------------
+
+--- Status for Order ord_9ef8097b ---
+Status: FUNDED
+Creator: customer_1d52dd7a
+Contractor: contractor_3d0cbb91
+Representative: customer_1d52dd7a
+Total Cost: 1500.00
+Escrow Balance: 1500.00
+Funding Progress: 100.0% funded
+Contributions:
+  - customer_1d52dd7a: 500.00
+  - customer_6cccf6b1: 600.00
+  - customer_c6542d57: 400.00
+Current Votes for Representative:
+  (No active votes)
+-------------------------------------
+--- Milestones for Order ord_9ef8097b ---
+  - ID: ms_391f9ad2
+    Desc: P1: Design
+    Amount: 200.00
+    Status: PENDING
+  - ID: ms_255eccfd
+    Desc: P2: Backend
+    Amount: 800.00
+    Status: PENDING
+  - ID: ms_33a08302
+    Desc: P3: Frontend
+    Amount: 500.00
+    Status: PENDING
+-----------------------------------------
+
+--- Step 5: Milestone Work for Order ord_9ef8097b ---
+
+--- Completing Milestone 1 (ms_391f9ad2) ---
+Act act_7d02697d created for Milestone ms_391f9ad2 in Order ord_9ef8097b.
+Milestone ms_391f9ad2 ('P1: Design') in Order ord_9ef8097b marked as COMPLETED_BY_CONTRACTOR.
+
+--- Status for Order ord_9ef8097b ---
+Status: IN_PROGRESS
+Creator: customer_1d52dd7a
+Contractor: contractor_3d0cbb91
+Representative: customer_1d52dd7a
+Total Cost: 1500.00
+Escrow Balance: 1500.00
+Funding Progress: 100.0% funded
+Contributions:
+  - customer_1d52dd7a: 500.00
+  - customer_6cccf6b1: 600.00
+  - customer_c6542d57: 400.00
+Current Votes for Representative:
+  (No active votes)
+-------------------------------------
+--- Milestones for Order ord_9ef8097b ---
+  - ID: ms_391f9ad2
+    Desc: P1: Design
+    Amount: 200.00
+    Status: COMPLETED_BY_CONTRACTOR
+    Act ID: act_7d02697d
+    Act Signatures: (None)
+    Act Complete: False
+  - ID: ms_255eccfd
+    Desc: P2: Backend
+    Amount: 800.00
+    Status: PENDING
+  - ID: ms_33a08302
+    Desc: P3: Frontend
+    Amount: 500.00
+    Status: PENDING
+-----------------------------------------
+
+--- Signing Act 1 (act_7d02697d) ---
+
+--- Test Case: Bob (contributor, not rep) tries to sign ---
+Error: Signer 'customer_6cccf6b1' (Customer (Bob, not representative)) is not authorized to sign Act act_7d02697d for Order ord_9ef8097b. Requires: Platform, Contractor contractor_3d0cbb91, or Representative customer_1d52dd7a.
+
+--- Signing Act 1 - Legitimate Signatures ---
+Attempting signature by 'Platform' for Act act_7d02697d (Milestone ms_391f9ad2)...
+Signature from 'PLATFORM' added to Act act_7d02697d.
+--- Balance for Dave (contractor_3d0cbb91) ---
+Current Balance: 0.00
+------------------------------
+
+--- Status for Order ord_9ef8097b ---
+Status: IN_PROGRESS
+Creator: customer_1d52dd7a
+Contractor: contractor_3d0cbb91
+Representative: customer_1d52dd7a
+Total Cost: 1500.00
+Escrow Balance: 1500.00
+Funding Progress: 100.0% funded
+Contributions:
+  - customer_1d52dd7a: 500.00
+  - customer_6cccf6b1: 600.00
+  - customer_c6542d57: 400.00
+Current Votes for Representative:
+  (No active votes)
+-------------------------------------
+--- Milestones for Order ord_9ef8097b ---
+  - ID: ms_391f9ad2
+    Desc: P1: Design
+    Amount: 200.00
+    Status: COMPLETED_BY_CONTRACTOR
+    Act ID: act_7d02697d
+    Act Signatures: {'PLATFORM'}
+    Act Complete: False
+  - ID: ms_255eccfd
+    Desc: P2: Backend
+    Amount: 800.00
+    Status: PENDING
+  - ID: ms_33a08302
+    Desc: P3: Frontend
+    Amount: 500.00
+    Status: PENDING
+-----------------------------------------
+Attempting signature by 'Representative (Alice)' for Act act_7d02697d (Milestone ms_391f9ad2)...
+Signature from 'customer_1d52dd7a' added to Act act_7d02697d.
+Act act_7d02697d is now complete with 2 signatures.
+Act act_7d02697d is now complete. Releasing funds...
+Funds (200.00) released for Milestone ms_391f9ad2 ('P1: Design') in Order ord_9ef8097b.
+  Order ord_9ef8097b New Escrow Balance: 1300.00
+Balance updated for Dave (contractor_3d0cbb91): 200.00
+Contractor contractor_3d0cbb91's balance updated by +200.00.
+
+--- Status for Order ord_9ef8097b ---
+Status: IN_PROGRESS
+Creator: customer_1d52dd7a
+Contractor: contractor_3d0cbb91
+Representative: customer_1d52dd7a
+Total Cost: 1500.00
+Escrow Balance: 1300.00
+Funding Progress: 86.7% funded
+Contributions:
+  - customer_1d52dd7a: 500.00
+  - customer_6cccf6b1: 600.00
+  - customer_c6542d57: 400.00
+Current Votes for Representative:
+  (No active votes)
+-------------------------------------
+--- Milestones for Order ord_9ef8097b ---
+  - ID: ms_391f9ad2
+    Desc: P1: Design
+    Amount: 200.00
+    Status: PAID
+    Act ID: act_7d02697d
+    Act Signatures: {'customer_1d52dd7a', 'PLATFORM'}
+    Act Complete: True
+  - ID: ms_255eccfd
+    Desc: P2: Backend
+    Amount: 800.00
+    Status: PENDING
+  - ID: ms_33a08302
+    Desc: P3: Frontend
+    Amount: 500.00
+    Status: PENDING
+-----------------------------------------
+--- Balance for Dave (contractor_3d0cbb91) ---
+Current Balance: 200.00
+------------------------------
+
+--- Test Case: Platform signs again (should be ignored) ---
+Attempting signature by 'Platform' for Act act_7d02697d (Milestone ms_391f9ad2)...
+Warning: Attempting to sign act for milestone ms_391f9ad2 which is already PAID.
+Act act_7d02697d is already complete. No more signatures needed.
+
+--- Step 6: Voting for Representative Change (Order ord_9ef8097b) ---
+--- Vote Attempt 1: Bob votes for himself (Needs 1125) ---
+Vote recorded: customer_6cccf6b1 votes for customer_6cccf6b1 in Order ord_9ef8097b.
+Checking votes for representative change in Order ord_9ef8097b...
+  Vote support totals: {'customer_6cccf6b1': '600.00'}
+  Total Order Cost (Base for %): 1500.00
+  Required support amount (>= 75.0%): 1125.00
+  No candidate reached the 75% threshold yet.
+
+--- Status for Order ord_9ef8097b ---
+Status: IN_PROGRESS
+Creator: customer_1d52dd7a
+Contractor: contractor_3d0cbb91
+Representative: customer_1d52dd7a
+Total Cost: 1500.00
+Escrow Balance: 1300.00
+Funding Progress: 86.7% funded
+Contributions:
+  - customer_1d52dd7a: 500.00
+  - customer_6cccf6b1: 600.00
+  - customer_c6542d57: 400.00
+Current Votes for Representative:
+  - customer_6cccf6b1 voted for customer_6cccf6b1
+-------------------------------------
+--- Milestones for Order ord_9ef8097b ---
+  - ID: ms_391f9ad2
+    Desc: P1: Design
+    Amount: 200.00
+    Status: PAID
+    Act ID: act_7d02697d
+    Act Signatures: {'customer_1d52dd7a', 'PLATFORM'}
+    Act Complete: True
+  - ID: ms_255eccfd
+    Desc: P2: Backend
+    Amount: 800.00
+    Status: PENDING
+  - ID: ms_33a08302
+    Desc: P3: Frontend
+    Amount: 500.00
+    Status: PENDING
+-----------------------------------------
+
+--- Vote Attempt 2: Charlie votes for Bob ---
+Vote recorded: customer_c6542d57 votes for customer_6cccf6b1 in Order ord_9ef8097b.
+Checking votes for representative change in Order ord_9ef8097b...
+  Vote support totals: {'customer_6cccf6b1': '1000.00'}
+  Total Order Cost (Base for %): 1500.00
+  Required support amount (>= 75.0%): 1125.00
+  No candidate reached the 75% threshold yet.
+
+--- Status for Order ord_9ef8097b ---
+Status: IN_PROGRESS
+Creator: customer_1d52dd7a
+Contractor: contractor_3d0cbb91
+Representative: customer_1d52dd7a
+Total Cost: 1500.00
+Escrow Balance: 1300.00
+Funding Progress: 86.7% funded
+Contributions:
+  - customer_1d52dd7a: 500.00
+  - customer_6cccf6b1: 600.00
+  - customer_c6542d57: 400.00
+Current Votes for Representative:
+  - customer_6cccf6b1 voted for customer_6cccf6b1
+  - customer_c6542d57 voted for customer_6cccf6b1
+-------------------------------------
+--- Milestones for Order ord_9ef8097b ---
+  - ID: ms_391f9ad2
+    Desc: P1: Design
+    Amount: 200.00
+    Status: PAID
+    Act ID: act_7d02697d
+    Act Signatures: {'customer_1d52dd7a', 'PLATFORM'}
+    Act Complete: True
+  - ID: ms_255eccfd
+    Desc: P2: Backend
+    Amount: 800.00
+    Status: PENDING
+  - ID: ms_33a08302
+    Desc: P3: Frontend
+    Amount: 500.00
+    Status: PENDING
+-----------------------------------------
+
+--- Vote Attempt 3: Alice votes for Bob ---
+Vote recorded: customer_1d52dd7a votes for customer_6cccf6b1 in Order ord_9ef8097b.
+Checking votes for representative change in Order ord_9ef8097b...
+  Vote support totals: {'customer_6cccf6b1': '1500.00'}
+  Total Order Cost (Base for %): 1500.00
+  Required support amount (>= 75.0%): 1125.00
+  Candidate customer_6cccf6b1 reached threshold with 1500.00 support!
+Representative CHANGE successful for Order ord_9ef8097b!
+  Old Representative: customer_1d52dd7a
+  New Representative: customer_6cccf6b1
+  Votes have been reset.
+
+--- Status for Order ord_9ef8097b ---
+Status: IN_PROGRESS
+Creator: customer_1d52dd7a
+Contractor: contractor_3d0cbb91
+Representative: customer_6cccf6b1
+Total Cost: 1500.00
+Escrow Balance: 1300.00
+Funding Progress: 86.7% funded
+Contributions:
+  - customer_1d52dd7a: 500.00
+  - customer_6cccf6b1: 600.00
+  - customer_c6542d57: 400.00
+Current Votes for Representative:
+  (No active votes)
+-------------------------------------
+--- Milestones for Order ord_9ef8097b ---
+  - ID: ms_391f9ad2
+    Desc: P1: Design
+    Amount: 200.00
+    Status: PAID
+    Act ID: act_7d02697d
+    Act Signatures: {'customer_1d52dd7a', 'PLATFORM'}
+    Act Complete: True
+  - ID: ms_255eccfd
+    Desc: P2: Backend
+    Amount: 800.00
+    Status: PENDING
+  - ID: ms_33a08302
+    Desc: P3: Frontend
+    Amount: 500.00
+    Status: PENDING
+-----------------------------------------
+
+--- Step 7: Completing Remaining Milestones (Order ord_9ef8097b) ---
+
+--- Completing Milestone 2 (ms_255eccfd) ---
+Act act_5a2be6c1 created for Milestone ms_255eccfd in Order ord_9ef8097b.
+Milestone ms_255eccfd ('P2: Backend') in Order ord_9ef8097b marked as COMPLETED_BY_CONTRACTOR.
+
+--- Signing Act 2 (act_5a2be6c1) ---
+Attempting signature by 'Contractor (Dave)' for Act act_5a2be6c1 (Milestone ms_255eccfd)...
+Signature from 'contractor_3d0cbb91' added to Act act_5a2be6c1.
+Attempting signature by 'Representative (Bob)' for Act act_5a2be6c1 (Milestone ms_255eccfd)...
+Signature from 'customer_6cccf6b1' added to Act act_5a2be6c1.
+Act act_5a2be6c1 is now complete with 2 signatures.
+Act act_5a2be6c1 is now complete. Releasing funds...
+Funds (800.00) released for Milestone ms_255eccfd ('P2: Backend') in Order ord_9ef8097b.
+  Order ord_9ef8097b New Escrow Balance: 500.00
+Balance updated for Dave (contractor_3d0cbb91): 1000.00
+Contractor contractor_3d0cbb91's balance updated by +800.00.
+
+--- Status for Order ord_9ef8097b ---
+Status: IN_PROGRESS
+Creator: customer_1d52dd7a
+Contractor: contractor_3d0cbb91
+Representative: customer_6cccf6b1
+Total Cost: 1500.00
+Escrow Balance: 500.00
+Funding Progress: 33.3% funded
+Contributions:
+  - customer_1d52dd7a: 500.00
+  - customer_6cccf6b1: 600.00
+  - customer_c6542d57: 400.00
+Current Votes for Representative:
+  (No active votes)
+-------------------------------------
+--- Milestones for Order ord_9ef8097b ---
+  - ID: ms_391f9ad2
+    Desc: P1: Design
+    Amount: 200.00
+    Status: PAID
+    Act ID: act_7d02697d
+    Act Signatures: {'customer_1d52dd7a', 'PLATFORM'}
+    Act Complete: True
+  - ID: ms_255eccfd
+    Desc: P2: Backend
+    Amount: 800.00
+    Status: PAID
+    Act ID: act_5a2be6c1
+    Act Signatures: {'customer_6cccf6b1', 'contractor_3d0cbb91'}
+    Act Complete: True
+  - ID: ms_33a08302
+    Desc: P3: Frontend
+    Amount: 500.00
+    Status: PENDING
+-----------------------------------------
+--- Balance for Dave (contractor_3d0cbb91) ---
+Current Balance: 1000.00
+------------------------------
+
+--- Completing Milestone 3 (ms_33a08302) ---
+Act act_838c38b8 created for Milestone ms_33a08302 in Order ord_9ef8097b.
+Milestone ms_33a08302 ('P3: Frontend') in Order ord_9ef8097b marked as COMPLETED_BY_CONTRACTOR.
+
+--- Signing Act 3 (act_838c38b8) ---
+Attempting signature by 'Platform' for Act act_838c38b8 (Milestone ms_33a08302)...
+Signature from 'PLATFORM' added to Act act_838c38b8.
+Attempting signature by 'Contractor (Dave)' for Act act_838c38b8 (Milestone ms_33a08302)...
+Signature from 'contractor_3d0cbb91' added to Act act_838c38b8.
+Act act_838c38b8 is now complete with 2 signatures.
+Act act_838c38b8 is now complete. Releasing funds...
+Funds (500.00) released for Milestone ms_33a08302 ('P3: Frontend') in Order ord_9ef8097b.
+  Order ord_9ef8097b New Escrow Balance: 0.00
+Order ord_9ef8097b is now fully COMPLETED.
+Balance updated for Dave (contractor_3d0cbb91): 1500.00
+Contractor contractor_3d0cbb91's balance updated by +500.00.
+
+--- Status for Order ord_9ef8097b ---
+Status: COMPLETED
+Creator: customer_1d52dd7a
+Contractor: contractor_3d0cbb91
+Representative: customer_6cccf6b1
+Total Cost: 1500.00
+Escrow Balance: 0.00
+Funding Progress: 0.0% funded
+Contributions:
+  - customer_1d52dd7a: 500.00
+  - customer_6cccf6b1: 600.00
+  - customer_c6542d57: 400.00
+Current Votes for Representative:
+  (No active votes)
+-------------------------------------
+--- Milestones for Order ord_9ef8097b ---
+  - ID: ms_391f9ad2
+    Desc: P1: Design
+    Amount: 200.00
+    Status: PAID
+    Act ID: act_7d02697d
+    Act Signatures: {'customer_1d52dd7a', 'PLATFORM'}
+    Act Complete: True
+  - ID: ms_255eccfd
+    Desc: P2: Backend
+    Amount: 800.00
+    Status: PAID
+    Act ID: act_5a2be6c1
+    Act Signatures: {'customer_6cccf6b1', 'contractor_3d0cbb91'}
+    Act Complete: True
+  - ID: ms_33a08302
+    Desc: P3: Frontend
+    Amount: 500.00
+    Status: PAID
+    Act ID: act_838c38b8
+    Act Signatures: {'contractor_3d0cbb91', 'PLATFORM'}
+    Act Complete: True
+-----------------------------------------
+--- Balance for Dave (contractor_3d0cbb91) ---
+Current Balance: 1500.00
+------------------------------
+
+--- Step 8: Create and Fund a Second Order (Bob for Eve) ---
+Creating Order ord_573a711f by Customer customer_6cccf6b1 for Contractor contractor_c5d09854.
+  Added Milestone: Analysis (50.00) ID: ms_0efe33b0
+  Added Milestone: Report (75.00) ID: ms_40436cc2
+Order ord_573a711f created. Total Cost: 125.00, Representative: customer_6cccf6b1
+Order ord_573a711f successfully registered in the application.
+Attempting deposit of 200.00 for Bob...
+Balance updated for Bob (customer_6cccf6b1): 200.00
+
+--- Funding Order ord_573a711f ---
+Balance updated for Bob (customer_6cccf6b1): 150.00
+Contribution of 50.00 from Customer customer_6cccf6b1 added to Order ord_573a711f.
+  Order ord_573a711f Escrow: 50.00 / 125.00
+Customer Bob (customer_6cccf6b1) successfully joined Order ord_573a711f.
+Balance updated for Alice (customer_1d52dd7a): 425.00
+Contribution of 75.00 from Customer customer_1d52dd7a added to Order ord_573a711f.
+  Order ord_573a711f Escrow: 125.00 / 125.00
+Order ord_573a711f is now fully FUNDED!
+Customer Alice (customer_1d52dd7a) successfully joined Order ord_573a711f.
+
+--- Status for Order ord_573a711f ---
+Status: FUNDED
+Creator: customer_6cccf6b1
+Contractor: contractor_c5d09854
+Representative: customer_6cccf6b1
+Total Cost: 125.00
+Escrow Balance: 125.00
+Funding Progress: 100.0% funded
+Contributions:
+  - customer_6cccf6b1: 50.00
+  - customer_1d52dd7a: 75.00
+Current Votes for Representative:
+  (No active votes)
+-------------------------------------
+--- Milestones for Order ord_573a711f ---
+  - ID: ms_0efe33b0
+    Desc: Analysis
+    Amount: 50.00
+    Status: PENDING
+  - ID: ms_40436cc2
+    Desc: Report
+    Amount: 75.00
+    Status: PENDING
+-----------------------------------------
+
+--- Work on Order ord_573a711f ---
+Act act_c1a98172 created for Milestone ms_0efe33b0 in Order ord_573a711f.
+Milestone ms_0efe33b0 ('Analysis') in Order ord_573a711f marked as COMPLETED_BY_CONTRACTOR.
+
+--- Signing Act for Order 2 (act_c1a98172) ---
+Attempting signature by 'Platform' for Act act_c1a98172 (Milestone ms_0efe33b0)...
+Signature from 'PLATFORM' added to Act act_c1a98172.
+Attempting signature by 'Contractor (Eve)' for Act act_c1a98172 (Milestone ms_0efe33b0)...
+Signature from 'contractor_c5d09854' added to Act act_c1a98172.
+Act act_c1a98172 is now complete with 2 signatures.
+Act act_c1a98172 is now complete. Releasing funds...
+Funds (50.00) released for Milestone ms_0efe33b0 ('Analysis') in Order ord_573a711f.
+  Order ord_573a711f New Escrow Balance: 75.00
+Balance updated for Eve (contractor_c5d09854): 50.00
+Contractor contractor_c5d09854's balance updated by +50.00.
+--- Balance for Eve (contractor_c5d09854) ---
+Current Balance: 50.00
+------------------------------
+
+--- Status for Order ord_573a711f ---
+Status: IN_PROGRESS
+Creator: customer_6cccf6b1
+Contractor: contractor_c5d09854
+Representative: customer_6cccf6b1
+Total Cost: 125.00
+Escrow Balance: 75.00
+Funding Progress: 60.0% funded
+Contributions:
+  - customer_6cccf6b1: 50.00
+  - customer_1d52dd7a: 75.00
+Current Votes for Representative:
+  (No active votes)
+-------------------------------------
+--- Milestones for Order ord_573a711f ---
+  - ID: ms_0efe33b0
+    Desc: Analysis
+    Amount: 50.00
+    Status: PAID
+    Act ID: act_c1a98172
+    Act Signatures: {'contractor_c5d09854', 'PLATFORM'}
+    Act Complete: True
+  - ID: ms_40436cc2
+    Desc: Report
+    Amount: 75.00
+    Status: PENDING
+-----------------------------------------
+
+--- Step 9: Final User Views ---
+--- Balance for Alice (customer_1d52dd7a) ---
+Current Balance: 425.00
+------------------------------
+--- Balance for Bob (customer_6cccf6b1) ---
+Current Balance: 150.00
+------------------------------
+--- Balance for Charlie (customer_c6542d57) ---
+Current Balance: 0.00
+------------------------------
+--- Balance for Dave (contractor_3d0cbb91) ---
+Current Balance: 1500.00
+------------------------------
+--- Balance for Eve (contractor_c5d09854) ---
+Current Balance: 50.00
+------------------------------
+
+--- Orders associated with Alice (customer_1d52dd7a) ---
+Orders Created:
+  - ord_9ef8097b
+Orders Joined (Contributions):
+  - ord_9ef8097b (Contributed: 500.00)
+  - ord_573a711f (Contributed: 75.00)
+------------------------------
+
+--- Orders associated with Bob (customer_6cccf6b1) ---
+Orders Created:
+  - ord_573a711f
+Orders Joined (Contributions):
+  - ord_9ef8097b (Contributed: 600.00)
+  - ord_573a711f (Contributed: 50.00)
+------------------------------
+
+--- Orders associated with Dave (contractor_3d0cbb91) ---
+Orders Assigned:
+  - ord_9ef8097b
+------------------------------
+
+--- Orders associated with Eve (contractor_c5d09854) ---
+Orders Assigned:
+  - ord_573a711f
+------------------------------
