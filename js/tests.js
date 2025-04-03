@@ -7,8 +7,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Wait for Firebase to initialize
   setTimeout(() => {
-    // Create test button
-    createTestButton();
+    // Test button creation disabled
+    // createTestButton();
   }, 1000);
 });
 
