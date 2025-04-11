@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escrow API Integration Tests</title>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    
+    <!-- Application Styles -->
+    <link rel="stylesheet" href="styles/styles.css">
+    
+    <style>
+        /* Test report styling */
+        .test-report {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: #fff;
+            font-family: Arial, sans-serif;
+        }
+        
+        .test-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        
+        .test-stat {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .test-passed {
+            color: #28a745;
+        }
+        
+        .test-failed {
+            color: #dc3545;
+        }
+        
+        .test-details {
+            margin-top: 20px;
+        }
+        
+        .test-result {
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .test-result.success {
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        
+        .test-result.failure {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        
+        .test-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        
+        .test-name {
+            flex-grow: 1;
+            font-weight: 500;
+        }
+        
+        .test-error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+            padding-left: 24px;
+            font-family: monospace;
+        }
+        
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 350px;
+            z-index: 9999;
+        }
+        
+        .notification {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        
+        .notification-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .notification-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .notification-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .notification-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .notification-icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        .notification-message {
+            flex-grow: 1;
+        }
+        
+        .notification-close {
+            color: inherit;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            font-size: 18px;
+            opacity: 0.7;
+            cursor: pointer;
+        }
+        
+        .notification-close:hover {
+            opacity: 1;
+        }
+        
+        .controls {
+            margin: 20px auto;
+            max-width: 800px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0069d9;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
+    
+    <!-- Mock Firebase Config -->
+    <script>
+        // Инициализируем Firebase с мок-данными для тестирования
+        const firebaseConfig = {
+            apiKey: "test-api-key",
+            authDomain: "test-project.firebaseapp.com",
+            projectId: "test-project",
+            appId: "test-app-id"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Мок-функции для Firebase Auth
+        firebase.auth().onAuthStateChanged = function(callback) {
+            const mockUser = {
+                uid: 'test-user-' + Date.now(),
+                email: 'test@example.com',
+                displayName: 'Test User'
+            };
+            callback(mockUser);
+            return function() {}; // unsubscribe function
+        };
+        
+        firebase.auth().signInWithEmailAndPassword = function() {
+            return Promise.resolve();
+        };
+        
+        firebase.auth().signOut = function() {
+            return Promise.resolve();
+        };
+    </script>
+    
+    <!-- Basic App Script -->
+    <script>
+        // Mock functions for loading indicator
+        window.showLoading = function(message) {
+            console.log('Loading:', message);
+            const loadingEl = document.createElement('div');
+            loadingEl.className = 'loading-overlay';
+            loadingEl.innerHTML = `
+                <div class="loading-spinner"></div>
+                <div style="color: white; margin-top: 10px;">${message}</div>
+            `;
+            document.body.appendChild(loadingEl);
+        };
+        
+        window.hideLoading = function() {
+            const loadingEl = document.querySelector('.loading-overlay');
+            if (loadingEl) loadingEl.remove();
+        };
+        
+        // Mock getCurrentUser function
+        window.getCurrentUser = function() {
+            return {
+                uid: 'test-user-' + Date.now(),
+                email: 'test@example.com',
+                displayName: 'Test User',
+                role: 'customer'
+            };
+        };
+    </script>
+    
+    <!-- Mock Escrow API for Testing -->
+    <script type="module">
+        import mockEscrowApi from './js/api/mock-api.js';
+        
+        // Make mock API available globally for testing
+        window.escrowAPI = mockEscrowApi;
+        
+        // Log API initialization for debugging
+        console.log('Mock Escrow API initialized for testing:', window.escrowAPI);
+        
+        // Make imports available directly for debugging
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('Testing Mock API Services Availability:');
+            console.log('- userService:', window.escrowAPI.userService ? 'Available' : 'Not available');
+            console.log('- orderService:', window.escrowAPI.orderService ? 'Available' : 'Not available');
+            console.log('- milestoneService:', window.escrowAPI.milestoneService ? 'Available' : 'Not available');
+            console.log('- uiUtils:', window.escrowAPI.uiUtils ? 'Available' : 'Not available');
+            console.log('- StorageSync:', window.escrowAPI.StorageSync ? 'Available' : 'Not available');
+            console.log('- paymentWrapper:', window.escrowAPI.paymentWrapper ? 'Available' : 'Not available');
+        });
+    </script>
+</head>
+
+<body>
+    <div id="notification-container" class="notification-container"></div>
+    
+    <div class="test-report">
+        <h1>Escrow API Integration Tests</h1>
+        <p>Эта страница предназначена для тестирования интеграции с API Escrow. Тесты проверяют следующие аспекты:</p>
+        <ul>
+            <li>Корректную работу аутентификации с API</li>
+            <li>Создание, финансирование и управление заказами</li>
+            <li>Обработку этапов заказа и актов</li>
+            <li>Синхронизацию данных между API и локальным хранилищем</li>
+            <li>Обратную совместимость с существующей системой</li>
+        </ul>
+        
+        <div class="controls">
+            <button id="clear-results-btn" class="btn btn-secondary">Очистить результаты</button>
+        </div>
+        
+        <div id="test-results-container"></div>
+    </div>
+    
+    <!-- Utility Scripts -->
+    <script>
+        // Notification system
+        window.showNotification = function(message, type = 'info') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            
+            let iconClass = 'info-circle';
+            if (type === 'success') iconClass = 'check-circle';
+            if (type === 'error') iconClass = 'exclamation-circle';
+            if (type === 'warning') iconClass = 'exclamation-triangle';
+            
+            notification.innerHTML = `
+                <span class="notification-icon"><i class="fas fa-${iconClass}"></i></span>
+                <span class="notification-message">${message}</span>
+                <button class="notification-close">&times;</button>
+            `;
+            
+            container.appendChild(notification);
+            
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.addEventListener('click', () => {
+                notification.remove();
+            });
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        };
+        
+        // Additional mock functions for the app
+        window.getEscrowApplication = function() {
+            return {
+                storage: {
+                    getOrders: () => [],
+                    getUsers: () => []
+                }
+            };
+        };
+        
+        // Mock application helpers
+        window.app = {
+            escrow: window.getEscrowApplication()
+        };
+        
+        // Event handlers for buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            const runTestsBtn = document.getElementById('run-tests-btn');
+            const clearResultsBtn = document.getElementById('clear-results-btn');
+            const resultsContainer = document.getElementById('test-results-container');
+            
+            if (runTestsBtn) {
+                runTestsBtn.addEventListener('click', () => {
+                    if (window.runEscrowApiTests) {
+                        window.runEscrowApiTests();
+                    } else {
+                        showNotification('Test runner not found. Make sure tests.js is loaded correctly.', 'error');
+                    }
+                });
+            }
+            
+            if (clearResultsBtn) {
+                clearResultsBtn.addEventListener('click', () => {
+                    if (resultsContainer) {
+                        resultsContainer.innerHTML = '';
+                    }
+                });
+            }
+        });
+    </script>
+    
+    <!-- Test Scripts -->
+    <script type="module" src="./js/api/tests.js"></script>
+</body>
+</html>

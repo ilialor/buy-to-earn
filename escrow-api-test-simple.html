@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Простые тесты Escrow API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .test-section h2 {
+            margin-top: 0;
+        }
+        .test-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-left: 3px solid #f0f0f0;
+        }
+        .success {
+            border-left-color: green;
+            background-color: rgba(0, 128, 0, 0.1);
+        }
+        .failure {
+            border-left-color: red;
+            background-color: rgba(255, 0, 0, 0.1);
+        }
+        .test-status {
+            font-weight: bold;
+        }
+        .success .test-status {
+            color: green;
+        }
+        .failure .test-status {
+            color: red;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .run-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .clear-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+        .log-output {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Простые тесты интеграции Escrow API</h1>
+        <p>Эта страница проверяет базовую интеграцию с Escrow API</p>
+    </div>
+    
+    <div class="buttons">
+        <button class="clear-btn" id="clear-results">Очистить результаты</button>
+    </div>
+    
+    <div id="results-container"></div>
+    
+    <div class="log-output" id="log-output"></div>
+    
+    <script>
+        // Простая функция для логирования
+        const logElement = document.getElementById('log-output');
+        const log = (message) => {
+            if (typeof message === 'object') {
+                message = JSON.stringify(message, null, 2);
+            }
+            const time = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${time}] ${message}\n`;
+            console.log(message);
+        };
+        
+        // Функция для очистки лога
+        const clearLog = () => {
+            logElement.innerHTML = '';
+        };
+        
+        // Функция для добавления результата теста
+        const addTestResult = (name, success, details = '') => {
+            const container = document.getElementById('results-container');
+            const testItem = document.createElement('div');
+            testItem.className = `test-item ${success ? 'success' : 'failure'}`;
+            testItem.innerHTML = `
+                <div class="test-status">${success ? '✓ Успешно' : '✗ Ошибка'}</div>
+                <div class="test-name">${name}</div>
+                ${details ? `<div class="test-details">${details}</div>` : ''}
+            `;
+            container.appendChild(testItem);
+        };
+        
+        // Функция для проверки доступности API
+        const testApiAvailability = () => {
+            log('Проверка доступности Escrow API...');
+            const isAvailable = typeof window.escrowAPI !== 'undefined';
+            addTestResult('Доступность Escrow API', isAvailable);
+            
+            if (isAvailable) {
+                log('Escrow API доступен');
+                
+                // Проверим доступность всех сервисов
+                const services = [
+                    'escrowApi', 'userService', 'orderService', 
+                    'milestoneService', 'uiUtils', 'StorageSync', 'paymentWrapper'
+                ];
+                
+                services.forEach(service => {
+                    const isServiceAvailable = Boolean(window.escrowAPI[service]);
+                    addTestResult(`Сервис: ${service}`, isServiceAvailable);
+                    log(`- ${service}: ${isServiceAvailable ? 'доступен' : 'недоступен'}`);
+                });
+            } else {
+                log('Escrow API недоступен');
+            }
+        };
+        
+        // Функция для тестирования синхронизации данных
+        const testDataSync = () => {
+            log('Тестирование синхронизации данных...');
+            try {
+                // Создадим тестовые данные
+                const mockOrder = {
+                    id: 'test-order-id',
+                    title: 'Test Order',
+                    description: 'Test description',
+                    creatorId: 'user-1',
+                    status: 'PENDING',
+                    milestones: [
+                        { id: 'milestone-1', description: 'First milestone', amount: 100 }
+                    ]
+                };
+                
+                // Тестовый объект хранилища
+                const mockStorage = {
+                    savedData: null,
+                    saveOrder(data) { 
+                        this.savedData = data;
+                        return true;
+                    },
+                    getOrder() { return this.savedData; }
+                };
+                
+                // Проверим syncOrder, если доступен
+                if (window.escrowAPI.StorageSync && window.escrowAPI.StorageSync.syncOrder) {
+                    const syncResult = window.escrowAPI.StorageSync.syncOrder(mockOrder, mockStorage);
+                    log('Результат синхронизации:', syncResult);
+                    log('Данные в хранилище:', mockStorage.savedData);
+                    
+                    const isSuccess = Boolean(syncResult && mockStorage.savedData);
+                    addTestResult('Синхронизация заказа с хранилищем', isSuccess);
+                } else {
+                    log('Функция синхронизации недоступна');
+                    addTestResult('Синхронизация заказа с хранилищем', false, 'Функция недоступна');
+                }
+            } catch (error) {
+                log('Ошибка при тестировании синхронизации:', error);
+                addTestResult('Синхронизация данных', false, error.message);
+            }
+        };
+        
+        // Инициализация Escrow API в глобальной области
+        window.initEscrowAPI = async () => {
+            try {
+                log('Загрузка Escrow API...');
+                const module = await import('./js/api/index.js');
+                window.escrowAPI = module;
+                log('Escrow API загружен:', window.escrowAPI);
+                return true;
+            } catch (error) {
+                log('Ошибка загрузки Escrow API:', error);
+                addTestResult('Загрузка Escrow API', false, error.message);
+                return false;
+            }
+        };
+        
+        // Функция для запуска всех тестов
+        const runAllTests = async () => {
+            clearLog();
+            document.getElementById('results-container').innerHTML = '';
+            log('Запуск тестов...');
+            
+            try {
+                // Инициализация API если еще не инициализирован
+                if (!window.escrowAPI) {
+                    await window.initEscrowAPI();
+                }
+                
+                // Запуск всех тестов
+                testApiAvailability();
+                testDataSync();
+                
+                log('Тесты завершены');
+            } catch (error) {
+                log('Ошибка при запуске тестов:', error);
+            }
+        };
+        
+        // Назначение обработчиков событий для кнопок
+        document.getElementById('run-tests').addEventListener('click', runAllTests);
+        document.getElementById('clear-results').addEventListener('click', () => {
+            document.getElementById('results-container').innerHTML = '';
+            clearLog();
+        });
+        
+        // Инициализация после загрузки страницы
+        document.addEventListener('DOMContentLoaded', async () => {
+            log('Страница загружена');
+            await window.initEscrowAPI();
+        });
+    </script>
+</body>
+</html>
