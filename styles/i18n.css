@@ -1,0 +1,114 @@
+/**
+ * Internationalization styles
+ */
+
+/* Language selector container */
+.language-selector {
+  position: relative;
+  margin-right: 12px;
+  z-index: 100;
+}
+
+/* Language selector button */
+.lang-button {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-bg-secondary, #f8f9fa);
+  border: 1px solid var(--color-border, #dee2e6);
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text, #333);
+  transition: all 0.2s ease;
+}
+
+.lang-button:hover {
+  background-color: var(--color-bg-hover, #e9ecef);
+}
+
+.lang-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Flag icon in the button */
+.lang-button span {
+  margin-left: 6px;
+}
+
+/* Language dropdown menu */
+.language-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  min-width: 150px;
+  background-color: white;
+  border: 1px solid var(--color-border, #dee2e6);
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+  display: none;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+/* Show the dropdown */
+.language-dropdown.show {
+  display: block;
+}
+
+/* Language option */
+.language-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.language-option:hover {
+  background-color: var(--color-bg-hover, #e9ecef);
+}
+
+.language-option.active {
+  background-color: var(--color-bg-selected, #e2e6ea);
+  font-weight: 500;
+}
+
+/* Flag icon in option */
+.language-option span {
+  margin-left: 6px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .language-selector {
+    margin-right: 8px;
+  }
+  
+  .lang-button {
+    padding: 6px 8px;
+  }
+  
+  /* On mobile, only show flag in button */
+  .lang-button span {
+    display: none;
+  }
+  
+  /* But show the language name in dropdown */
+  .language-option span {
+    display: inline;
+  }
+}
+
+/* Animation for dropdown */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.language-dropdown.show {
+  animation: fade-in 0.2s ease forwards;
+} 

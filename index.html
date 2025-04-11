@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Firebase Core -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <!-- Firebase Authentication -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <!-- Firebase Analytics -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+    
+    <!-- Firebase Fallback (for production) -->
+    <script src="js/firebase-fallback.js"></script>
+
+    <!-- Auth Styles -->
+    <link rel="stylesheet" href="styles/auth.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-Intent - Buy to Earn Platform</title>
+    
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="manifest" href="images/site.webmanifest">
+    <link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#007bff">
+    <meta name="msapplication-TileColor" content="#007bff">
+    <meta name="theme-color" content="#007bff">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/auth.css">
+    <link rel="stylesheet" href="styles/notification.css">   
+    <link rel="stylesheet" href="styles/i18n.css">
+    <link rel="stylesheet" href="styles/escrow.css">
+  
+    <!-- Local Auth System -->
+    <script src="js/local-auth.js"></script>
+    
+    <!-- Internationalization -->
+    <script type="module" src="locales/index.js"></script>
+    <script type="module" src="js/i18n.js"></script>
+    
+    <!-- Escrow API Integration -->
+    <script type="module">
+        import * as escrowAPI from './js/api/index.js';
+        // Make escrowAPI available globally
+        window.escrowAPI = escrowAPI;
+    </script>
+</head>
+
+<body>
+    <div id="notification-container" class="notification-container"></div>
+    <div class="container">
+        <header>
+            <button class="menu-toggle" id="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="logo">
+                <i class="fas fa-handshake"></i>
+                <h1>Co-Intent</h1>
+            </div>
+
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#" class="nav-link active" data-page="marketplace" data-i18n="nav.marketplace">Marketplace</a></li>
+                    <li><a href="#" class="nav-link" data-page="portfolio" data-i18n="nav.portfolio">My Portfolio</a></li>
+                    <li><a href="#" class="nav-link" data-page="revenue" data-i18n="nav.revenue">Revenue Sharing</a></li>
+                    <li><a href="#" class="nav-link" data-page="docs" data-i18n="nav.docs">Documentation</a></li>
+                    <li><a href="#" class="nav-link" data-page="support" data-i18n="nav.support">Support</a></li>
+                </ul>
+            </nav>
+
+            <div class="user-controls user-controls-auth">
+                <button class="btn btn-outline" id="connect-wallet-btn" data-i18n="wallet.connectWallet"><i class="fas fa-wallet"></i> Connect Wallet</button>
+                <button class="btn btn-primary" id="sign-in-btn" data-i18n="auth.signIn"><i class="fas fa-user"></i> Sign In</button>
+              </div>
+              <div class="user-controls-logged-in">
+                <div class="btn btn-outline" id="wallet-balance-display" data-modal="deposit-funds-modal">
+                  <i class="fas fa-wallet"></i> <span id="wallet-balance-value">0.00</span> ETH
+                </div>
+                
+                <div class="user-info" id="user-info">
+                  <div class="user-avatar" id="user-avatar">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <span class="user-name" id="user-display-name">User</span>
+                  <i class="fas fa-chevron-down"></i>
+                  
+                  <div class="user-dropdown" id="user-dropdown">
+                    <div class="user-dropdown-item" id="go-to-profile" data-i18n="profile.title" tabindex="0">
+                      <i class="fas fa-user-circle"></i> <span>Профиль</span>
+                    </div>
+                    <div class="user-dropdown-item" id="go-to-wallet" data-i18n="wallet.title" tabindex="0">
+                      <i class="fas fa-wallet"></i> <span>Кошелек</span>
+                    </div>
+                    <div class="user-dropdown-item" id="go-to-portfolio" data-i18n="portfolio.title" tabindex="0">
+                      <i class="fas fa-chart-pie"></i> <span>Портфолио</span>
+                    </div>
+                    <div class="user-dropdown-divider"></div>
+                    <div class="user-dropdown-item" id="sign-out-btn" tabindex="0">
+                      <i class="fas fa-sign-out-alt"></i> <span>Выйти</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </header>
+
+        <!-- Marketplace Page -->
+        <div class="page-content active" id="marketplace">
+            <h1 class="main-title" data-i18n="marketplace.title">Marketplace</h1>
+            <p class="subtitle" data-i18n="marketplace.subtitle">Discover and participate in co-intent projects, fund ideas, and earn from future sales.
+            </p>
+
+            <div class="tabs">
+                <div class="tab active" data-tab="explore" data-parent="marketplace" data-i18n="marketplace.explore">Explore</div>
+                <div class="tab" data-tab="submit" data-parent="marketplace" data-i18n="marketplace.submit">Submit Order</div>
+                <div class="tab" data-tab="executor" data-parent="marketplace" data-i18n="marketplace.executor">Become Executor</div>
+            </div>
+
+            <div class="content-area active" id="explore">
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value">235</div>
+                        <div class="stat-label" data-i18n="marketplace.activeOrders">Active Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$1.2M</div>
+                        <div class="stat-label" data-i18n="marketplace.totalInvested">Total Invested</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">42</div>
+                        <div class="stat-label" data-i18n="marketplace.completedProducts">Completed Products</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$3.5M</div>
+                        <div class="stat-label" data-i18n="marketplace.revenueGenerated">Revenue Generated</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" data-i18n="marketplace.activeOrders">Active Orders</h3>
+                    </div>
+
+                    <div class="order-item">
+                        <div class="order-thumbnail">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="order-details">
+                            <h4 class="order-title">Book on Blockchain Technology</h4>
+                            <div class="order-meta">
+                                <span><i class="fas fa-tag"></i> Education</span>
+                                <span><i class="fas fa-users"></i> 24 Participants</span>
+                                <span><i class="fas fa-calendar"></i> 15 days left</span>
+                            </div>
+                            <p class="order-description">A comprehensive book explaining blockchain technology to beginners with real-world examples and case studies.</p>
+                            <div class="order-participation">
+                                <div class="progress-container">
+                                    <div class="progress-label">
+                                        <span data-i18n="marketplace.fundingProgress">Funding Progress</span>
+                                        <span>$2,400 / $5,000</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 48%;"></div>
+                                    </div>
+                                </div>
+                                <div class="order-actions">
+                                    <button class="btn btn-primary btn-sm participate-btn" data-order-id="1" data-i18n="marketplace.participate"><i class="fas fa-plus"></i> Participate</button>
+                                    <button class="btn btn-outline btn-sm" data-i18n="marketplace.details"><i class="fas fa-info-circle"></i> Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- More order items here... -->
+                </div>
+            </div>
+
+            <div class="content-area" id="submit">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" data-i18n="order.createTitle">Create Order</h3>
+                    </div>
+                    <form id="create-order-form">
+                        <div class="form-group">
+                            <label for="order-title" data-i18n="order.title">Order Title</label>
+                            <input type="text" id="order-title" name="title" data-i18n-placeholder="order.titlePlaceholder" placeholder="Enter a descriptive title for your order" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="order-category">Category</label>
+                            <select id="order-category" name="category">
+                                <option value="">Select a category</option>
+                                <option value="book">Book</option>
+                                <option value="software">Software</option>
+                                <option value="course">Online Course</option>
+                                <option value="research">Research Paper</option>
+                                <option value="design">Design</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="order-description" data-i18n="order.description">Description</label>
+                            <textarea id="order-description" name="description" data-i18n-placeholder="order.descriptionPlaceholder" placeholder="Describe in detail what you want to be created..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="create-order-contractor" data-i18n="order.selectContractor">Select Contractor (Optional)</label>
+                            <select id="create-order-contractor" name="contractor_id">
+                                <option value="" data-i18n="order.selectContractorPlaceholder">-- Select a contractor --</option>
+                                <!-- Contractors will be loaded dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="milestones" data-i18n="order.milestones">Milestones</label>
+                            <p class="form-help" data-i18n="order.milestonesHelp">Define the steps of your project and their costs</p>
+                            
+                            <div id="create-order-milestones-container">
+                                <!-- Milestone fields will be added here -->
+                            </div>
+                            
+                            <button type="button" id="create-order-add-milestone-btn" class="btn btn-secondary">
+                                <i class="fas fa-plus"></i> <span data-i18n="order.addMilestone">Add Milestone</span>
+                            </button>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" data-i18n="order.createOrder">Create Order</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="content-area" id="executor">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Become an Executor</h3>
+                    </div>
+                    <p>Executors are skilled professionals who bring orders to life. They create digital products and receive milestone-based payments.</p>
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-value">$12,350</div>
+                            <div class="stat-label">Avg. Earning per Project</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">10%</div>
+                            <div class="stat-label">Future Revenue Share</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="apply-executor-btn" data-i18n="marketplace.applyExecutor">Apply as Executor</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Page -->
+        <div class="page-content" id="portfolio">
+            <h1 class="main-title">My Portfolio</h1>
+            <p class="subtitle">Track your investments, collected NFTs, and product ownership.</p>
+
+            <div class="content-area">
+                <!-- User Balance & Statistics -->
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="user-balance">0.00 USD</div>
+                        <div class="stat-label">Escrow Balance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="created-orders-count">0</div>
+                        <div class="stat-label">Orders Created</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="joined-orders-count">0</div>
+                        <div class="stat-label">Orders Joined</div>
+                    </div>
+                </div>
+                
+                <!-- User's Orders Tabs -->
+                <div class="tabs escrow-auth-required">
+                    <div class="tab active" data-tab="created-orders" data-parent="portfolio">Created Orders</div>
+                    <div class="tab" data-tab="joined-orders" data-parent="portfolio">Joined Orders</div>
+                    <div class="tab" data-tab="assigned-orders" data-parent="portfolio">Assigned Orders</div>
+                </div>
+                
+                <!-- Created Orders Section -->
+                <div class="content-area active" id="created-orders">
+                    <div class="user-orders-section">
+                        <h3>Orders You Created</h3>
+                        <div id="user-created-orders" class="orders-list">
+                            <!-- Orders will be loaded here dynamically -->
+                            <p class="empty-message">You haven't created any orders yet.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Joined Orders Section -->
+                <div class="content-area" id="joined-orders">
+                    <div class="user-orders-section">
+                        <h3>Orders You Joined</h3>
+                        <div id="user-joined-orders" class="orders-list">
+                            <!-- Orders will be loaded here dynamically -->
+                            <p class="empty-message">You haven't joined any orders yet.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Assigned Orders Section (for contractors) -->
+                <div class="content-area" id="assigned-orders">
+                    <div class="user-orders-section">
+                        <h3>Orders Assigned to You</h3>
+                        <div id="user-assigned-orders" class="orders-list">
+                            <!-- Orders will be loaded here dynamically -->
+                            <p class="empty-message">You don't have any assigned orders.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Sharing Page -->
+        <div class="page-content" id="revenue">
+            <h1 class="main-title">Revenue Sharing</h1>
+            <p class="subtitle">Monitor the returns from your product investments and withdraw your earnings.</p>
+
+            <div class="tabs">
+                <div class="tab active" data-tab="recent-earnings" data-parent="revenue">Recent Earnings</div>
+                <div class="tab" data-tab="withdraw" data-parent="revenue">Withdraw</div>
+            </div>
+
+            <div class="content-area active" id="recent-earnings">
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value">$320</div>
+                        <div class="stat-label">Available Balance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$1,750</div>
+                        <div class="stat-label">Total Earned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">24</div>
+                        <div class="stat-label">Transactions</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Revenue Share Transactions</h3>
+                    </div>
+
+                    <div class="revenue-item">
+                        <div class="revenue-product">Blockchain Basics Book</div>
+                        <div class="revenue-date">3 days ago</div>
+                        <div class="revenue-amount">$45.00</div>
+                    </div>
+
+                    <div class="revenue-item">
+                        <div class="revenue-product">Smart Contract Templates</div>
+                        <div class="revenue-date">1 week ago</div>
+                        <div class="revenue-amount">$63.50</div>
+                    </div>
+
+                    <div class="revenue-item">
+                        <div class="revenue-product">Blockchain Basics Book</div>
+                        <div class="revenue-date">2 weeks ago</div>
+                        <div class="revenue-amount">$42.00</div>
+                    </div>
+
+                    <!-- More revenue items here... -->
+                </div>
+            </div>
+
+            <div class="content-area" id="withdraw">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Withdraw Earnings</h3>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-value">$320</div>
+                            <div class="stat-label">Available to Withdraw</div>
+                        </div>
+                    </div>
+                    <form>
+                        <div class="form-group">
+                            <label for="withdraw-amount">Amount to Withdraw</label>
+                            <input type="number" id="withdraw-amount" placeholder="Enter amount" max="320">
+                        </div>
+                        <div class="form-group">
+                            <label for="withdraw-wallet">Wallet Address</label>
+                            <input type="text" id="withdraw-wallet" placeholder="Enter your wallet address">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Withdraw Funds</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div class="page-content" id="profile">
+            <h1 class="main-title">Profile</h1>
+            <p class="subtitle">Manage your account information and settings.</p>
+
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2>John Doe</h2>
+                        <p>john.doe@example.com</p>
+                        <p>Member since: January 2023</p>
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">10</div>
+                        <div class="stat-label">Investments</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">NFTs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$1,250</div>
+                        <div class="stat-label">Total Earnings</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h3 class="profile-section-title">Account Settings</h3>
+                <div class="card">
+                    <form>
+                        <div class="form-group">
+                            <label for="profile-name">Full Name</label>
+                            <input type="text" id="profile-name" value="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-email">Email</label>
+                            <input type="email" id="profile-email" value="john.doe@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-bio">Bio</label>
+                            <textarea id="profile-bio" placeholder="Tell us about yourself"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h3 class="profile-section-title">Security</h3>
+                <div class="card">
+                    <form>
+                        <div class="form-group">
+                            <label for="current-password">Current Password</label>
+                            <input type="password" id="current-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-password">New Password</label>
+                            <input type="password" id="new-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-password">Confirm New Password</label>
+                            <input type="password" id="confirm-password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h3 class="profile-section-title">Notifications</h3>
+                <div class="card">
+                    <form>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" checked> Email notifications for new investment opportunities
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" checked> Revenue share payment notifications
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox"> Marketing updates and newsletters
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Preferences</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wallet Page -->
+        <div class="page-content" id="wallet">
+            <h1 class="main-title">Wallet</h1>
+            <p class="subtitle">Manage your digital assets and transactions.</p>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">My Wallet</h3>
+                </div>
+                <div class="wallet-balance">1,250.75 <span class="wallet-currency">ETH</span></div>
+                <div class="wallet-actions">
+                    <button class="btn btn-primary" id="wallet-deposit-btn" data-modal="deposit-funds-modal"><i class="fas fa-plus"></i> Deposit</button>
+                    <button class="btn btn-outline"><i class="fas fa-arrow-right"></i> Withdraw</button>
+                    <button class="btn btn-outline"><i class="fas fa-exchange-alt"></i> Transfer</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Escrow Balance</h3>
+                </div>
+                <div class="wallet-balance">
+                    <span id="escrow-balance-value">0.00</span> <span class="wallet-currency">USD</span>
+                </div>
+                <p class="wallet-info">This balance is used for participating in group orders and is stored in escrow accounts.</p>
+                <div class="wallet-actions">
+                    <button class="btn btn-primary" id="escrow-deposit-btn" data-modal="deposit-funds-modal"><i class="fas fa-plus"></i> Deposit to Escrow</button>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h3 class="profile-section-title">Transaction History</h3>
+                <div class="card">
+                    <div class="transaction-item transaction-incoming">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Deposit</div>
+                            <div class="transaction-date">12 May 2023, 15:30</div>
+                        </div>
+                        <div class="transaction-amount positive">+0.5 ETH</div>
+                    </div>
+
+                    <div class="transaction-item transaction-outgoing">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Investment in "Blockchain Basics Book"</div>
+                            <div class="transaction-date">10 May 2023, 12:45</div>
+                        </div>
+                        <div class="transaction-amount negative">-0.25 ETH</div>
+                    </div>
+
+                    <div class="transaction-item transaction-incoming">
+                        <div class="transaction-info">
+                            <div class="transaction-title">Revenue Share</div>
+                            <div class="transaction-date">5 May 2023, 09:15</div>
+                        </div>
+                        <div class="transaction-amount positive">+0.15 ETH</div>
+                    </div>
+
+                    <!-- More transaction items here... -->
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h3 class="profile-section-title">Connect External Wallet</h3>
+                <div class="card">
+                    <p>Connect with third-party wallets to easily move funds between accounts.</p>
+                    <div class="wallet-actions" style="margin-top: 20px;">
+                        <button class="btn btn-outline"><i class="fab fa-ethereum"></i> MetaMask</button>
+                        <button class="btn btn-outline"><i class="fas fa-wallet"></i> Trust Wallet</button>
+                        <button class="btn btn-outline"><i class="fas fa-coins"></i> Coinbase Wallet</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documentation Page -->
+        <div class="page-content" id="docs">
+            <h1 class="main-title" data-i18n="docs.title">Platform Documentation</h1>
+            <p class="subtitle" data-i18n="docs.subtitle">Learn how the Co-Intent platform works and how to make the most of it.</p>
+
+            <div class="card">
+                <div class="doc-section">
+                    <h2 class="doc-section-title" data-i18n="docs.howItWorks">How It Works</h2>
+                    <p class="doc-text" data-i18n="docs.howItWorksDescription">The Co-Intent platform allows customers to jointly fund the creation of digital products, receive ownership NFTs, and earn from future sales revenue. Here's how the process works:</p>
+                    <ol>
+                        <li data-i18n="docs.orderSystem"><strong>Order System:</strong> Customers submit orders; an AI assistant groups similar requests.</li>
+                        <li data-i18n="docs.escrowPayments"><strong>Escrow Payments:</strong> Prepayments are stored in an escrow account.</li>
+                        <li data-i18n="docs.executorWorkflow"><strong>Executor Workflow:</strong> Executors accept orders, create digital products (e.g., books, software, videos), and receive milestone-based payments from escrow.</li>
+                        <li data-i18n="docs.tokenization"><strong>Tokenization:</strong> Completed products are tokenized; customers receive NFTs with serial numbers.</li>
+                        <li data-i18n="docs.revenueSharing"><strong>Revenue Sharing:</strong> Future sales revenues are split (e.g., 10% to creator, 10% to platform, 10% to costs, 70% to buyers—initial and subsequent—in varying proportions).</li>
+                        <li data-i18n="docs.customerReturns"><strong>Customer Returns:</strong> Initial customers recover their investment, receive the product, and earn 100% profit; subsequent buyers get the product and potential compensation.</li>
+                        <li data-i18n="docs.slidingIncomeWindow"><strong>Sliding Income Window:</strong> Main revenue is distributed among recent buyers (e.g., last 5,000), ensuring most participants can recoup investments.</li>
+                    </ol>
+                </div>
+
+                <div class="doc-section">
+                    <h2 class="doc-section-title" data-i18n="docs.forCustomers">For Customers</h2>
+                    <p class="doc-text" data-i18n="docs.customersDescription">As a customer, you can:</p>
+                    <ul>
+                        <li data-i18n="docs.customersSubmit">Submit orders for digital products you'd like to see created</li>
+                        <li data-i18n="docs.customersParticipate">Participate in funding existing orders</li>
+                        <li data-i18n="docs.customersReceiveNFTs">Receive NFTs representing your ownership of completed products</li>
+                        <li data-i18n="docs.customersEarn">Earn revenue from future sales of products you've invested in</li>
+                        <li data-i18n="docs.customersTrack">Track your investments and earnings through your portfolio</li>
+                    </ul>
+                </div>
+
+                <div class="doc-section">
+                    <h2 class="doc-section-title" data-i18n="docs.forExecutors">For Executors</h2>
+                    <p class="doc-text" data-i18n="docs.executorsDescription">As an executor, you can:</p>
+                    <ul>
+                        <li data-i18n="docs.executorsBrowse">Browse and accept orders that match your skills</li>
+                        <li data-i18n="docs.executorsReceive">Receive milestone-based payments as you complete work</li>
+                        <li data-i18n="docs.executorsRetain">Retain a share of future revenue from products you create</li>
+                        <li data-i18n="docs.executorsBuild">Build a portfolio and reputation on the platform</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support Page -->
+        <div class="page-content" id="support">
+            <h1 class="main-title" data-i18n="support.title">Support Center</h1>
+            <p class="subtitle" data-i18n="support.subtitle">Need help? We're here for you.</p>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title" data-i18n="support.faq">Frequently Asked Questions</div>
+                </div>
+
+                <div class="support-faq">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-i18n="support.faq_what_is_cointent_q">What is Co-Intent?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <span data-i18n="support.faq_what_is_cointent_a">Co-Intent is a platform that enables collaborative funding of digital products. Users can submit or fund product ideas, while executors create these products. Once completed, products are tokenized as NFTs, and future sales revenue is shared among all participants.</span>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-i18n="support.faq_how_earn_q">How do I earn from my investments?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <span data-i18n="support.faq_how_earn_a">When you invest in a product, you receive an NFT representing your ownership. As the product sells to new customers, you receive a share of the revenue. The revenue sharing model allocates 70% of sales to NFT holders, with the remaining split between creators and the platform.</span>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-i18n="support.faq_products_types_q">What types of products can be created?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <span data-i18n="support.faq_products_types_a">The platform supports various digital products including books, software, online courses, research papers, designs, and more. Any digital product that can be tokenized and distributed is eligible.</span>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-i18n="support.faq_become_executor_q">How do I become an executor?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <span data-i18n="support.faq_become_executor_a">To become an executor, you need to apply through the "Become Executor" section. You'll be asked to provide details about your skills, experience, and the types of projects you can execute. Once approved, you can start accepting orders.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" data-i18n="support.contactSupport">Contact Support</h3>
+                </div>
+                <form>
+                    <div class="form-group">
+                        <label for="support-name" data-i18n="support.yourName">Your Name</label>
+                        <input type="text" id="support-name" data-i18n-placeholder="support.yourName" placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="support-email" data-i18n="support.emailAddress">Email Address</label>
+                        <input type="email" id="support-email" data-i18n-placeholder="support.emailAddress" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="support-subject" data-i18n="support.subject">Subject</label>
+                        <input type="text" id="support-subject" data-i18n-placeholder="support.subject" placeholder="What is your query about?">
+                    </div>
+                    <div class="form-group">
+                        <label for="support-message" data-i18n="support.message">Message</label>
+                        <textarea id="support-message" data-i18n-placeholder="support.message" placeholder="Describe your issue or question in detail"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" data-i18n="support.sendMessage">Send Message</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <div class="modal" id="order-detail-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Order Details</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-row">
+                        <div class="modal-row-label">Order Title:</div>
+                        <div class="modal-row-value">Book on Blockchain Technology</div>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-row-label">Category:</div>
+                        <div class="modal-row-value">Education</div>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-row-label">Total Funding:</div>
+                        <div class="modal-row-value">$5,000</div>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-row-label">Current Progress:</div>
+                        <div class="modal-row-value">$2,400 (48%)</div>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-row-label">Participants:</div>
+                        <div class="modal-row-value">24</div>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-row-label">Deadline:</div>
+                        <div class="modal-row-value">15 days left</div>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-row-label">Description:</div>
+                        <div class="modal-row-value">A comprehensive book explaining blockchain technology to beginners with real-world examples and case studies.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline">Close</button>
+                    <button class="btn btn-primary">Participate</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="participation-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Participate in Order</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-row">
+                        <div class="modal-row-label">Order Title:</div>
+                        <div class="modal-row-value">Book on Blockchain Technology</div>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-row-label">Min. Participation:</div>
+                        <div class="modal-row-value">$50</div>
+                    </div>
+                    <div class="modal-row">
+                        <div class="modal-row-label">Your Wallet Balance:</div>
+                        <div class="modal-row-value">$1,250.75</div>
+                    </div>
+                    <form>
+                        <div class="form-group">
+                            <label for="participation-amount">Participation Amount ($)</label>
+                            <input type="number" id="participation-amount" min="50" placeholder="Enter amount">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline">Cancel</button>
+                    <button class="btn btn-primary">Confirm Participation</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auth Modal -->
+        <div class="modal auth-modal" id="auth-modal">
+          <div class="auth-content">
+            <div class="auth-tabs">
+              <div class="auth-tab active" data-target="sign-in-tab" data-i18n="auth.signIn">Вход</div>
+              <div class="auth-tab" data-target="sign-up-tab" data-i18n="auth.signUp">Регистрация</div>
+              <div class="auth-tab" data-target="reset-password-tab" data-i18n="auth.resetPassword">Сброс пароля</div>
+            </div>
+            
+            <!-- Sign In Tab -->
+            <div class="auth-tab-content active" id="sign-in-tab">
+              <div class="auth-header">
+                <h3 class="auth-title" data-i18n="auth.signIn">Вход в систему</h3>
+                <p class="auth-subtitle">Войдите в свой аккаунт</p>
+              </div>
+              
+              <div class="social-login-buttons">
+                <button class="btn btn-google" id="google-sign-in">
+                  <i class="fab fa-google"></i> <span data-i18n="auth.signInWith">Войти через</span> Google
+                </button>
+              </div>
+              
+              <div class="auth-divider">
+                <span data-i18n="auth.or">или</span>
+              </div>
+              
+              <form id="sign-in-form">
+                <div class="form-group">
+                  <label for="sign-in-email" data-i18n="auth.email">Email</label>
+                  <input type="email" id="sign-in-email" data-i18n-placeholder="auth.enterEmail" placeholder="Введите email" required>
+                </div>
+                <div class="form-group">
+                  <label for="sign-in-password" data-i18n="auth.password">Пароль</label>
+                  <input type="password" id="sign-in-password" data-i18n-placeholder="auth.enterPassword" placeholder="Введите пароль" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="auth.signIn">Войти</button>
+              </form>
+              
+              <div class="auth-footer">
+                <p><span data-i18n="auth.noAccount">Нет аккаунта?</span> <a id="switch-to-signup" data-i18n="auth.signUp">Зарегистрироваться</a></p>
+                <p><span data-i18n="auth.forgotPassword">Забыли пароль?</span> <a id="switch-to-reset" data-i18n="auth.resetPassword">Сбросить пароль</a></p>
+              </div>
+            </div>
+            
+            <!-- Sign Up Tab -->
+            <div class="auth-tab-content" id="sign-up-tab">
+              <div class="auth-header">
+                <h3 class="auth-title" data-i18n="auth.signUp">Регистрация</h3>
+                <p class="auth-subtitle">Создайте новый аккаунт</p>
+              </div>
+              
+              <div class="social-login-buttons">
+                <button class="btn btn-google" id="google-sign-up">
+                  <i class="fab fa-google"></i> <span data-i18n="auth.signUpWith">Зарегистрироваться через</span> Google
+                </button>
+              </div>
+              
+              <div class="auth-divider">
+                <span data-i18n="auth.or">или</span>
+              </div>
+              
+              <form id="sign-up-form">
+                <div class="form-group">
+                  <label for="sign-up-name" data-i18n="auth.name">Имя</label>
+                  <input type="text" id="sign-up-name" data-i18n-placeholder="auth.enterName" placeholder="Введите имя" required>
+                </div>
+                <div class="form-group">
+                  <label for="sign-up-email" data-i18n="auth.email">Email</label>
+                  <input type="email" id="sign-up-email" data-i18n-placeholder="auth.enterEmail" placeholder="Введите email" required>
+                </div>
+                <div class="form-group">
+                  <label for="sign-up-password" data-i18n="auth.password">Пароль</label>
+                  <input type="password" id="sign-up-password" data-i18n-placeholder="auth.enterPassword" placeholder="Введите пароль" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="auth.signUp">Зарегистрироваться</button>
+              </form>
+              
+              <div class="auth-footer">
+                <p><span data-i18n="auth.haveAccount">Уже есть аккаунт?</span> <a id="switch-to-signin" data-i18n="auth.signIn">Войти</a></p>
+              </div>
+            </div>
+            
+            <!-- Reset Password Tab -->
+            <div class="auth-tab-content" id="reset-password-tab">
+              <div class="auth-header">
+                <h3 class="auth-title" data-i18n="auth.resetPassword">Сброс пароля</h3>
+                <p class="auth-subtitle" data-i18n="auth.resetInstructions">Укажите email для получения инструкций</p>
+              </div>
+              
+              <form id="reset-password-form">
+                <div class="form-group">
+                  <label for="reset-email" data-i18n="auth.email">Email</label>
+                  <input type="email" id="reset-email" data-i18n-placeholder="auth.enterEmail" placeholder="Введите email" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" data-i18n="auth.sendInstructions">Отправить инструкцию</button>
+              </form>
+              
+              <div class="auth-footer">
+                <p><span data-i18n="auth.haveAccount">Вспомнили пароль?</span> <a id="switch-to-signin-from-reset" data-i18n="auth.signIn">Войти</a></p>
+              </div>
+            </div>
+            
+            <button class="modal-close">&times;</button>
+          </div>
+        </div>
+
+        <!-- Модальные окна для эскроу-функциональности -->
+        
+        <!-- Модальное окно создания группового заказа -->
+        <div class="modal" id="create-order-modal">
+            <div class="modal-container">
+                <h3 class="modal-title" data-i18n="order.createTitle">Create Group Order</h3>
+                <form id="modal-create-order-form">
+                    <div class="form-group">
+                        <label for="modal-title" data-i18n="order.title">Order Title</label>
+                        <input type="text" id="modal-title" name="title" data-i18n-placeholder="order.titlePlaceholder" placeholder="Enter a descriptive title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="modal-description" data-i18n="order.description">Description</label>
+                        <textarea id="modal-description" name="description" data-i18n-placeholder="order.descriptionPlaceholder" placeholder="Describe what you want to create" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="modal-contractor-id" data-i18n="order.selectContractor">Select Contractor (Optional)</label>
+                        <select id="modal-contractor-id" name="contractor_id">
+                            <option value="" data-i18n="order.selectContractorPlaceholder">-- Select a contractor --</option>
+                            <!-- Contractors will be loaded dynamically -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="modal-milestones" data-i18n="order.milestones">Milestones</label>
+                        <p class="form-help" data-i18n="order.milestonesHelp">Define the steps of your project and their costs</p>
+                        
+                        <div id="modal-milestones-container">
+                            <!-- Milestone fields will be added here -->
+                        </div>
+                        
+                        <button type="button" id="modal-add-milestone-btn" class="btn btn-secondary">
+                            <i class="fas fa-plus"></i> <span data-i18n="order.addMilestone">Add Milestone</span>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary" data-i18n="order.createOrder">Create Order</button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('create-order-modal')" data-i18n="order.cancel">Cancel</button>
+                    </div>
+                </form>
+                <button class="modal-close">&times;</button>
+            </div>
+        </div>
+        
+        <!-- Модальное окно пополнения баланса -->
+        <div class="modal" id="deposit-funds-modal">
+            <div class="modal-container">
+                <h3 class="modal-title">Deposit Funds</h3>
+                <form id="deposit-form">
+                    <div class="form-group">
+                        <label for="deposit_amount">Amount (USD)</label>
+                        <input type="number" id="deposit_amount" name="deposit_amount" min="1" step="0.01" placeholder="Enter amount to deposit" required>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary">Deposit</button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('deposit-funds-modal')">Cancel</button>
+                    </div>
+                </form>
+                <button class="modal-close">&times;</button>
+            </div>
+        </div>
+        
+        <!-- Модальное окно участия в заказе -->
+        <div class="modal" id="participate-modal">
+            <div class="modal-container">
+                <h3 class="modal-title">Participate in Order</h3>
+                <div class="order-summary">
+                    <div class="info-row">
+                        <div class="modal-row-label">Order Title:</div>
+                        <div class="modal-row-value" id="participate-order-title">Loading...</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="modal-row-label">Total Cost:</div>
+                        <div class="modal-row-value" id="participate-order-cost">$0.00</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="modal-row-label">Current Funding:</div>
+                        <div class="modal-row-value" id="participate-order-funding">0%</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="modal-row-label">Your Balance:</div>
+                        <div class="modal-row-value" id="participate-user-balance">$0.00</div>
+                    </div>
+                </div>
+                
+                <form id="participate-form">
+                    <input type="hidden" id="order_id" name="order_id">
+                    
+                    <div class="form-group">
+                        <label for="contribution_amount">Contribution Amount (USD)</label>
+                        <input type="number" id="contribution_amount" name="contribution_amount" min="1" step="0.01" placeholder="Enter your contribution" required>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary">Contribute</button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('participate-modal')">Cancel</button>
+                    </div>
+                </form>
+                <button class="modal-close">&times;</button>
+            </div>
+        </div>
+        
+        <!-- Модальное окно голосования за представителя -->
+        <div class="modal" id="vote-representative-modal">
+            <div class="modal-container">
+                <h3 class="modal-title">Vote for Representative</h3>
+                <p class="modal-subtitle">Choose a contributor to represent the group</p>
+                
+                <form id="vote-representative-form">
+                    <input type="hidden" name="order_id">
+                    
+                    <!-- Содержимое формы будет добавлено динамически -->
+                    
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary">Submit Vote</button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('vote-representative-modal')">Cancel</button>
+                    </div>
+                </form>
+                <button class="modal-close">&times;</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize progress bars
+        document.querySelectorAll('.progress-fill').forEach(bar => {
+            setTimeout(() => {
+                bar.style.width = bar.style.width || '0%';
+            }, 100);
+        });
+
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu');
+        const mainNav = document.getElementById('main-nav');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mainNav.style.display = mainNav.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Navigation functionality between pages
+        document.querySelectorAll('.nav-link').forEach(menuItem => {
+            menuItem.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // Remove active class from all menu items
+                document.querySelectorAll('.nav-link').forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // Add active class to clicked menu item
+                menuItem.classList.add('active');
+
+                // Hide all pages
+                document.querySelectorAll('.page-content').forEach(page => {
+                    page.classList.remove('active');
+                });
+
+                // Show the selected page
+                const page = menuItem.getAttribute('data-page');
+                document.getElementById(page).classList.add('active');
+
+                // Hide mobile menu if open
+                if (window.innerWidth < 768) {
+                    mainNav.style.display = 'none';
+                }
+            });
+        });
+
+        // Tab functionality within pages
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const parentPage = tab.getAttribute('data-parent');
+                const targetTab = tab.getAttribute('data-tab');
+
+                // Remove active class from all tabs in the parent
+                document.querySelectorAll(`#${parentPage} .tab`).forEach(t => {
+                    t.classList.remove('active');
+                });
+
+                // Add active class to clicked tab
+                tab.classList.add('active');
+
+                // Hide all content areas in the parent
+                document.querySelectorAll(`#${parentPage} .content-area`).forEach(c => c.classList.remove('active'));
+
+                // Show the selected content area
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+
+        // Modal functionality
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+        
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        function setupModal(triggerSelector, modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            
+            const closeBtn = modal.querySelector('.modal-close');
+            const cancelBtn = modal.querySelector('.btn-outline');
+
+            document.querySelectorAll(triggerSelector).forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    modal.style.display = 'flex';
+                });
+            });
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                });
+            }
+
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                });
+            }
+
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        // Setup modals
+        setupModal('.btn-outline[data-modal="order-detail"]', 'order-detail-modal');
+        setupModal('.btn-primary[data-modal="participation"]', 'participation-modal');
+        
+        // Setup wallet and deposit modals
+        setupModal('#wallet-balance-display', 'deposit-funds-modal');
+        setupModal('#wallet-deposit-btn', 'deposit-funds-modal');
+        setupModal('#escrow-deposit-btn', 'deposit-funds-modal');
+        
+        // Setup escrow modals
+        setupModal('.participate-btn', 'participate-modal');
+        
+        // Notification functionality
+        function showNotification(message, type = 'info', duration = 3000) {
+            // Получаем текущий язык интерфейса
+            const currentLang = document.documentElement.lang || 'en';
+            
+            // Перевод сообщения, если доступен
+            if (typeof getCurrentLanguageMessage === 'function') {
+                if (typeof message === 'string' && 
+                   (message.startsWith('marketplace.') || 
+                    message.startsWith('escrow.') || 
+                    message.startsWith('order.'))) {
+                    message = getCurrentLanguageMessage(message);
+                }
+            }
+            
+            // Проверяем, если сообщение на русском, но язык интерфейса не русский - 
+            // переключаемся на английские эквиваленты
+            if (currentLang !== 'ru' && /[а-яА-ЯёЁ]/.test(message)) {
+                // Словарь русско-английских соответствий для частых уведомлений
+                const translations = {
+                    'Заказ успешно создан': 'Order created successfully',
+                    'Эскроу-функциональность загружена': 'Escrow functionality loaded',
+                    'Максимальное количество этапов - 10': 'Maximum number of milestones is 10',
+                    'Ошибка создания заказа': 'Error creating order',
+                    'Успешно пополнен баланс': 'Successfully deposited funds',
+                    'Пользователь успешно присоединился к заказу': 'Successfully joined the order',
+                    'Этап работы отмечен как выполненный': 'Milestone marked as complete',
+                    'Акт выполненных работ подписан': 'Act signed successfully',
+                    'Голос за представителя учтен': 'Vote for representative submitted'
+                };
+                
+                // Ищем соответствие или используем оригинал
+                for (const [ru, en] of Object.entries(translations)) {
+                    if (message.includes(ru)) {
+                        message = message.replace(ru, en);
+                        break;
+                    }
+                }
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            
+            // Иконка зависит от типа уведомления
+            let iconClass = type === 'success' ? 'fa-check-circle' : 
+                            type === 'error' ? 'fa-exclamation-circle' : 
+                            type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            
+            // Создаем содержимое уведомления
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="fas ${iconClass}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close">&times;</button>
+            `;
+            
+            // Добавляем в DOM
+            const container = document.getElementById('notification-container');
+            if (!container) {
+                // Если контейнер уведомлений не существует, создаем его
+                const notificationContainer = document.createElement('div');
+                notificationContainer.id = 'notification-container';
+                document.body.appendChild(notificationContainer);
+                notificationContainer.appendChild(notification);
+            } else {
+                container.appendChild(notification);
+            }
+            
+            // Показываем уведомление
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // Добавляем обработчик закрытия
+            const closeBtn = notification.querySelector('.notification-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    closeNotification(notification);
+                });
+            }
+            
+            // Автоматически закрываем уведомление через указанное время
+            if (duration > 0) {
+                setTimeout(() => {
+                    closeNotification(notification);
+                }, duration);
+            }
+        }
+
+        // Функция закрытия уведомления
+        function closeNotification(notification) {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }
+
+        // FAQ toggle
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                answer.classList.toggle('show');
+                
+                // Toggle icon
+                const icon = question.querySelector('i');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                mainNav.style.display = '';
+            }
+        });
+
+        // User orders section rendering with proper i18n and styling
+        function renderOrders(orders, userOrders = null) {
+            const ordersContainer = document.querySelector('#explore .card');
+            if (!ordersContainer) return;
+            
+            // Clear previous orders except the header
+            const header = ordersContainer.querySelector('.card-header');
+            ordersContainer.innerHTML = '';
+            ordersContainer.appendChild(header);
+            
+            // Если у пользователя есть заказы, отображаем их в отдельном разделе
+            if (userOrders && userOrders.length > 0) {
+                // Создаем раздел "Your Orders"
+                const userOrdersSection = document.createElement('div');
+                userOrdersSection.className = 'user-orders-section';
+                
+                // Добавляем заголовок
+                const userOrdersHeader = document.createElement('h3');
+                userOrdersHeader.className = 'section-title';
+                userOrdersHeader.innerHTML = '<i class="fas fa-clipboard-list"></i> <span data-i18n="marketplace.yourOrders">Your Orders</span>';
+                userOrdersSection.appendChild(userOrdersHeader);
+                
+                // Добавляем заказы пользователя
+                userOrders.forEach(order => {
+                    const orderElement = createOrderElement(order, true);
+                    userOrdersSection.appendChild(orderElement);
+                });
+                
+                // Добавляем разделитель
+                const divider = document.createElement('hr');
+                divider.className = 'section-divider';
+                userOrdersSection.appendChild(divider);
+                
+                // Добавляем раздел к контейнеру
+                ordersContainer.appendChild(userOrdersSection);
+            }
+            
+            // Проверяем, есть ли заказы для отображения в общем списке
+            if (orders.length === 0) {
+                const emptyMessage = document.createElement('p');
+                emptyMessage.textContent = 'Нет активных заказов';
+                emptyMessage.setAttribute('data-i18n', 'marketplace.noActiveOrders');
+                emptyMessage.style.textAlign = 'center';
+                emptyMessage.style.padding = '20px';
+                ordersContainer.appendChild(emptyMessage);
+                return;
+            }
+            
+            // Добавляем заголовок для всех заказов, если были показаны заказы пользователя
+            if (userOrders && userOrders.length > 0) {
+                const allOrdersHeader = document.createElement('h3');
+                allOrdersHeader.className = 'section-title';
+                allOrdersHeader.innerHTML = '<i class="fas fa-globe"></i> <span data-i18n="marketplace.allActiveOrders">All Active Orders</span>';
+                ordersContainer.appendChild(allOrdersHeader);
+            }
+            
+            // Добавляем все заказы
+            orders.forEach(order => {
+                // Если это заказ пользователя и он уже был показан в разделе "Твои заказы", не показываем его снова
+                if (userOrders && userOrders.some(userOrder => userOrder.id === order.id)) {
+                    return;
+                }
+                const orderElement = createOrderElement(order);
+                ordersContainer.appendChild(orderElement);
+            });
+        }
+
+        // Create an order element with improved styling
+        function createOrderElement(order, isInPortfolio = false) {
+            const orderItem = document.createElement('div');
+            orderItem.className = isInPortfolio ? 'order-item user-order-card' : 'order-item card mb-3';
+            orderItem.id = `order-${order.id}`;
+            
+            // Убедимся, что у нас есть корректные данные о цене/бюджете
+            const orderPrice = typeof order.budget === 'number' ? order.budget : 
+                              (typeof order.budget === 'string' ? parseFloat(order.budget) : 0);
+            const orderCurrency = order.currency || 'USD';
+            
+            let orderContent = '';
+            
+            if (isInPortfolio) {
+                // Enhanced styling for user orders
+                orderContent = `
+                    <div class="order-card-inner">
+                        <h6 class="order-title">${order.title}</h6>
+                        <div class="order-meta">
+                            <span class="order-price"><i class="fas fa-coins"></i> ${orderPrice} ${orderCurrency}</span>
+                            <span class="order-date"><i class="fas fa-calendar-alt"></i> ${formatDate(order.createdAt)}</span>
+                            <span class="user-badge"><i class="fas fa-user"></i> ${getCurrentUserId() === order.userId ? 'Вы' : order.userName || 'Пользователь'}</span>
+                        </div>
+                        <p class="order-description">${order.description.substring(0, 100)}${order.description.length > 100 ? '...' : ''}</p>
+                        <div class="order-actions">
+                            <button class="btn btn-sm btn-primary view-order-details" data-order-id="${order.id}">
+                                <i class="fas fa-eye"></i> <span data-i18n="marketplace.viewDetails">View Details</span>
+                            </button>
+                            <button class="btn btn-sm btn-success participate-btn" data-order-id="${order.id}">
+                                <i class="fas fa-handshake"></i> <span data-i18n="marketplace.participate">Participate</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Enhanced styling for marketplace orders
+                orderContent = `
+                    <div class="card-body">
+                        <h5 class="card-title">${order.title}</h5>
+                        <p class="card-text">${order.description}</p>
+                        <div class="order-meta">
+                            <span class="price-tag"><i class="fas fa-tag"></i> ${orderPrice} ${orderCurrency}</span>
+                            <span class="order-date"><i class="fas fa-calendar-alt"></i> ${formatDate(order.createdAt)}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <button class="btn btn-sm btn-primary view-order-details" data-order-id="${order.id}">
+                                <i class="fas fa-eye"></i> <span data-i18n="marketplace.viewDetails">View Details</span>
+                            </button>
+                            <button class="btn btn-sm btn-success participate-btn" data-order-id="${order.id}">
+                                <i class="fas fa-handshake"></i> <span data-i18n="marketplace.participate">Participate</span>
+                            </button>
+                        </div>
+                        ${getCurrentUserId() === order.userId ? '<span class="badge bg-info float-end user-order-badge" data-i18n="marketplace.yourOrder">Your Order</span>' : ''}
+                    </div>
+                `;
+            }
+            
+            orderItem.innerHTML = orderContent;
+            
+            // Add styles directly to the order item
+            if (isInPortfolio) {
+                orderItem.style.border = '1px solid #ddd';
+                orderItem.style.borderRadius = '8px';
+                orderItem.style.padding = '15px';
+                orderItem.style.margin = '10px 0';
+                orderItem.style.backgroundColor = '#f8f9fa';
+                orderItem.style.transition = 'transform 0.2s, box-shadow 0.2s';
+                orderItem.style.cursor = 'pointer';
+                
+                // Add hover effect
+                orderItem.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                });
+                
+                orderItem.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            }
+            
+            // Добавляем обработчик событий для кнопки подробностей
+            const viewDetailsBtn = orderItem.querySelector('.view-order-details');
+            if (viewDetailsBtn) {
+                viewDetailsBtn.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    showOrderDetails(orderId);
+                });
+            }
+            
+            // Добавляем обработчик событий для кнопки участия
+            const participateBtn = orderItem.querySelector('.participate-btn');
+            if (participateBtn) {
+                participateBtn.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    // Проверка авторизации
+                    if (!isUserAuthenticated()) {
+                        showModal('auth-modal');
+                        return;
+                    }
+                    showModal('participate-modal');
+                    document.getElementById('order_id').value = orderId;
+                });
+            }
+            
+            return orderItem;
+        }
+    </script>
+
+    <style>
+        /* Add styles for order cards */
+        .order-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 15px;
+        }
+        
+        .user-order-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            background: linear-gradient(to right, #f9f9f9, #ffffff);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .order-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .order-title {
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .order-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .order-price {
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .order-description {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .user-badge {
+            background-color: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .user-order-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            color: #495057;
+            padding: 10px 0;
+            border-bottom: 2px solid #f1f1f1;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #007bff;
+        }
+        
+        .section-divider {
+            margin: 20px 0;
+            border-top: 1px dashed #e0e0e0;
+        }
+    </style>
+
+    <!-- Firebase Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/tests.js"></script>
+    <script type="module" src="js/revenue-calculator.js"></script>
+    
+    <!-- Escrow Module -->
+    <script type="module" src="js/escrow/index.js"></script>
+
+    <script type="module">
+        import escrowUI from './js/escrow/ui.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Setup modal display for buttons
+            setupModal('#deposit-funds-btn', 'deposit-funds-modal');
+            setupModal('.participate-btn', 'participate-modal');
+            setupModal('#wallet-balance', 'deposit-funds-modal');
+            setupModal('#escrow-deposit-btn', 'deposit-funds-modal');
+            
+            // Модальные окна для создания заказа и другой функциональности
+            function setupModal(buttonSelector, modalId) {
+                document.querySelectorAll(buttonSelector).forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        if (modalId === 'participate-modal' && button.dataset.orderId) {
+                            document.querySelector('#participate-form [name="order_id"]').value = button.dataset.orderId;
+                        }
+                        showModal(modalId);
+                    });
+                });
+            }
+        });
+    </script>
+    
+    <script>
+        // Функция для получения локализованных сообщений
+        window.getCurrentLanguageMessage = function(key) {
+            // Получаем текущий язык
+            const lang = document.documentElement.lang || 'en';
+            
+            // Если есть доступ к переводам, используем их
+            if (window.ru && window.en && window.es) {
+                if (lang === 'ru') {
+                    return getNestedProperty(window.ru, key) || key;
+                } else if (lang === 'es') {
+                    return getNestedProperty(window.es, key) || key;
+                } else {
+                    return getNestedProperty(window.en, key) || key;
+                }
+            }
+            
+            // Функция для получения вложенных свойств объекта
+            function getNestedProperty(obj, path) {
+                const parts = path.split('.');
+                let current = obj;
+                
+                for (const part of parts) {
+                    if (current && typeof current === 'object' && part in current) {
+                        current = current[part];
+                    } else {
+                        return undefined;
+                    }
+                }
+                
+                return current;
+            }
+            
+            // Возвращаем ключ, если нет переводов
+            return key;
+        };
+    
+        // Initialize progress bars
+        document.querySelectorAll('.progress-fill').forEach(bar => {
+            setTimeout(() => {
+                bar.style.width = bar.style.width || '0%';
+            }, 100);
+        });
+    </script>
+</body>
+
+</html> 
