@@ -155,7 +155,32 @@ const es = {
     executorsBrowse: "Explorar y aceptar pedidos que coincidan con sus habilidades",
     executorsReceive: "Recibir pagos basados en hitos a medida que completa el trabajo",
     executorsRetain: "Retener una parte de los ingresos futuros de los productos que crea",
-    executorsBuild: "Construir un portafolio y reputación en la plataforma"
+    executorsBuild: "Construir un portafolio y reputación en la plataforma",
+    // Ecosistema Ateira
+    ecosystem: "Ecosistema Ateira",
+    ecosystemDescription: "Ateira es un ecosistema unificado de proyectos, que incluye Co-Intent y otras plataformas interconectadas:",
+    ecosystemNoosits: " un juego con un compañero de IA donde los usuarios pueden desarrollar su asistente digital.",
+    ecosystemLoreland: " una plataforma para aprender a través del juego, permitiendo la adquisición de conocimientos de forma interactiva.",
+    ecosystemCoIntent: " una plataforma de economía cooperativa donde los usuarios financian conjuntamente y se benefician de productos digitales.",
+    ecosystemIntegration: "Interconexión entre proyectos",
+    ecosystemIntegrationDescription: "Todos los proyectos del ecosistema Ateira están conectados, permitiendo la transferencia de valor y capacidades entre plataformas. Los usuarios pueden utilizar logros y habilidades obtenidos en un proyecto en otros proyectos del ecosistema.",
+    ecosystemBenefits: "Beneficios del ecosistema",
+    ecosystemBenefitsDescription: "La participación en el ecosistema Ateira proporciona a los usuarios mayores oportunidades para aprender, ganar y desarrollarse, así como acceso a tecnologías innovadoras y una comunidad de personas afines.",
+    escrowSystem: "Procesamiento seguro de pagos y liberación de fondos basada en hitos.",
+    nftTokenization: "Conversión de productos digitales en tokens de propiedad con derechos de ingresos.",
+    revenueDistribution: "Sistema automatizado para compartir los ingresos de ventas entre las partes interesadas.",
+    marketplace: "Donde los productos completados se venden a nuevos clientes, generando ingresos.",
+    // Asistente de IA Ailock
+    ailock: "Asistente de IA Ailock",
+    ailockDescription: "Ailock es un compañero de IA en evolución que se desarrolla en un entorno de juego y se convierte en un asistente digital real para el usuario.",
+    ailockStatus: "Estado actual de desarrollo",
+    ailockStatusDescription: "El desarrollo activo del MVP está en marcha con la implementación de funciones clave: generación de contenido, establecimiento y seguimiento de tareas, búsqueda inteligente, comunicación y aprendizaje.",
+    ailockTechnology: "Tecnología",
+    ailockTechnologyDescription: "Ailock utiliza tecnologías de inteligencia artificial de vanguardia (SotA) y proporciona almacenamiento de datos local y en cadena para máxima privacidad y seguridad.",
+    ailockBenefits: "Beneficios para los usuarios",
+    ailockBenefitsDescription: "Ailock garantiza un alto nivel de privacidad, interacción personalizada e integración con la plataforma Co-Intent, ampliando las capacidades de los usuarios en la economía cooperativa.",
+    ailockUseCases: "Casos de uso",
+    ailockUseCasesDescription: "Los usuarios pueden entrenar a Ailock en el juego Noosits y luego usar sus habilidades para automatizar tareas en Co-Intent, encontrar proyectos relevantes y comunicarse con otros participantes del ecosistema."
   },
   
   // Support
@@ -348,4 +373,4 @@ const es = {
   }
 };
 
-export default es; 
+export default es;

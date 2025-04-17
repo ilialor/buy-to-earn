@@ -3,22 +3,21 @@
 ## Общий обзор
 
 Система авторизации Co-Intent Platform реализована с использованием гибкой архитектуры, поддерживающей два режима работы:
-1. **Firebase Authentication** - полнофункциональная облачная авторизация для производственной среды
+1. **Серверная авторизация** - полноценная авторизация через бэкенд-сервис с PostgreSQL
 2. **Локальная авторизация** - эмуляция системы авторизации через localStorage для разработки и тестирования
 
 Такая архитектура обеспечивает независимость разработки от облачных сервисов и возможность быстрого тестирования.
 
 ## Компоненты системы
 
-### Firebase Authentication
-- Аутентификация по email/password
-- Аутентификация через Google (OAuth)
-- Верификация email
+### Серверная авторизация
+- Аутентификация по email/password через бэкенд
+- Поддержка OAuth (Google)
 - Восстановление пароля
 - Управление профилем пользователя
 
 ### Локальная авторизация
-- Эмуляция Firebase Auth API через localStorage
+- Эмуляция системы авторизации через localStorage
 - Поддержка регистрации/входа по email/password
 - Управление сессией пользователя
 - Тестовый аккаунт по умолчанию (test@example.com / password)
@@ -28,85 +27,84 @@
 ```
 js/
   ├── auth.js             # Основной интерфейс для работы с авторизацией
-  ├── firebase-config.js  # Конфигурация Firebase
-  └── local-auth.js       # Локальная эмуляция Firebase Auth
+  └── local-auth.js       # Локальная эмуляция системы авторизации
 ```
 
 ## Процесс инициализации
 
-1. Система проверяет доступность Firebase:
+1. Система проверяет доступность серверной авторизации:
 ```javascript
 function checkAndInitAuth() {
-  if (typeof firebase !== 'undefined' && firebase.auth) {
-    console.log("Firebase доступен, используем Firebase Auth");
-    firebaseWorking = true;
+  if (typeof authBackend !== 'undefined' && authBackend.auth) {
+    console.log("Серверная авторизация доступна, используем серверную авторизацию");
+    backendWorking = true;
   } else {
-    console.log("Firebase недоступен, используем локальную авторизацию");
-    firebaseWorking = false;
+    console.log("Серверная авторизация недоступна, используем локальную авторизацию");
+    backendWorking = false;
     initLocalAuth();
   }
 }
 ```
 
-2. Если Firebase недоступен, активируется локальная авторизация:
+2. If server-side authentication is not available, local authentication is activated:
 ```javascript
 function initLocalAuth() {
   if (typeof LocalAuth !== 'undefined') {
     LocalAuth.init();
-    console.log("Локальная авторизация инициализирована");
+    console.log("Local authentication initialized");
   } else {
-    console.error("Ошибка: модуль локальной авторизации не найден");
+    console.error("Error: local authentication module not found");
   }
 }
 ```
 
 ## Режимы работы
 
-### Firebase Auth
+### Серверная авторизация
 
 ```javascript
-// Регистрация нового пользователя
+// Register a new user
 async function signUp(email, password, displayName) {
   try {
-    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+    const userCredential = await authBackend.auth.createUserWithEmailAndPassword(email, password);
     await userCredential.user.updateProfile({ displayName });
     return userCredential.user;
   } catch (error) {
-    console.error("Ошибка при регистрации:", error);
+    console.error("Error during registration:", error);
     throw error;
   }
 }
 
-// Вход пользователя
+// Sign in user
 async function signIn(email, password) {
   try {
-    const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+    const userCredential = await authBackend.auth.signInWithEmailAndPassword(email, password);
     return userCredential.user;
   } catch (error) {
-    console.error("Ошибка при входе:", error);
+    console.error("Error during login:", error);
     throw error;
   }
 }
 
-// Выход пользователя
+// Sign out user
 async function signOut() {
   try {
-    await firebase.auth().signOut();
+    await authBackend.auth.signOut();
     return true;
   } catch (error) {
-    console.error("Ошибка при выходе:", error);
+    console.error("Error during logout:", error);
     throw error;
   }
 }
 
-// Слушатель изменений состояния авторизации
-firebase.auth().onAuthStateChanged((user) => {
+// Auth state change listener
+authBackend.auth.onAuthStateChanged((user) => {
   if (user) {
-    console.log("Пользователь вошел:", user.uid);
-    // Обновляем UI и состояние
+    console.log("User logged in:", user.uid);
+    // Update UI and state
   } else {
-    console.log("Пользователь вышел");
-    // Обновляем UI и состояние
+    console.log("User logged out");
+    // Update UI and state
   }
 });
 ```
@@ -119,23 +117,23 @@ const LocalAuth = {
   currentUser: null,
   listeners: [],
   
-  // Инициализация
+  // Initialization
   init() {
     this._loadUsers();
     this._loadSession();
     
-    // Создаем тестового пользователя если нет пользователей
+    // Create test user if no users exist
     if (this.users.length === 0) {
       this._createTestUser();
     }
   },
   
-  // Создание тестового пользователя
+  // Create test user
   _createTestUser() {
     const testUser = {
       uid: this._generateUid(),
       email: "test@example.com",
-      password: "password", // В реальной системе пароль должен быть захеширован
+      password: "password", // In a real system, the password should be hashed
       displayName: "Test User",
       emailVerified: true,
       createdAt: new Date().toISOString()
@@ -145,26 +143,26 @@ const LocalAuth = {
     this._saveUsers();
   },
   
-  // Регистрация
+  // Create user (sign-up)
   createUserWithEmailAndPassword(email, password) {
     return new Promise((resolve, reject) => {
       if (!email || !password) {
-        reject(new Error("Email и пароль обязательны"));
+        reject(new Error("Email and password are required"));
         return;
       }
       
-      // Проверяем, существует ли пользователь
+      // Check if user exists
       const existingUser = this.users.find(user => user.email === email);
       if (existingUser) {
-        reject(new Error("Пользователь с таким email уже существует"));
+        reject(new Error("User with this email already exists"));
         return;
       }
       
-      // Создаем нового пользователя
+      // Create new user
       const newUser = {
         uid: this._generateUid(),
         email,
-        password, // В реальной системе пароль должен быть захеширован
+        password, // In a real system, the password should be hashed
         displayName: "",
         emailVerified: false,
         createdAt: new Date().toISOString()
@@ -173,15 +171,15 @@ const LocalAuth = {
       this.users.push(newUser);
       this._saveUsers();
       
-      // Устанавливаем текущего пользователя
+      // Set current user
       this.currentUser = { ...newUser };
-      delete this.currentUser.password; // Не храним пароль в объекте текущего пользователя
+      delete this.currentUser.password; // Do not store password in current user object
       this._saveSession();
       
-      // Уведомляем слушателей об изменении
+      // Notify listeners of change
       this._notifyListeners();
       
-      // Возвращаем объект, имитирующий Firebase UserCredential
+      // Return object mimicking Firebase UserCredential
       resolve({
         user: this.currentUser,
         operationType: "signIn"
@@ -189,30 +187,30 @@ const LocalAuth = {
     });
   },
   
-  // Вход пользователя
+  // Sign in user
   signInWithEmailAndPassword(email, password) {
     return new Promise((resolve, reject) => {
       if (!email || !password) {
-        reject(new Error("Email и пароль обязательны"));
+        reject(new Error("Email and password are required"));
         return;
       }
       
-      // Ищем пользователя
+      // Find user
       const user = this.users.find(u => u.email === email && u.password === password);
       if (!user) {
-        reject(new Error("Неверный email или пароль"));
+        reject(new Error("Invalid email or password"));
         return;
       }
       
-      // Устанавливаем текущего пользователя
+      // Set current user
       this.currentUser = { ...user };
-      delete this.currentUser.password; // Не храним пароль в объекте текущего пользователя
+      delete this.currentUser.password; // Do not store password in current user object
       this._saveSession();
       
-      // Уведомляем слушателей об изменении
+      // Notify listeners of change
       this._notifyListeners();
       
-      // Возвращаем объект, имитирующий Firebase UserCredential
+      // Return object mimicking Firebase UserCredential
       resolve({
         user: this.currentUser,
         operationType: "signIn"
@@ -220,35 +218,35 @@ const LocalAuth = {
     });
   },
   
-  // Выход пользователя
+  // Sign out user
   signOut() {
     return new Promise((resolve) => {
       this.currentUser = null;
       localStorage.removeItem('localAuthSession');
       
-      // Уведомляем слушателей об изменении
+      // Notify listeners of change
       this._notifyListeners();
       
       resolve();
     });
   },
   
-  // Слушатель изменений состояния
+  // Auth state change listener
   onAuthStateChanged(callback) {
     if (typeof callback === 'function') {
       this.listeners.push(callback);
       
-      // Сразу вызываем callback с текущим состоянием
+      // Immediately call callback with current state
       callback(this.currentUser);
     }
     
-    // Возвращаем функцию для отписки
+    // Return function for unsubscribing
     return () => {
       this.listeners = this.listeners.filter(listener => listener !== callback);
     };
   },
   
-  // Вспомогательные методы
+  // Helper methods
   _loadUsers() {
     const storedUsers = localStorage.getItem('localAuthUsers');
     this.users = storedUsers ? JSON.parse(storedUsers) : [];
@@ -312,7 +310,7 @@ function getAuthErrorMessage(error) {
 Система авторизации тесно интегрирована с другими компонентами:
 
 ```javascript
-// Инициализация профиля пользователя при первой регистрации
+// Initialize user profile on first registration
 async function initUserProfile(user) {
   if (!user) return;
   
@@ -335,7 +333,7 @@ async function initUserProfile(user) {
   }
 }
 
-// Обновление UI при изменении состояния авторизации
+// Update UI on auth state change
 function updateUIOnAuthChange(user) {
   const authButtons = document.getElementById('auth-buttons');
   const userProfile = document.getElementById('user-profile');
@@ -344,7 +342,7 @@ function updateUIOnAuthChange(user) {
     authButtons.style.display = 'none';
     userProfile.style.display = 'flex';
     
-    // Загружаем данные пользователя из БД
+    // Load user data from database
     db.collection('users').doc(user.uid).get()
       .then(doc => {
         if (doc.exists) {
@@ -362,25 +360,25 @@ function updateUIOnAuthChange(user) {
 
 ## Безопасность
 
-### Хеширование паролей
+### Password hashing
 
-В производственной среде Firebase автоматически обеспечивает безопасное хранение паролей. В локальной эмуляции для учебных целей хеширование упрощено, но в реальном приложении рекомендуется использовать bcrypt:
+In a production environment, server-side authentication provides secure password storage. In local emulation for educational purposes, password hashing is simplified, but in a real application, it is recommended to use bcrypt:
 
 ```javascript
-// Хеширование пароля
+// Password hashing
 function hashPassword(password) {
-  // Простая имитация хеширования для учебных целей
-  // В реальном приложении используйте bcrypt или аналогичную библиотеку
+  // Simple password hashing for educational purposes
+  // In a real application, use bcrypt or a similar library
   return btoa(password + "salt");
 }
 
-// Проверка пароля
+// Verify password
 function verifyPassword(password, hash) {
   return hash === hashPassword(password);
 }
 ```
 
-### Валидация данных
+### Data validation
 
 ```javascript
 function validateEmail(email) {
@@ -395,21 +393,21 @@ function validatePassword(password) {
 
 ## Тестирование
 
-Для тестирования системы авторизации во время разработки:
+For testing the authentication system during development:
 
-1. Используйте тестовый аккаунт: `test@example.com` / `password`
-2. Или создайте нового тестового пользователя через форму регистрации
+1. Use the test account: `test@example.com` / `password`
+2. Or create a new test user through the registration form
 
-Команда для запуска локального сервера:
+Command to run the local server:
 ```
 python -m http.server 8000
 ```
 
-## Производственная среда
+## Production environment
 
-В производственной среде рекомендуется:
-1. Использовать только Firebase Authentication
-2. Настроить двухфакторную аутентификацию
-3. Ограничить доступ по IP если требуется
-4. Активировать проверку подозрительной активности
-5. Настроить автоматические уведомления о попытках несанкционированного доступа 
+In a production environment, it is recommended:
+1. Use only server-side authentication
+2. Configure two-factor authentication
+3. Restrict access by IP if necessary
+4. Enable suspicious activity detection
+5. Configure automatic notifications for unauthorized access attempts

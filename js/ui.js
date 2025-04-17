@@ -1983,30 +1983,20 @@ function showOrderDetails(orderId) {
     return;
   }
   
-  // Если заказ не найден в локальном хранилище, пытаемся получить его из Firebase
-  const db = window.firebase ? window.firebase.firestore() : null;
-  if (db) {
-    db.collection('orders').doc(orderId).get()
-      .then(doc => {
-        if (doc.exists) {
-          order = {
-            id: doc.id,
-            ...doc.data()
-          };
-          displayOrderDetailsModal(order);
-        } else {
-          console.error('Заказ не найден в базе данных');
-          showNotification('Заказ не найден', 'error');
-        }
-      })
-      .catch(error => {
-        console.error('Ошибка при получении заказа из Firebase:', error);
-        showNotification('Ошибка при загрузке заказа: ' + error.message, 'error');
-      });
-  } else {
-    console.error('Заказ не найден ни в локальном хранилище, ни в Firebase');
-    showNotification('Заказ не найден', 'error');
-  }
+  // Fetch from database if not in localStorage
+  getDocument('orders', orderId)
+    .then(orderData => {
+      if (orderData) {
+        displayOrderDetailsModal(orderData);
+      } else {
+        console.error('Order not found in database');
+        showNotification('Order not found', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching order:', error);
+      showNotification('Error loading order: ' + error.message, 'error');
+    });
 }
 
 // Функция для отображения модального окна с деталями заказа

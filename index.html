@@ -2,18 +2,6 @@
 <html lang="en">
 
 <head>
-    <!-- Firebase Core -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <!-- Firebase Authentication -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <!-- Firebase Firestore -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <!-- Firebase Analytics -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
-    
-    <!-- Firebase Fallback (for production) -->
-    <script src="js/firebase-fallback.js"></script>
-
     <!-- Auth Styles -->
     <link rel="stylesheet" href="styles/auth.css">
     <meta charset="UTF-8">
@@ -76,6 +64,10 @@
                     <li><a href="#" class="nav-link" data-page="support" data-i18n="nav.support">Support</a></li>
                 </ul>
             </nav>
+            
+            <div class="language-selector" id="language-selector">
+                <!-- Language selector will be populated by i18n.js -->
+            </div>
 
             <div class="user-controls user-controls-auth">
                 <button class="btn btn-outline" id="connect-wallet-btn" data-i18n="wallet.connectWallet"><i class="fas fa-wallet"></i> Connect Wallet</button>
@@ -566,7 +558,7 @@
                     <div class="wallet-actions" style="margin-top: 20px;">
                         <button class="btn btn-outline"><i class="fab fa-ethereum"></i> MetaMask</button>
                         <button class="btn btn-outline"><i class="fas fa-wallet"></i> Trust Wallet</button>
-                        <button class="btn btn-outline"><i class="fas fa-coins"></i> Coinbase Wallet</button>
+                        <button class="btn btn-outline"><i class="fas fa-coins"></i> ICP Wallet</button>
                     </div>
                 </div>
             </div>
@@ -578,6 +570,22 @@
             <p class="subtitle" data-i18n="docs.subtitle">Learn how the Co-Intent platform works and how to make the most of it.</p>
 
             <div class="card">
+                <div class="doc-section">
+                    <h2 class="doc-section-title" data-i18n="docs.ecosystem">Ateira Ecosystem</h2>
+                    <p class="doc-text" data-i18n="docs.ecosystemDescription">The Co-Intent platform is part of the Ateira ecosystem, designed to create a sustainable environment for collaborative digital product development and revenue sharing.</p>
+                    <ul>
+                        <li><strong>Ateira: Noosits - </strong> <span data-i18n="docs.ecosystemNoosits"></span></li>    
+                        <li><strong>Ateira: Loreland - </strong> <span data-i18n="docs.ecosystemLoreland"></span></li>
+                        <li><strong>Ateira: Co-Intent - </strong> <span data-i18n="docs.ecosystemCoIntent">The core platform connecting customers, executors, and digital products.</span></li>
+                        <li><strong>Escrow System:</strong> <span data-i18n="docs.escrowSystem">Secure payment processing and milestone-based fund release.</span></li>
+                        <li><strong>NFT Tokenization:</strong> <span data-i18n="docs.nftTokenization">Converting digital products into ownership tokens with revenue rights.</span></li>
+                        <li><strong>Revenue Distribution:</strong> <span data-i18n="docs.revenueDistribution">Automated system for sharing sales proceeds among stakeholders.</span></li>
+                        <li><strong>Marketplace:</strong> <span data-i18n="docs.marketplace">Where completed products are sold to new customers, generating revenue.</span></li>
+                        <li><strong data-i18n="docs.ecosystemIntegration"></strong>: <span data-i18n="docs.ecosystemIntegrationDescription"></span></li>
+                        <li><strong data-i18n="docs.ecosystemBenefits"></strong>: <span data-i18n="docs.ecosystemBenefitsDescription"></span></li>
+                    </ul>
+                </div>
+                
                 <div class="doc-section">
                     <h2 class="doc-section-title" data-i18n="docs.howItWorks">How It Works</h2>
                     <p class="doc-text" data-i18n="docs.howItWorksDescription">The Co-Intent platform allows customers to jointly fund the creation of digital products, receive ownership NFTs, and earn from future sales revenue. Here's how the process works:</p>
@@ -612,6 +620,17 @@
                         <li data-i18n="docs.executorsReceive">Receive milestone-based payments as you complete work</li>
                         <li data-i18n="docs.executorsRetain">Retain a share of future revenue from products you create</li>
                         <li data-i18n="docs.executorsBuild">Build a portfolio and reputation on the platform</li>
+                    </ul>
+                </div>
+
+                <div class="doc-section">
+                    <h2 class="doc-section-title" data-i18n="docs.ailock">AI Assistant Ailock</h2>
+                    <p class="doc-text" data-i18n="docs.ailockDescription"></p>
+                    <ul>
+                        <li><strong data-i18n="docs.ailockStatus"></strong>: <span data-i18n="docs.ailockStatusDescription"></span></li>
+                        <li><strong data-i18n="docs.ailockTechnology"></strong>: <span data-i18n="docs.ailockTechnologyDescription"></span></li>
+                        <li><strong data-i18n="docs.ailockBenefits"></strong>: <span data-i18n="docs.ailockBenefitsDescription"></span></li>
+                        <li><strong data-i18n="docs.ailockUseCases"></strong>: <span data-i18n="docs.ailockUseCasesDescription"></span></li>
                     </ul>
                 </div>
             </div>
@@ -1428,100 +1447,15 @@
         }
     </script>
 
-    <style>
-        /* Add styles for order cards */
-        .order-item {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin-bottom: 15px;
-        }
-        
-        .user-order-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 16px;
-            background: linear-gradient(to right, #f9f9f9, #ffffff);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        .order-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .order-title {
-            color: #333;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        
-        .order-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 12px;
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .order-price {
-            font-weight: bold;
-            color: #28a745;
-        }
-        
-        .order-description {
-            color: #555;
-            margin-bottom: 15px;
-            line-height: 1.4;
-        }
-        
-        .order-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .user-badge {
-            background-color: #e9ecef;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-        }
-        
-        .user-order-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-        
-        .section-title {
-            font-size: 1.4rem;
-            color: #495057;
-            padding: 10px 0;
-            border-bottom: 2px solid #f1f1f1;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .section-title i {
-            color: #007bff;
-        }
-        
-        .section-divider {
-            margin: 20px 0;
-            border-top: 1px dashed #e0e0e0;
-        }
-    </style>
 
-    <!-- Firebase Scripts -->
-    <script src="js/firebase-config.js"></script>
+
+    <!-- App Scripts -->
     <script src="js/auth.js"></script>
     <script src="js/db.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/tests.js"></script>
     <script type="module" src="js/revenue-calculator.js"></script>
-    
+
     <!-- Escrow Module -->
     <script type="module" src="js/escrow/index.js"></script>
 
@@ -1596,4 +1530,4 @@
     </script>
 </body>
 
-</html> 
+</html>

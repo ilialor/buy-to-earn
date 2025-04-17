@@ -166,7 +166,32 @@ const en = {
     executorsBrowse: "Browse and accept orders that match your skills",
     executorsReceive: "Receive milestone-based payments as you complete work",
     executorsRetain: "Retain a share of future revenue from products you create",
-    executorsBuild: "Build a portfolio and reputation on the platform"
+    executorsBuild: "Build a portfolio and reputation on the platform",
+    // Ateira Ecosystem
+    ecosystem: "Ateira Ecosystem",
+    ecosystemDescription: "Ateira is a unified ecosystem of projects, including Co-Intent and other interconnected platforms:",
+    ecosystemNoosits: " a game with an AI companion where users can develop their digital assistant.",
+    ecosystemLoreland: " a platform for learning through gaming, allowing knowledge acquisition in an interactive form.",
+    ecosystemCoIntent: " a cooperative economy platform where users jointly fund and benefit from digital products.",
+    ecosystemIntegration: "Interconnection between projects",
+    ecosystemIntegrationDescription: "All projects in the Ateira ecosystem are connected, enabling the transfer of value and capabilities between platforms. Users can utilize achievements and skills gained in one project across other projects in the ecosystem.",
+    ecosystemBenefits: "Ecosystem benefits",
+    ecosystemBenefitsDescription: "Participation in the Ateira ecosystem provides users with enhanced opportunities for learning, earning, and development, as well as access to innovative technologies and a community of like-minded individuals.",
+    escrowSystem: "Secure payment processing and milestone-based fund release.",
+    nftTokenization: "Converting digital products into ownership tokens with revenue rights.",
+    revenueDistribution: "Automated system for sharing sales proceeds among stakeholders.",
+    marketplace: "Where completed products are sold to new customers, generating revenue.",
+    // AI Assistant Ailock
+    ailock: "AI Assistant Ailock",
+    ailockDescription: "Ailock is an evolving AI companion that develops in a gaming environment and becomes a real digital assistant for the user.",
+    ailockStatus: "Current development status",
+    ailockStatusDescription: "Active development of the MVP is underway with implementation of key functions: content generation, task setting and tracking, intelligent search, communication, and learning.",
+    ailockTechnology: "Technology",
+    ailockTechnologyDescription: "Ailock uses state-of-the-art artificial intelligence technologies and provides local and on-chain data storage for maximum privacy and security.",
+    ailockBenefits: "Benefits for users",
+    ailockBenefitsDescription: "Ailock ensures a high level of privacy, personalized interaction, and integration with the Co-Intent platform, expanding user capabilities in the cooperative economy.",
+    ailockUseCases: "Use cases",
+    ailockUseCasesDescription: "Users can train Ailock in the Noosits game and then use its skills to automate tasks in Co-Intent, find relevant projects, and communicate with other ecosystem participants."
   },
   
   // Support
@@ -361,4 +386,4 @@ const en = {
   }
 };
 
-export default en; 
+export default en;

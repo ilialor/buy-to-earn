@@ -197,6 +197,90 @@ nav a.active:after {
     display: block;
 }
 
+/* Order Card Styles */
+.order-item {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.user-order-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    background: linear-gradient(to right, #f9f9f9, #ffffff);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.order-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.order-title {
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.order-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.order-price {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.order-description {
+    color: #555;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.order-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.user-badge {
+    background-color: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.user-order-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.section-title {
+    font-size: 1.4rem;
+    color: #495057;
+    padding: 10px 0;
+    border-bottom: 2px solid #f1f1f1;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-title i {
+    color: #007bff;
+}
+
+.section-divider {
+    margin: 20px 0;
+    border-top: 1px dashed #e0e0e0;
+}
+
 .card {
     background-color: white;
     border-radius: 10px;
@@ -570,6 +654,14 @@ textarea {
 /* Documentation Page Specific Styles */
 .doc-section {
     margin-bottom: 30px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.doc-section:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .doc-section-title {
@@ -577,10 +669,28 @@ textarea {
     font-weight: 600;
     color: var(--primary);
     margin-bottom: 15px;
+    border-bottom: 2px solid var(--secondary);
+    padding-bottom: 8px;
 }
 
 .doc-text {
     margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.doc-section ul, .doc-section ol {
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+.doc-section li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.doc-section strong {
+    color: var(--primary);
+    font-weight: 600;
 }
 
 /* Support Page Specific Styles */
@@ -1263,4 +1373,4 @@ textarea {
 .stat-label {
   color: #666;
   font-size: 0.9rem;
-} 
+}
