@@ -1,150 +1,137 @@
-# Документация проекта Buy-to-Earn
+# Ateira:CoIntent - Project Documentation
 
-## Обзор
-Проект Buy-to-Earn представляет собой платформу для групповых заказов с использованием эскроу-функциональности, обеспечивающей безопасные сделки между заказчиками и исполнителями. Платформа позволяет:
-- Создавать групповые заказы с определением этапов работы
-- Подключаться к групповым заказам, внося свою долю средств
-- Выбирать представителя среди участников заказа
-- Контролировать выполнение работ по этапам
-- Проверять качество работы и подписывать акты выполненных работ
+## Overview
+Ateira:CoIntent is the 'Buy-to-Earn' project is a platform for group orders using escrow functionality, ensuring secure transactions between customers and contractors. The platform allows you to:
+- Create group orders with work stages
+- Join group orders by contributing your share of funds
+- Select a representative among the order participants
+- Monitor the execution of work by stages
+- Check the quality of work and sign certificates of completion
 
-## Структура документации
-- [Архитектура проекта](architecture.md)
-- [Эскроу-функциональность](escrow.md)
-- [Система уведомлений](notifications.md)
-- [Локальная разработка](local-development.md)
-- [API и серверная часть](api.md)
-- [Безопасность](security.md)
 
-## Структура проекта
+## Project structure
 ```
 /
-├── index.html       # Основной HTML-файл приложения
-├── styles/          # CSS-стили
-│   ├── main.css     # Основные стили
-│   └── escrow.css   # Стили для эскроу-компонентов
-├── js/              # JavaScript файлы
-│   ├── local-auth.js       # Локальная авторизация
-│   ├── db.js               # Взаимодействие с базой данных
-│   └── escrow/            # Модули для эскроу-функциональности
-│       ├── constants.js    # Константы и перечисления
-│       ├── models.js       # Модели данных
-│       ├── local-storage.js # Локальное хранилище
-│       ├── application.js  # Основная логика
-│       ├── ui.js           # Интерфейс пользователя
-│       └── index.js        # Точка входа для эскроу-модуля
-└── docs/            # Документация проекта
-    ├── README.md    # Обзор документации
-    └── ...          # Другие файлы документации
+├── index.html # Main HTML file of the application
+├── styles/ # CSS styles
+│ ├── main.css # Main styles
+│ └── escrow.css # Styles for escrow components
+├── js/ # JavaScript files
+│ ├── local-auth.js # Local authorization
+│ ├── db.js # Interaction with the database
+│ └── escrow/ # Modules for escrow functionality
+│ ├── constants.js # Constants and enumerations
+│ ├── models.js # Data models
+│ ├── local-storage.js # Local storage
+│ ├── application.js # Main logic
+│ ├── ui.js # User interface
+│ └── index.js # Entry point for the escrow module
+└── docs/ # Project documentation
+├── README.md # Documentation overview
+└── ... # Other documentation files
 ```
 
-## Технологии
-- HTML5, CSS3, JavaScript
-- Firebase (Firestore) для хранения данных
-- Firebase Authentication для аутентификации
-- LocalStorage для локальной разработки
+## Installation and launch
+For local development:
+1. Clone the repository
+2. Open index.html in a browser (some APIs may require a local server for full functionality)
 
-## Установка и запуск
-Для локальной разработки:
-1. Клонировать репозиторий
-2. Открыть index.html в браузере (для полноценной работы некоторых API может потребоваться локальный сервер)
+For testing individual components:
+- `test-notifications.html` - testing the notification system
 
-Для тестирования отдельных компонентов:
-- `test-notifications.html` - тестирование системы уведомлений
+## Project features
+- Modular architecture with the possibility of expansion
+- Support for local development without mandatory connection to the server
+- Notification system for interactive interaction with the user
+- Escrow functionality for ensuring the security of transactions
 
-## Особенности проекта
-- Модульная архитектура с возможностью расширения
-- Поддержка локальной разработки без обязательного подключения к серверу
-- Система уведомлений для интерактивного взаимодействия с пользователем
-- Эскроу-функциональность для обеспечения безопасности сделок 
+## Update: Optional selection of the performer
 
-## Обновление: Опциональный выбор исполнителя
+In the latest The update added the functionality of creating group orders without specifying an executor. This allows users to create group orders even if there are no available executors in the system.
 
-В последнем обновлении была добавлена функциональность создания групповых заказов без указания исполнителя. Это позволяет пользователям создавать групповые заказы даже при отсутствии доступных исполнителей в системе.
+### Changes:
+1. The contractor selection field is now optional when creating an order
+2. The corresponding translation has been added for the interface in Russian, English and Spanish
+3. The business logic has been modified to ensure that orders without a contractor work correctly
 
-### Изменения:
-1. Поле выбора исполнителя (contractor) теперь опциональное при создании заказа
-2. Добавлен соответствующий перевод для интерфейса на русском, английском и испанском языках
-3. Модифицирована бизнес-логика для корректной работы заказов без исполнителя
+### How it works:
+- The user can create an order without selecting a contractor
+- Such an order will have the PENDING status until the contractor is assigned
+- The contractor can be assigned later by the administrator or through a vote by representatives
 
-### Как это работает:
-- Пользователь может создать заказ без выбора исполнителя
-- Такой заказ будет находиться в статусе PENDING, пока не назначен исполнитель
-- Исполнитель может быть назначен позже администратором или через голосование представителей
+### Limitations:
+- For orders without a contractor, it is impossible to mark stages as completed until the contractor is assigned
+- All other functions (fundraising, voting for a representative, etc.) are available without restrictions
 
-### Ограничения:
-- Для заказов без исполнителя невозможно отметить этапы как выполненные, пока исполнитель не будет назначен
-- Все остальные функции (сбор средств, голосование за представителя и т.д.) доступны без ограничений 
+## Interface update
 
-## Обновление интерфейса
+The following changes have been made to the interface to unify and simplify user interaction with the system:
 
-В интерфейс были внесены следующие изменения для унификации и упрощения взаимодействия пользователя с системой:
+### Unification of order creation
+1. The separate "Create a group order" button has been removed, since all orders in the system are group orders
+2. The existing order creation form on the tab "Submit Order" has been modified to use escrow functionality
+3. The form has been updated to work with milestones and optional performer selection
 
-### Унификация создания заказов
-1. Удалена отдельная кнопка "Создать групповой заказ", так как в системе все заказы являются групповыми
-2. Существующая форма создания заказа на вкладке "Submit Order" была модифицирована для использования эскроу-функциональности
-3. Форма обновлена для работы с этапами (milestones) и выбором опционального исполнителя
+### Fund Management
+1. Fund management functionality has been moved to the "Wallet" section
+2. The ability to top up the escrow balance from the wallet has been added
+3. The balance button in the site header now also opens a modal window for replenishing the account
+4. The escrow account balance is displayed both in the portfolio section and in the wallet
 
-### Управление фондами
-1. Функциональность управления фондами перенесена в раздел "Кошелек" (Wallet)
-2. Добавлена возможность пополнения эскроу-баланса из кошелька
-3. Кнопка с балансом в шапке сайта теперь также открывает модальное окно пополнения счета
-4. Баланс эскроу-аккаунта отображается как в разделе портфолио, так и в кошельке
+### Benefits of the modification
+- Simplification of the interface by eliminating duplication of functionality
+- More intuitive placement of fund management functions in the "Wallet" section
+- A single order creation process that is understandable to the user
+- A clearer division of functionality into the relevant sections of the site
 
-### Преимущества модификации
-- Упрощение интерфейса путем устранения дублирования функциональности
-- Более интуитивное размещение функций управления средствами в разделе "Кошелек"
-- Единый процесс создания заказов, понятный пользователю
-- Более четкое разделение функциональности по соответствующим разделам сайта 
+## Latest updates
 
-## Последние обновления
+### Order interface update and UX improvement (2023-04-xx)
 
-### Обновление интерфейса заказов и улучшение UX (2023-04-xx)
+#### What has been updated
+- Fixed issues with duplicate notifications when creating an order
+- Added a check for a positive stage amount (milestone) when creating an order
+- Improved the appearance of order cards in the marketplace
+- Added correct localization of section titles for all supported languages ​​(RU, EN, ES)
+- Improved functionality for participating in orders for other users
+- Added "Participate" buttons for joining group orders
 
-#### Что обновлено
-- Исправлены проблемы с дублированием уведомлений при создании заказа
-- Добавлена проверка на положительную сумму этапа (milestone) при создании заказа
-- Улучшен внешний вид карточек заказов в маркетплейсе
-- Добавлена корректная локализация заголовков разделов для всех поддерживаемых языков (RU, EN, ES)
-- Улучшена функциональность участия в заказах для других пользователей
-- Добавлены кнопки "Участвовать" для присоединения к групповым заказам
+#### How it works
+1. **Order creation**
+- When creating an order, the system checks that all stage amounts are positive
+- Validation prevents creating an order with incorrect data
+- The user receives clear error messages in their language
 
-#### Как это работает
-1. **Создание заказа**
-   - При создании заказа система проверяет, что все суммы этапов положительные
-   - Валидация предотвращает создание заказа с некорректными данными
-   - Пользователь получает четкие сообщения об ошибках на своем языке
+2. **Order display**
+- Orders are divided into two categories: "Your orders" and "All active orders"
+- Styles and animations have been added to improve the user experience
+- Order cards contain all the necessary information and buttons for actions
 
-2. **Отображение заказов**
-   - Заказы разделены на две категории: "Ваши заказы" и "Все активные заказы"
-   - Добавлены стили и анимации для улучшения пользовательского опыта
-   - Карточки заказов содержат всю необходимую информацию и кнопки для действий
+3. **Participation in orders**
+- Any authorized user can join the order via the "Participate" button
+- When clicked, a modal window opens for depositing funds
+- After successful participation, the user becomes a co-investor in the order
 
-3. **Участие в заказах**
-   - Любой авторизованный пользователь может присоединиться к заказу через кнопку "Участвовать"
-   - При нажатии открывается модальное окно для внесения средств
-   - После успешного участия пользователь становится соинвестором заказа
+4. **Order execution**
+- Performers can take orders for execution if they have sufficient funds
+- When completing work stages, funds are automatically transferred to the performer
+- Customers can track the progress of the order
 
-4. **Исполнение заказов**
-   - Исполнители могут брать заказы на исполнение при наличии достаточного количества средств
-   - При выполнении этапов работы средства автоматически переводятся исполнителю
-   - Заказчики могут отслеживать прогресс выполнения заказа
+#### Technical details
+- Improved process order creation form validation
+- Added event handlers for participation and view details buttons
+- Fixed issues with localization and display of text in different languages
+- Optimized the process of creating and displaying order cards
 
-#### Технические детали
-- Улучшен процесс валидации форм создания заказа
-- Добавлены обработчики событий для кнопок участия и просмотра деталей
-- Исправлены проблемы с локализацией и отображением текста на разных языках
-- Оптимизирован процесс создания и отображения карточек заказов
+#### Limitations
+- To participate in an order, you must be authorized in the system
+- The participation amount must be positive and not exceed the user's balance
+- The contractor must be registered in the system as a contractor
 
-#### Ограничения
-- Для участия в заказе необходима авторизация в системе
-- Сумма участия должна быть положительной и не превышать баланс пользователя
-- Исполнитель должен быть зарегистрирован в системе как подрядчик 
+## Ateira Ecosystem and AI Assistant Ailock
+Ateira is an ecosystem of interconnected projects:
+- **Ateira:Noosits** is a game where you train the AI ​​companion Ailock, who can become your real assistant.
+- **Ateira:Loreland** is an educational play-to-learn game with AI mentors and AI students.
+- **Ateira:Co-Intent** is a cooperative economic system that allows you to jointly create value and share income.
 
-## Экосистема Ateira и ИИ-помощник Ailock
-Ateira — это экосистема взаимосвязанных проектов:
-- **Ateira:Noosits** — игра, где вы тренируете ИИ-компаньона Айлока, который может стать вашим реальным помощником.
-- **Ateira:Loreland** — обучающая игра технологии play-to-learn с ИИ-наставниками и ИИ-учениками.
-- **Ateira:Co-Intent** — кооперативная экономическая система, позволяющая совместно создавать ценность и делить доходы.
-
-ИИ-помощник **Ailock** активно разрабатывается: он эволюционирует в игре и интегрируется в реальные приложения, помогает с задачами, поиском, контентом и коммуникацией. Все данные защищены и могут храниться локально или в пользовательских канистрах ICP. Интеграция с Co-Intent обеспечивает приватность, персонализацию и новые возможности для пользователей.
+The AI ​​assistant **Ailock** is actively developed: it evolves in the game and integrates into real applications, helps with tasks, search, content and communication. All data is protected and can be stored locally or in user ICP canisters. Integration with Co-Intent provides privacy, personalization and new opportunities for users.
