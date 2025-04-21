@@ -8,7 +8,7 @@ import { EscrowClient } from './escrow-client.js';
 import API_CONFIG from '../config/config.js';
 
 // Для единообразия с остальным кодом
-const API_KEY = 'Escrow-secret-test-1';
+const API_KEY = 'api-key-for-validation';
 
 /**
  * Get API configuration based on current environment
