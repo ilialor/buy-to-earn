@@ -1218,7 +1218,7 @@ function loadUserRevenue() {
   
   getUserRevenue(userId)
     .then(revenues => {
-      renderRevenues(revenues);
+      renderUserRevenue(revenues);
     })
     .catch(error => {
       console.error('Error loading revenues:', error);
@@ -1244,7 +1244,7 @@ function loadUserTransactions() {
   
   getUserTransactions(userId)
     .then(transactions => {
-      renderTransactions(transactions);
+      renderUserTransactions(transactions);
     })
     .catch(error => {
       console.error('Error loading transactions:', error);
@@ -1320,7 +1320,7 @@ function renderOrders(orders, userOrders = null) {
 // Create an order element
 function createOrderElement(order, isInPortfolio = false) {
   const orderItem = document.createElement('div');
-  orderItem.className = isInPortfolio ? 'order-item' : 'card mb-3';
+  orderItem.className = 'order-item';
   orderItem.id = `order-${order.id}`;
   
   // Убедимся, что у нас есть корректные данные о цене/бюджете
