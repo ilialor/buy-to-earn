@@ -1,4 +1,4 @@
-# Ateira:CoIntent - Project Documentation
+# Ateira:CoIntent - Documentation
 
 ## Overview
 Ateira:CoIntent is the 'Buy-to-Earn' project is a platform for group orders using escrow functionality, ensuring secure transactions between customers and contractors. The platform allows you to:
