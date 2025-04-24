@@ -1320,7 +1320,7 @@ function renderOrders(orders, userOrders = null) {
 // Create an order element
 function createOrderElement(order, isInPortfolio = false) {
   const orderItem = document.createElement('div');
-  orderItem.className = 'order-item';
+  orderItem.className = `order-item order-status-${order.status.toLowerCase()}`;
   orderItem.id = `order-${order.id}`;
   
   // Убедимся, что у нас есть корректные данные о цене/бюджете
@@ -1343,17 +1343,34 @@ function createOrderElement(order, isInPortfolio = false) {
       <button class="btn btn-sm btn-outline-primary view-order-details" data-order-id="${order.id}" data-i18n="marketplace.viewDetails">Подробнее</button>
     `;
   } else {
-    // Обычное отображение для маркетплейса
+    // Полная структура карточки заказа
     orderContent = `
-      <div class="card-body">
-        <h5 class="card-title">${order.title}</h5>
-        <p class="card-text">${order.description}</p>
-        <div class="d-flex justify-content-between align-items-center">
-          <span class="price-tag">${orderPrice} ${orderCurrency}</span>
-          <button class="btn btn-sm btn-primary view-order-details" data-order-id="${order.id}" data-i18n="marketplace.viewDetails">Подробнее</button>
-        </div>
-        <small class="text-muted">${formatDate(order.createdAt)}</small>
-        ${getCurrentUserId() === order.userId ? '<span class="badge bg-info float-end" data-i18n="marketplace.yourOrder">Ваш заказ</span>' : ''}
+      <div class="order-header">
+        <h3 class="order-title">${order.title}</h3>
+        <span class="order-status">${order.status}</span>
+      </div>
+      <div class="order-funding">
+        <span class="funded-amount">${order.fundedAmount}</span> / <span class="total-amount">${order.totalAmount}</span>
+      </div>
+      <div class="order-dates">
+        <span>Created: ${formatDate(order.createdAt)}</span>
+        <span>Updated: ${formatDate(order.updatedAt)}</span>
+      </div>
+      <p class="order-description">${order.description}</p>
+      <div class="order-milestones">
+        ${order.milestones.map(milestone => `
+          <div class="milestone-item milestone-status-${milestone.status.toLowerCase()}">
+            <div class="milestone-desc">${milestone.description}</div>
+            <div class="milestone-info">
+              <span class="milestone-amount">${milestone.amount}</span>
+              <span class="milestone-deadline">${formatDate(milestone.deadline)}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="order-actions">
+        <button class="btn btn-primary btn-sm participate-btn" data-order-id="${order.id}">Participate</button>
+        <button class="btn btn-outline btn-sm details-btn" data-order-id="${order.id}">Details</button>
       </div>
     `;
   }
