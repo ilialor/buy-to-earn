@@ -108,6 +108,8 @@ export class EscrowClient {
    * @returns {Promise<Array>} List of orders
    */
   async getOrders() {
+    console.log('Getting orders from Escrow API');
+    console.log('Request from EscrowClient: ', this);
     return this.request('/orders');
   }
 

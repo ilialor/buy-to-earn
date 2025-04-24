@@ -860,8 +860,8 @@ function setupUIListeners() {
 
 // Load marketplace orders
 function loadMarketplaceOrders() {
-  // Загружаем все заказы
-  getAllOrders()
+  showLoadingIndicator();
+  window.escrowAPI.orderService.getOrders()
     .then(orders => {
       // Проверяем, авторизован ли пользователь
       if (isUserAuthenticated()) {
@@ -881,6 +881,9 @@ function loadMarketplaceOrders() {
     .catch(error => {
       console.error('Error loading orders:', error);
       showNotification('Ошибка загрузки заказов', 'error');
+    })
+    .finally(() => {
+      hideLoadingIndicator();
     });
 }
 
@@ -986,50 +989,22 @@ function loadUserPortfolio() {
   
   console.log('Загрузка портфолио для пользователя:', userId);
   
-  // Показываем индикатор загрузки
   showLoadingIndicator();
-  
-  // Загружаем заказы пользователя из window.dbFunctions
-  if (window.dbFunctions && typeof window.dbFunctions.getUserOrders === 'function') {
-    window.dbFunctions.getUserOrders(userId)
-      .then(orders => {
-        console.log('Получены заказы пользователя:', orders.length);
-        
-        // Обновляем статистику на основе полученных данных
-        loadPortfolioStatistics(userId, { pendingOrders: orders.length });
-        
-        // Отображаем заказы
-        renderUserOrders(orders);
-      })
-      .catch(error => {
-        console.error('Ошибка загрузки заказов пользователя:', error);
-        showNotification('Ошибка загрузки заказов пользователя', 'error');
-      })
-      .finally(() => {
-        // Скрываем индикатор загрузки после получения заказов
-        hideLoadingIndicator();
-      });
-  } else {
-    console.error('Функция получения заказов пользователя не найдена');
-    // Пытаемся получить заказы напрямую из локального хранилища
-    try {
-      const localOrdersJson = localStorage.getItem('orders') || '[]';
-      const localOrders = JSON.parse(localOrdersJson);
-      const userOrders = localOrders.filter(order => order.userId === userId);
-      console.log('Получены заказы пользователя из локального хранилища:', userOrders.length);
-      
-      // Обновляем статистику на основе полученных данных
+  // Fetch user orders from Escrow API
+  window.escrowAPI.orderService.getOrders()
+    .then(orders => {
+      const userOrders = orders.filter(o => o.userId === userId);
+      console.log('Получены заказы пользователя из Escrow API:', userOrders.length);
       loadPortfolioStatistics(userId, { pendingOrders: userOrders.length });
-      
-      // Отображаем заказы
       renderUserOrders(userOrders);
-    } catch (error) {
-      console.error('Ошибка при получении заказов из локального хранилища:', error);
-      showNotification('Не удалось загрузить заказы пользователя', 'error');
-    } finally {
+    })
+    .catch(error => {
+      console.error('Ошибка загрузки заказов пользователя из Escrow API:', error);
+      showNotification('Ошибка загрузки заказов пользователя', 'error');
+    })
+    .finally(() => {
       hideLoadingIndicator();
-    }
-  }
+    });
   
   // Загружаем инвестиции пользователя
   if (typeof getUserInvestments === 'function') {
@@ -1859,7 +1834,6 @@ function renderUserOrders(orders) {
     cardTitle.className = 'card-title';
     cardTitle.setAttribute('data-i18n', 'portfolio.myOrders');
     cardTitle.innerHTML = '<i class="fas fa-shopping-cart"></i> <span>Мои заказы</span>';
-    
     cardHeader.appendChild(cardTitle);
     ordersSection.appendChild(cardHeader);
     

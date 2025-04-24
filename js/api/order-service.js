@@ -11,7 +11,7 @@ import { getCurrentEscrowUserId } from './user-service.js';
  * @param {Object} orderData - Order data 
  * @returns {Promise<Object>} Created order
  */
-async function createEscrowOrder(orderData) {
+async function createOrder(orderData) {
   try {
     const currentEscrowUserId = getCurrentEscrowUserId();
     if (!currentEscrowUserId) {
@@ -46,7 +46,7 @@ async function createEscrowOrder(orderData) {
  * @param {Array<string>} customerIds - Array of customer IDs
  * @returns {Promise<Object>} Created group order
  */
-async function createGroupEscrowOrder(orderData, customerIds) {
+async function createGroupOrder(orderData, customerIds) {
   try {
     const currentEscrowUserId = getCurrentEscrowUserId();
     if (!currentEscrowUserId) {
@@ -87,7 +87,7 @@ async function createGroupEscrowOrder(orderData, customerIds) {
  * @param {number} amount - Amount to fund
  * @returns {Promise<Object>} Updated order
  */
-async function fundEscrowOrder(orderId, amount) {
+async function fundOrder(orderId, amount) {
   try {
     const currentEscrowUserId = getCurrentEscrowUserId();
     if (!currentEscrowUserId) {
@@ -112,7 +112,7 @@ async function fundEscrowOrder(orderId, amount) {
  * @param {string} contractorId - Contractor ID
  * @returns {Promise<Object>} Updated order
  */
-async function assignContractorToOrder(orderId, contractorId) {
+async function assignContractor(orderId, contractorId) {
   try {
     const currentEscrowUserId = getCurrentEscrowUserId();
     if (!currentEscrowUserId) {
@@ -144,7 +144,7 @@ async function assignContractorToOrder(orderId, contractorId) {
  * Get all orders from Escrow API
  * @returns {Promise<Array>} List of orders
  */
-async function getEscrowOrders() {
+async function getOrders() {
   try {
     return await escrowApi.getOrders();
   } catch (error) {
@@ -158,7 +158,7 @@ async function getEscrowOrders() {
  * @param {string} orderId - Order ID
  * @returns {Promise<Object>} Order data
  */
-async function getEscrowOrderById(orderId) {
+async function getOrderById(orderId) {
   try {
     return await escrowApi.getOrderById(orderId);
   } catch (error) {
@@ -193,11 +193,11 @@ async function voteForRepresentative(orderId, candidateId) {
 }
 
 export {
-  createEscrowOrder,
-  createGroupEscrowOrder,
-  fundEscrowOrder,
-  assignContractorToOrder,
-  getEscrowOrders,
-  getEscrowOrderById,
+  createOrder,
+  createGroupOrder,
+  fundOrder,
+  assignContractor,
+  getOrders,
+  getOrderById,
   voteForRepresentative
 };
