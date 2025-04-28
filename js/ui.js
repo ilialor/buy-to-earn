@@ -366,7 +366,11 @@ function initializeUI() {
   }
   
   // Load initial data
-  loadMarketplaceOrders();
+  // Load marketplace data only on marketplace page
+  const activeLink = document.querySelector('.nav-link.active');
+  if (activeLink && activeLink.getAttribute('data-page') === 'marketplace') {
+    loadMarketplaceOrders();
+  }
 }
 
 // Set up auth-related event listeners
@@ -1697,9 +1701,16 @@ document.addEventListener('DOMContentLoaded', function() {
       let isAuthenticated = isUserAuthenticated();
       console.log(`Page ${page}, auth status: ${isAuthenticated ? 'authenticated' : 'not authenticated'}`);
       
+      // Explicitly handle 'home' nav to redirect to home.html
+      if (page === 'home') {
+        event.preventDefault();
+        window.location.href = 'home.html';
+        return;
+      }
+      
       // Загружаем данные для страницы, только если пользователь авторизован
       // или если это маркетплейс/документация (публичные страницы)
-      if (page === 'marketplace' || page === 'docs') {
+      if (page === 'marketplace' || page === 'docs' || page === 'home' || page === 'support') {
         // Публичные страницы всегда доступны
         if (page === 'marketplace') {
           loadMarketplaceOrders();

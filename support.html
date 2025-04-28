@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <!-- Core meta and imports copied from home.html -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-Intent - Support</title>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="manifest" href="images/site.webmanifest">
+    <link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#007bff">
+    <meta name="msapplication-TileColor" content="#007bff">
+    <meta name="theme-color" content="#007bff">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/notification.css">
+    <link rel="stylesheet" href="styles/i18n.css">
+    <link rel="stylesheet" href="styles/escrow.css">
+    <link rel="stylesheet" href="styles/home.css">
+
+    <!-- Local scripts -->
+    <script src="js/local-auth.js"></script>
+    <script type="module" src="locales/index.js"></script>
+    <script type="module" src="js/i18n.js"></script>
+</head>
+
+<body>
+    <div id="notification-container" class="notification-container"></div>
+    <div class="container">
+        <header>
+            <button class="menu-toggle" id="mobile-menu"><i class="fas fa-bars"></i></button>
+            <div class="logo">
+                <img src="images/Logo_CoIntent.png" alt="Co-Intent Logo" class="loading-logo">
+            </div>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="home.html" class="nav-link" data-page="home" data-i18n="nav.home">Главная</a></li>
+                    <li><a href="index.html" class="nav-link" data-page="marketplace" data-i18n="nav.marketplace">Marketplace</a></li>
+                    <li><a href="docs.html" class="nav-link" data-page="docs" data-i18n="nav.docs">Documentation</a></li>
+                    <li><a href="support.html" class="nav-link active" data-page="support" data-i18n="nav.support">Support</a></li>
+                </ul>
+            </nav>
+            <div class="user-controls user-controls-auth">
+                <button class="btn btn-outline" id="connect-wallet-btn" data-i18n="wallet.connectWallet"><i class="fas fa-wallet"></i> Connect Wallet</button>
+                <button class="btn btn-primary" id="sign-in-btn" data-i18n="auth.signIn"><i class="fas fa-user"></i> Sign In</button>
+            </div>
+            <div class="user-controls-logged-in">
+                <div class="btn btn-outline" id="wallet-balance-display" data-modal="deposit-funds-modal"><i class="fas fa-wallet"></i> <span id="wallet-balance-value">0.00</span> ETH</div>
+                <div class="user-info" id="user-info"><div class="user-avatar" id="user-avatar"><i class="fas fa-user"></i></div><span class="user-name" id="user-display-name">User</span><i class="fas fa-chevron-down"></i>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <div class="user-dropdown-item" id="go-to-profile" data-i18n="profile.title" tabindex="0"><i class="fas fa-user-circle"></i> <span>Профиль</span></div>
+                        <div class="user-dropdown-item" id="go-to-wallet" data-i18n="wallet.title" tabindex="0"><i class="fas fa-wallet"></i> <span>Кошелек</span></div>
+                        <div class="user-dropdown-item" id="go-to-portfolio" data-i18n="portfolio.title" tabindex="0"><i class="fas fa-chart-pie"></i> <span>Портфолио</span></div>
+                        <div class="user-dropdown-divider"></div>
+                        <div class="user-dropdown-item" id="sign-out-btn" tabindex="0"><i class="fas fa-sign-out-alt"></i> <span>Выйти</span></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-content support-main">
+            <h1>Support</h1>
+            <p>Здесь будет страница поддержки Co-Intent.</p>
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-nav">
+            <a href="home.html" data-i18n="nav.home">Главная</a> |
+            <a href="index.html" data-page="marketplace" data-i18n="nav.marketplace">Marketplace</a> |
+            <a href="docs.html" data-page="docs" data-i18n="nav.docs">Documentation</a> |
+            <a href="support.html" data-page="support" data-i18n="nav.support">Support</a>
+        </div>
+        <div class="legal"><p>&copy; 2025 Co-Intent. All rights reserved.</p></div>
+        <div class="social-icons"><a href="#"><i class="fab fa-youtube"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-telegram"></i></a></div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/ui.js"></script>
+    <script type="module" src="js/revenue-calculator.js"></script>
+    <script type="module" src="js/escrow/index.js"></script>
+    <script src="js/home-chat.js"></script>
+</body>
+</html>
