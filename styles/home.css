@@ -38,7 +38,7 @@
   display: flex;
   flex-direction: column;
   background: #fff;
-  border-radius: 8px;
+  border-radius: 15px;
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   min-height: 60vh;
@@ -49,7 +49,7 @@
   overflow-y: auto;
   background: rgba(245,245,245,0.8);
   padding: 0.5rem 0;
-  border-radius: 6px;
+  border-radius: 15px;
   margin-bottom: 1rem;
   font-size: 1rem;
   line-height: 1.5;
@@ -77,16 +77,20 @@
   min-width: 90px;
   font-size: 1rem;
   padding: 0 18px;
-  border-radius: 20px;
+  border-radius: 5px;
   box-shadow: none;
-  background: #007bff;
+  background: var(--gradient-primary);
   color: #fff;
   border: none;
   cursor: pointer;
   transition: background 0.2s;
 }
-#send-btn:hover {
-  background: #0056b3;
+/* Specific gradient hover for Send and Sign In buttons */
+#send-btn:hover,
+#sign-in-btn:hover,
+#sign-in-form button[type="submit"]:hover {
+  background-image: linear-gradient(90deg, #1E8AB9, #8828AF) !important;
+  color: #fff !important;
 }
 
 .chat-input {
@@ -95,11 +99,94 @@
   gap: 0.5rem;
 }
 
-.chat-input input {
-  min-height: 80px;
-  font-size: 1rem;
-  padding: 1rem;
+.chat-input .textarea-wrapper {
+  position: relative;
+  flex: 1;
+  margin-top: 4px;
 }
+
+.chat-input .textarea-wrapper textarea {
+  width: 100%;
+  padding-left: 36px;
+  padding-right: 36px;
+  border-radius: 15px;
+  flex: 1;
+  min-height: 80px;
+  max-height: 120px;
+  font-size: 1rem;
+  resize: none;
+  overflow-y: auto;
+  border: none;
+  background: #f8f9fa;
+  transition: border 0.3s;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.2) rgba(0,0,0,0.05);
+}
+
+.chat-input textarea::-webkit-scrollbar {
+  width: 4px;
+}
+.chat-input textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chat-input textarea::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 2px;
+}
+
+.chat-input textarea:focus {
+  outline: none;
+  border: 1px solid transparent;
+  border-image: linear-gradient(to right, #1E8AB9, #8828AF) 1;
+  border-radius: 15px;
+}
+
+.btn-add {
+  position: absolute;
+  left: 4px;
+  bottom: 8px;
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.btn-add:hover {
+  background: rgba(30, 138, 185, 0.1);
+}
+
+.chat-dropdown {
+  position: absolute;
+  right: 4px;
+  bottom: 8px;
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  padding: 2px;
+  font-size: 1rem;
+  color: var(--dark);
+}
+
+.chat-dropdown:focus {
+  outline: none;
+}
+
+.chat-dropdown::-ms-expand {
+  display: none;
+}
+
 .home-main > .sidebar {
   order: 2;
   display: flex;
@@ -116,38 +203,89 @@
   width: max-content;
   margin-left: auto;
 }
-/* Popular projects under stats: same width, 2 per row */
+/* Popular Projects: image-only cards */
 .sidebar > .popular-projects {
   background: rgba(255,255,255,0.6);
   border: none;
   border-radius: 20px;
   width: 368px;
-  /* 4*80px + 3*16px gap = 368px */
+  /* 4*120px + 3*16px gap = 368px */
   padding: 1rem;
   margin-left: auto;
+  margin-top: -1rem;
 }
 .sidebar > .popular-projects .project-cards {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 140px);
+  grid-auto-rows: 98px;
   gap: 0.5rem;
+  justify-content: center;
 }
 .sidebar > .popular-projects .project-card {
-  background: #f9f9f9;
-  padding: 0.75rem;
-  border-radius: 6px;
+  width: 140px;
+  height: 98px;
+  border-radius: 15px;
+  overflow: hidden;
+}
+.sidebar > .popular-projects .project-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Center Popular Projects title */
+.sidebar > .popular-projects h3 {
   text-align: center;
+  margin-bottom: 0.75rem;
+}
+/* News AI section styling */
+.sidebar > .news-ai {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  background: rgba(255,255,255,0.6);
+  border: none;
+  border-radius: 20px;
+  width: 368px;
+  padding: 1rem;
+  margin-left: auto;
+  margin-top: 0.25rem;
+}
+.sidebar > .news-ai h3 {
+  text-align: left;
+  margin: 0;
+}
+.sidebar > .news-ai .news-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 140px);
+  gap: 0.5rem;
+  justify-content: center;
+}
+.sidebar > .news-ai .project-card {
+  width: 220px;
+  height: 98px;
+  border-radius: 15px;
+  overflow: hidden;
+}
+.sidebar > .news-ai .project-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .ai-chat {
   background: #fff;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  border-radius: 8px;
+  border-radius: 15px;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto !important;
   min-height: 430px;
   flex: 1 1 0;
   /* matches sidebar height visually */
+}
+.home-main > .ai-chat {
+  height: auto !important;
 }
 .ai-chat .chat-header {
   display: flex;
@@ -173,7 +311,7 @@
 }
 .ai-chat .message {
   padding: 0.4rem 0.6rem;
-  border-radius: 8px;
+  border-radius: 15px;
   margin-bottom: 0.5rem;
   animation: fadeIn 0.3s ease;
 }
@@ -319,4 +457,32 @@ header {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* align textarea and send button bottoms */
+.chat-input .textarea-wrapper,
+.chat-input #send-btn {
+  align-self: flex-end;
+}
+.chat-input #send-btn {
+  margin-bottom: 0;
+  margin-top: -18px;
+}
+
+/* Button hover & active states */
+button:hover {
+  background-color: #1E8AB9;
+  color: #fff;
+}
+button:active {
+  background-image: linear-gradient(90deg, #1E8AB9, #8828AF);
+  color: #fff;
+}
+
+/* Disable hover/active gradient on stat-card buttons */
+button.stat-card:hover,
+button.stat-card:active {
+  background-color: unset !important;
+  background-image: none !important;
+  color: inherit !important;
 }

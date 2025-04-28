@@ -70,17 +70,17 @@
                     
                     <div class="user-dropdown" id="user-dropdown">
                         <div class="user-dropdown-item" id="go-to-profile" data-i18n="profile.title" tabindex="0">
-                            <i class="fas fa-user-circle"></i> <span>Профиль</span>
+                            <i class="fas fa-user-circle"></i> <span>Profile</span>
                         </div>
                         <div class="user-dropdown-item" id="go-to-wallet" data-i18n="wallet.title" tabindex="0">
-                            <i class="fas fa-wallet"></i> <span>Кошелек</span>
+                            <i class="fas fa-wallet"></i> <span>Wallet</span>
                         </div>
                         <div class="user-dropdown-item" id="go-to-portfolio" data-i18n="portfolio.title" tabindex="0">
-                            <i class="fas fa-chart-pie"></i> <span>Портфолио</span>
+                            <i class="fas fa-chart-pie"></i> <span>Portfolio</span>
                         </div>
                         <div class="user-dropdown-divider"></div>
                         <div class="user-dropdown-item" id="sign-out-btn" tabindex="0">
-                            <i class="fas fa-sign-out-alt"></i> <span>Выйти</span>
+                            <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                         </div>
                     </div>
                 </div>
@@ -93,63 +93,68 @@
                 <div class="stats">
                     <button type="button" class="stat-card">
                         <span class="stat-value">123</span>
-                        <span class="stat-label">Заказы</span>
+                        <span class="stat-label">Orders</span>
                     </button>
                     <button type="button" class="stat-card">
                         <span class="stat-value">₽1.2M</span>
-                        <span class="stat-label">Инвестиции</span>
+                        <span class="stat-label">Investments</span>
                     </button>
                     <button type="button" class="stat-card">
                         <span class="stat-value">45</span>
-                        <span class="stat-label">Продукты</span>
+                        <span class="stat-label">Products</span>
                     </button>
                     <button type="button" class="stat-card">
                         <span class="stat-value">₽3.4M</span>
-                        <span class="stat-label">Доход</span>
+                        <span class="stat-label">Revenue</span>
                     </button>
                 </div>
                 <!-- Popular Projects -->
                 <section class="popular-projects">
-                    <h3>Популярные проекты</h3>
+                    <h3>Popular Projects</h3>
                     <div class="project-cards">
                         <div class="project-card">
-                            <img src="images/project1.png" alt="Проект 1">
-                            <h4>Проект 1</h4>
-                            <p>Краткое описание проекта 1.</p>
+                            <img src="images/Project1.jpg" alt="Project 1">
                         </div>
                         <div class="project-card">
-                            <img src="images/project2.png" alt="Проект 2">
-                            <h4>Проект 2</h4>
-                            <p>Краткое описание проекта 2.</p>
+                            <img src="images/Project2.jpg" alt="Project 2">
                         </div>
                         <div class="project-card">
-                            <img src="images/project3.png" alt="Проект 3">
-                            <h4>Проект 3</h4>
-                            <p>Краткое описание проекта 3.</p>
+                            <img src="images/Project3.jpg" alt="Project 3">
+                        </div>
+                        <div class="project-card">
+                            <img src="images/Project4.jpg" alt="Project 4">
                         </div>
                     </div>
+                </section>
+                <section class="news-ai">
+                    <h3>News AI</h3>
+                    <div class="project-card"><img src="images/news1.jpg" alt="News 1"></div>
                 </section>
             </div>
             <!-- AI Chat Section -->
             <section class="ai-chat">
                 <div class="chat-messages">
                     <div class="message ai">
-                        <img src="images/cat_agent.png" alt="Айлок" class="ai-message-avatar">
-                        <p>Привет! Я Айлок, ваш AI-помощник на Co-Intent. Здесь вы можете задать вопросы о нашей платформе, узнать, как объединять усилия для коллективных заказов и получить ответы по вашим проектам.</p>
+                        <img src="images/cat_agent.png" alt="Ailock" class="ai-message-avatar">
+                        <p>Hello! I'm Ailok, your AI assistant on Co-Intent.</p>
                     </div>
                 </div>
                 <div class="chat-input">
-    <input type="text" id="user-input" placeholder="Введите сообщение..." />
-    <div class="chat-send-btn-row">
-        <button id="send-btn" class="btn btn-primary">Отправить</button>
-    </div>
-</div>
+                    <div class="textarea-wrapper">
+                        <button id="add-btn" class="btn-add"><i class="fas fa-plus"></i></button>
+                        <textarea id="user-input" placeholder="Type a message..."></textarea>
+                        <select id="options-dropdown" class="chat-dropdown">
+                            <option value="">…</option>
+                        </select>
+                    </div>
+                    <button id="send-btn" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send</button>
+                </div>
                 <div class="suggestions">
-                    <button class="btn suggestion-btn">Расскажи, что такое Co-Intent?</button>
-                    <button class="btn suggestion-btn">Как работает коллективный заказ?</button>
-                    <button class="btn suggestion-btn">Какую пользу я получу от участия?</button>
-                    <button class="btn suggestion-btn">Как прокачать Ailock</button>
-                    <button class="btn suggestion-btn">Расскажи что может Ailock</button>
+                    <button class="btn suggestion-btn">Tell me what Co-Intent is?</button>
+                    <button class="btn suggestion-btn">How does group ordering work?</button>
+                    <button class="btn suggestion-btn">What benefits will I gain from participating?</button>
+                    <button class="btn suggestion-btn">How to upgrade Ailok</button>
+                    <button class="btn suggestion-btn">Tell me what Ailok can do</button>
                 </div>
             </section>
         </main>
