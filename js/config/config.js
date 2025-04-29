@@ -8,10 +8,12 @@ const API_CONFIG = {
     : 'http://api.ateira.online/api'
 };
 
-export default API_CONFIG;
-export const ESCROW_API_URL = API_CONFIG.API_URL;
-export const AILOCK_API_URL = isProd
-  ? 'http://ai.ateira.online'
-  : window.location.origin;
-export const ESCROW_TOKEN = localStorage.getItem('escrowToken') || '';
-export const AILOCK_TOKEN = localStorage.getItem('ailockToken') || '';
+export default {
+  API_URL: API_CONFIG.API_URL,
+  ESCROW_API_URL: API_CONFIG.API_URL,
+  AILOCK_API_URL: isProd
+    ? 'http://ai.ateira.online'
+    : window.location.origin,
+  ESCROW_TOKEN: localStorage.getItem('escrowToken') || '',
+  AILOCK_TOKEN: localStorage.getItem('ailockToken') || ''
+};

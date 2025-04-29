@@ -113,11 +113,23 @@ function logoutFromEscrow() {
   localStorage.removeItem('currentEscrowUserId');
 }
 
+/**
+ * Get current Escrow user
+ */
+async function getCurrentUser() {
+  const escrowUserId = getCurrentEscrowUserId();
+  if (!escrowUserId) {
+    throw new Error('User not authenticated with Escrow');
+  }
+  return escrowApi.getUserById(escrowUserId);
+}
+
 export {
   registerUserWithEscrow,
   updateEscrowUserInfo,
   getEscrowUserId,
   getCurrentEscrowUserId,
   logoutFromEscrow,
+  getCurrentUser,
   mapUserRoleToEscrowType
 };

@@ -138,3 +138,24 @@ export function translateMilestoneStatus(status) {
   
   return statusMap[status] || status;
 }
+
+let currentLoader = null;
+
+/**
+ * Show global loading indicator
+ */
+export function showLoading(container = document.body) {
+  if (!currentLoader) {
+    currentLoader = showLoader(container);
+  }
+}
+
+/**
+ * Hide global loading indicator
+ */
+export function hideLoading() {
+  if (currentLoader) {
+    hideLoader(currentLoader);
+    currentLoader = null;
+  }
+}
