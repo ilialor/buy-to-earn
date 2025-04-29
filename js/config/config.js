@@ -9,3 +9,9 @@ const API_CONFIG = {
 };
 
 export default API_CONFIG;
+export const ESCROW_API_URL = API_CONFIG.API_URL;
+export const AILOCK_API_URL = import.meta.env.PROD
+  ? 'https://ai.ateira.online'
+  : window.location.origin;
+export const ESCROW_TOKEN = localStorage.getItem('escrowToken') || '';
+export const AILOCK_TOKEN = localStorage.getItem('ailockToken') || '';

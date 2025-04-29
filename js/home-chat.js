@@ -2,6 +2,8 @@
 // Initialize chat interactions and UI for home page
 // Assumes initializeUI is available from ui.js
 
+import { ailockApi } from './api/index.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize UI (navigation, modals, language selector)
     if (typeof initializeUI === 'function') initializeUI();
@@ -20,28 +22,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Handle send button
+    // Handle send button with Ailock API
     if (sendBtn && userInput && messagesContainer) {
-        sendBtn.addEventListener('click', () => {
+        sendBtn.addEventListener('click', async () => {
             const text = userInput.value.trim();
             if (!text) return;
 
             // Append user message
-            const msgElem = document.createElement('div');
-            msgElem.className = 'message user';
-            msgElem.innerHTML = `<p>${text}</p>`;
-            messagesContainer.appendChild(msgElem);
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.innerHTML = `<p>${text}</p>`;
+            messagesContainer.appendChild(userMsg);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             userInput.value = '';
 
-            // Simulate AI response
-            setTimeout(() => {
-                const aiElem = document.createElement('div');
-                aiElem.className = 'message ai';
-                aiElem.innerHTML = `<p>Я работаю над ответом на: ${text}</p>`;
-                messagesContainer.appendChild(aiElem);
+            // Send to Ailock
+            const session = localStorage.getItem('ailockSessionId') || '';
+            try {
+                const result = await ailockApi.sendMessage(session, text);
+                localStorage.setItem('ailockSessionId', result.sessionId);
+                // Render all messages
+                messagesContainer.innerHTML = '';
+                result.messages.forEach(msg => {
+                    const msgElem = document.createElement('div');
+                    msgElem.className = `message ${msg.role}`;
+                    msgElem.innerHTML = `<p>${msg.content}</p>`;
+                    messagesContainer.appendChild(msgElem);
+                });
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }, 800);
+            } catch (error) {
+                console.error('Ailock API error:', error);
+            }
         });
     }
 });
