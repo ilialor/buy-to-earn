@@ -192,6 +192,29 @@ async function voteForRepresentative(orderId, candidateId) {
   }
 }
 
+/**
+ * Get orders for the current user, categorized by created, joined, and assigned
+ * @returns {Promise<{success: boolean, data: {createdOrders: Array, joinedOrders: Array, assignedOrders: Array}}>} 
+ */
+async function getUserOrders() {
+  const currentUserId = getCurrentEscrowUserId();
+  if (!currentUserId) {
+    throw new Error('User not authenticated with Escrow');
+  }
+  const orders = await escrowApi.getOrders();
+  const createdOrders = [];
+  const joinedOrders = [];
+  const assignedOrders = [];
+  orders.forEach(order => {
+    if (order.creatorId === currentUserId) createdOrders.push(order);
+    if (order.contractorId === currentUserId) assignedOrders.push(order);
+    if (order.contributions && order.contributions[currentUserId] > 0) {
+      joinedOrders.push(order);
+    }
+  });
+  return { success: true, data: { createdOrders, joinedOrders, assignedOrders } };
+}
+
 export {
   createOrder,
   createGroupOrder,
@@ -199,5 +222,6 @@ export {
   assignContractor,
   getOrders,
   getOrderById,
-  voteForRepresentative
+  voteForRepresentative,
+  getUserOrders
 };

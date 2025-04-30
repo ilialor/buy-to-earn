@@ -396,96 +396,117 @@
             <h1 class="main-title">Profile</h1>
             <p class="subtitle">Manage your account information and settings.</p>
 
-            <div class="profile-card">
-                <div class="profile-header">
-                    <div class="profile-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="profile-info">
-                        <h2>John Doe</h2>
-                        <p>john.doe@example.com</p>
-                        <p>Member since: January 2023</p>
-                    </div>
-                </div>
-                <div class="profile-stats">
-                    <div class="stat-card">
-                        <div class="stat-value">10</div>
-                        <div class="stat-label">Investments</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">5</div>
-                        <div class="stat-label">NFTs</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">$1,250</div>
-                        <div class="stat-label">Total Earnings</div>
-                    </div>
-                </div>
+            <!-- Loading indicator -->
+            <div id="profile-loading" class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>Loading your profile...</p>
             </div>
 
-            <div class="profile-section">
-                <h3 class="profile-section-title">Account Settings</h3>
-                <div class="card">
-                    <form>
-                        <div class="form-group">
-                            <label for="profile-name">Full Name</label>
-                            <input type="text" id="profile-name" value="John Doe">
-                        </div>
-                        <div class="form-group">
-                            <label for="profile-email">Email</label>
-                            <input type="email" id="profile-email" value="john.doe@example.com">
-                        </div>
-                        <div class="form-group">
-                            <label for="profile-bio">Bio</label>
-                            <textarea id="profile-bio" placeholder="Tell us about yourself"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Update Profile</button>
-                    </form>
-                </div>
+            <!-- Error message -->
+            <div id="profile-error" class="error-container" style="display: none;">
+                <p class="error-message">Could not load your profile data. Please try again later.</p>
+                <button id="retry-profile-load" class="btn btn-primary">Retry</button>
             </div>
 
-            <div class="profile-section">
-                <h3 class="profile-section-title">Security</h3>
-                <div class="card">
-                    <form>
-                        <div class="form-group">
-                            <label for="current-password">Current Password</label>
-                            <input type="password" id="current-password">
+            <!-- Profile content (hidden until loaded) -->
+            <div id="profile-content" style="display: none;">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
                         </div>
-                        <div class="form-group">
-                            <label for="new-password">New Password</label>
-                            <input type="password" id="new-password">
+                        <div class="profile-info">
+                            <h2 id="profile-header-name"></h2>
+                            <p id="profile-header-email"></p>
+                            <p id="profile-header-member-since"></p>
                         </div>
-                        <div class="form-group">
-                            <label for="confirm-password">Confirm New Password</label>
-                            <input type="password" id="confirm-password">
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat-card">
+                            <div id="profile-investments" class="stat-value">0</div>
+                            <div class="stat-label">Investments</div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Change Password</button>
-                    </form>
+                        <div class="stat-card">
+                            <div id="profile-nfts" class="stat-value">0</div>
+                            <div class="stat-label">NFTs</div>
+                        </div>
+                        <div class="stat-card">
+                            <div id="profile-earnings" class="stat-value">$0</div>
+                            <div class="stat-label">Total Earnings</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="profile-section">
-                <h3 class="profile-section-title">Notifications</h3>
-                <div class="card">
-                    <form>
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" checked> Email notifications for new investment opportunities
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" checked> Revenue share payment notifications
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox"> Marketing updates and newsletters
-                            </label>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Preferences</button>
-                    </form>
+                <div class="profile-section">
+                    <h3 class="profile-section-title">Account Settings</h3>
+                    <div class="card">
+                        <form id="profile-form">
+                            <div class="form-group">
+                                <label for="profile-name">Full Name</label>
+                                <input type="text" id="profile-name" name="name">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-email">Email</label>
+                                <input type="email" id="profile-email" name="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="profile-bio">Bio</label>
+                                <textarea id="profile-bio" name="bio" placeholder="Tell us about yourself"></textarea>
+                            </div>
+                            <div id="profile-form-error" class="form-error" style="display: none;"></div>
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3 class="profile-section-title">Security</h3>
+                    <div class="card">
+                        <form id="password-form">
+                            <div class="form-group">
+                                <label for="current-password">Current Password</label>
+                                <input type="password" id="current-password" name="currentPassword">
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password">New Password</label>
+                                <input type="password" id="new-password" name="newPassword">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password">Confirm New Password</label>
+                                <input type="password" id="confirm-password" name="confirmPassword">
+                            </div>
+                            <div id="password-form-error" class="form-error" style="display: none;"></div>
+                            <button type="submit" class="btn btn-primary">Change Password</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3 class="profile-section-title">Notifications</h3>
+                    <div class="card">
+                        <form id="notification-form">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" name="investment-notifications" id="investment-notifications"> 
+                                    Email notifications for new investment opportunities
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" name="payment-notifications" id="payment-notifications"> 
+                                    Revenue share payment notifications
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" name="marketing-notifications" id="marketing-notifications"> 
+                                    Marketing updates and newsletters
+                                </label>
+                            </div>
+                            <div id="notification-form-error" class="form-error" style="display: none;"></div>
+                            <button type="submit" class="btn btn-primary">Save Preferences</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

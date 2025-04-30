@@ -5,12 +5,16 @@
 
 // Import and re-export all services
 import { escrowApi } from './escrow-api.js';
+import { AilockClient } from './ailock-client.js';
+import config from '../config/config.js';
 import * as userService from './user-service.js';
 import * as orderService from './order-service.js';
 import * as milestoneService from './milestone-service.js';
 import * as uiUtils from './ui-utils.js';
 import StorageSync from './storage-sync.js';
 import paymentWrapper from './payment-wrapper.js';
+
+const ailockApi = new AilockClient(config.AILOCK_API_URL, config.AILOCK_TOKEN);
 
 // Initialize the API integration when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -30,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export all components
 export { 
+  ailockApi,
   escrowApi,
   userService,
   orderService, 
