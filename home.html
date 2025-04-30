@@ -88,6 +88,69 @@
         </header>
 
         <main class="home-main">
+            <!-- Страницы для профиля и кошелька пользователя -->
+            <div id="profile" class="page-content">
+                <h2>Профиль пользователя</h2>
+                <div class="profile-content">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="profile-info">
+                            <h3 id="profile-name">Имя пользователя</h3>
+                            <p id="profile-email">email@example.com</p>
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span class="stat-value" id="profile-investments">0</span>
+                                <span class="stat-label">Инвестиции</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="profile-balance">0.00</span>
+                                <span class="stat-label">Баланс</span>
+                            </div>
+                        </div>
+                        <div class="profile-edit-form">
+                            <h4>Настройки профиля</h4>
+                            <form id="profile-form">
+                                <div class="form-group">
+                                    <label for="profile-name-input">Имя</label>
+                                    <input type="text" id="profile-name-input" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-bio">О себе</label>
+                                    <textarea id="profile-bio" class="form-control"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Сохранить</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="wallet" class="page-content">
+                <h2>Кошелек</h2>
+                <div class="wallet-content">
+                    <div class="wallet-balance">
+                        <h3>Текущий баланс</h3>
+                        <div class="balance-amount"><span id="wallet-amount">0.00</span> ETH</div>
+                    </div>
+                    <div class="wallet-actions">
+                        <button class="btn btn-primary" data-modal="deposit-funds-modal">Пополнить</button>
+                        <button class="btn btn-outline" data-modal="withdraw-funds-modal">Вывести</button>
+                    </div>
+                    <div class="wallet-history">
+                        <h3>История операций</h3>
+                        <div id="transaction-list" class="transaction-list">
+                            <!-- Список транзакций будет загружен динамически -->
+                            <div class="empty-message">История транзакций пуста</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Sidebar: stats and popular projects -->
             <div class="sidebar">
                 <div class="stats">
@@ -180,9 +243,9 @@
     <!-- Optional: custom script for chat interactions -->
     <script type="module" src="js/home-chat.js"></script>
     <script type="module" src="js/home-wallet.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/db.js"></script>
-    <script src="js/ui.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/db.js"></script>
+    <script type="module" src="js/ui.js"></script>
     <script type="module" src="js/revenue-calculator.js"></script>
     <script type="module" src="js/escrow/index.js"></script>
 </body>
