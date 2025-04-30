@@ -330,10 +330,34 @@ class EscrowUI {
     window.escrowAPI.uiUtils.showLoading();
     
     try {
-      // Use the Escrow API to get orders
-      const result = await window.escrowAPI.orderService.getUserOrders();
+      // Use the Escrow API to get all orders, then filter for current user
+      const allOrders = await window.escrowAPI.orderService.getOrders();
       
-      if (result.success) {
+      // Получаем ID текущего пользователя
+      const currentUserId = this.currentUser?.id || user?.id;
+      
+      // Если нет ID пользователя, невозможно фильтровать заказы
+      if (!currentUserId) {
+        console.warn('Не удалось определить ID текущего пользователя для фильтрации заказов');
+        return;
+      }
+      
+      // Фильтруем заказы пользователя
+      const createdOrders = allOrders.filter(order => order.customerId === currentUserId || order.customerIds?.includes(currentUserId));
+      const joinedOrders = allOrders.filter(order => order.isGroupOrder && order.customerIds?.includes(currentUserId) && order.customerId !== currentUserId);
+      const assignedOrders = allOrders.filter(order => order.contractorId === currentUserId);
+      
+      // Создаем структуру, аналогичную ожидаемой от метода getUserOrders
+      const result = {
+        success: true,
+        data: {
+          createdOrders,
+          joinedOrders,
+          assignedOrders
+        }
+      };
+      
+      if (true) { // Изменяем условие для совместимости
         // Structure data for the existing rendering function
         const userOrders = {
           orders_created: result.data.createdOrders || [],
