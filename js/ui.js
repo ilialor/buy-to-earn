@@ -949,7 +949,8 @@ function showError(message) {
 }
 
 // Функция для получения текущего пользователя
-function getCurrentUser() {
+// Экспортируем эту функцию, чтобы она была доступна в других модулях
+export function getCurrentUser() {
   if (window.auth && window.auth.currentUser) {
     return window.auth.currentUser;
   }
@@ -1758,13 +1759,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Заглушки для функций, которые будут реализованы позже
-
-// Получение инвестиций пользователя
-async function getUserInvestments(userId) {
-  console.log('Получение инвестиций пользователя:', userId);
-  // Заглушка, вернет пустой массив
-  return [];
-}
 
 // Отображение инвестиций пользователя
 function renderUserInvestments(investments) {

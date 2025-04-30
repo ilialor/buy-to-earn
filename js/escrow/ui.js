@@ -5,6 +5,7 @@
 
 import EscrowApplication from './application.js';
 import { PLATFORM_SIGNATURE_ID, UserType, OrderStatus, MilestoneStatus } from './constants.js';
+import { getCurrentUser } from '../ui.js';
 
 class EscrowUI {
   constructor() {
