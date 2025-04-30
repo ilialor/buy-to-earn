@@ -3,6 +3,9 @@
  * This file contains UI utility functions
  */
 
+// Import profile module
+import { initProfile } from './profile/profile.js';
+
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize UI components
@@ -361,6 +364,13 @@ function initializeUI() {
     if (typeof showUserInfo === 'function') {
       showUserInfo(auth.currentUser);
     }
+    
+    // Initialize profile page if user is authenticated
+    const profilePage = document.getElementById('profile');
+    if (profilePage) {
+      // Initialize profile functionality
+      initProfile();
+    }
   } else {
     console.log("Пользователь не авторизован");
   }
@@ -368,8 +378,14 @@ function initializeUI() {
   // Load initial data
   // Load marketplace data only on marketplace page
   const activeLink = document.querySelector('.nav-link.active');
-  if (activeLink && activeLink.getAttribute('data-page') === 'marketplace') {
-    loadMarketplaceOrders();
+  if (activeLink) {
+    const activePage = activeLink.getAttribute('data-page');
+    if (activePage === 'marketplace') {
+      loadMarketplaceOrders();
+    } else if (activePage === 'profile' && auth && auth.currentUser) {
+      // Initialize profile if navigating directly to profile page
+      initProfile();
+    }
   }
 }
 
