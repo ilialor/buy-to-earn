@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="styles/i18n.css">
     <link rel="stylesheet" href="styles/escrow.css">
     <link rel="stylesheet" href="styles/home.css">
+    <link rel="stylesheet" href="styles/mobile-header-fix.css">
 
     <!-- Local scripts -->
     <script src="js/local-auth.js"></script>
@@ -36,14 +37,15 @@
     <div id="notification-container" class="notification-container"></div>
     <div class="container">
         <header>
-            <button class="menu-toggle" id="mobile-menu">
-                <i class="fas fa-bars"></i>
-            </button>
-
             <div class="logo">
                 <img src="images/Logo_CoIntent.png" alt="Co-Intent Logo" class="loading-logo">
             </div>
-
+            <button class="btn-version mobile-only" id="lang-switch">GB</button>
+            <button class="btn-icon mobile-only" id="connect-wallet-mobile"><i class="fas fa-wallet"></i></button>
+            <button class="btn-icon mobile-only" id="sign-in-mobile"><i class="fas fa-user"></i></button>
+            <button class="menu-toggle" id="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </button>
             <nav id="main-nav">
                 <ul>
                     <li><a href="home.html" class="nav-link active" data-page="home" data-i18n="nav.home">Ailock</a></li>
@@ -52,7 +54,6 @@
                     <li><a href="support.html" class="nav-link" data-page="support" data-i18n="nav.support">Support</a></li>
                 </ul>
             </nav>
-            
             <div class="user-controls user-controls-auth">
                 <button class="btn btn-outline" id="connect-wallet-btn" data-i18n="wallet.connectWallet"><i class="fas fa-wallet"></i> Connect Wallet</button>
                 <button class="btn btn-primary" id="sign-in-btn" data-i18n="auth.signIn"><i class="fas fa-user"></i> Sign In</button>
@@ -67,7 +68,6 @@
                     </div>
                     <span class="user-name" id="user-display-name">User</span>
                     <i class="fas fa-chevron-down"></i>
-                    
                     <div class="user-dropdown" id="user-dropdown">
                         <div class="user-dropdown-item" id="go-to-profile" data-i18n="profile.title" tabindex="0">
                             <i class="fas fa-user-circle"></i> <span>Profile</span>

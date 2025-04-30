@@ -23,7 +23,7 @@
 }
 .stat-card .stat-value {
   font-size: 12px;
-  color: #007bff;
+  color: #19759F;
   line-height: 1;
   font-weight: 600;
   margin-bottom: 2px;
@@ -37,7 +37,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: rgba(255,255,255,0.5);
   border-radius: 15px;
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -47,12 +47,12 @@
   flex: 1 1 auto;
   min-height: 220px;
   overflow-y: auto;
-  background: rgba(245,245,245,0.8);
   padding: 0.5rem 0;
   border-radius: 15px;
   margin-bottom: 1rem;
   font-size: 1rem;
   line-height: 1.5;
+  background: #fff;
 }
 
 /* Ensure bottom quick-questions block is always at the bottom */
@@ -273,7 +273,7 @@
   object-fit: cover;
 }
 .ai-chat {
-  background: #fff;
+  background: rgba(255,255,255,0.5);
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   border-radius: 15px;
@@ -316,7 +316,7 @@
   animation: fadeIn 0.3s ease;
 }
 .ai-chat .message.ai {
-  background: #f1faff;
+  background: #e8f4ff;
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
@@ -326,7 +326,7 @@
   display: block;
 }
 .ai-chat .message.user {
-  background: #e0f7fa;
+  background: #cff3f9;
   align-self: flex-end;
 }
 .ai-chat .chat-input {
@@ -344,14 +344,14 @@
   margin-top: 0.5rem;
 }
 .suggestion-btn {
-  background: #e0f7fa;
+  background: #d0f0ff;
   border: none;
   border-radius: 6px;
   padding: 0.5rem 0.75rem;
   transition: background 0.2s;
 }
 .suggestion-btn:hover {
-  background: #b2ebf2;
+  background: #a0e0ff;
 }
 
 .info-sidebar {
@@ -434,29 +434,155 @@ footer {
   color: #007bff;
 }
 
-header .logo img {
-  width: 70%;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
-
+/* Compact header with left-aligned logo */
 header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.2rem;
   padding: 0.5rem 1rem;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 1000;
+}
+header .logo {
+  margin: 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+header .logo img {
+  width: 40px;
+  max-width: 40px;
+  margin: 0;
+}
+header .menu-toggle {
+  margin-right: 0.5rem;
+}
+header #main-nav {
+  margin-left: 1.2rem;
+  flex: 1 1 auto;
+}
+header #main-nav ul {
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+header .user-controls,
+header .user-controls-logged-in {
+  margin-left: 1.2rem;
+  display: flex;
+  gap: 0.5rem;
+}
+@media (max-width: 768px) {
+  header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+    padding: 0.3rem 0.5rem;
+    min-height: 48px;
+  }
+  header .logo {
+    margin-right: 0.5rem;
+  }
+  header .logo img {
+    width: 28px !important;
+    max-width: 28px !important;
+    height: auto !important;
+  }
+  header #main-nav {
+    flex: 1 1 0;
+    margin-left: 0.5rem;
+  }
+  header #main-nav ul {
+    display: flex;
+    gap: 0.3rem;
+    font-size: 0.92rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  header .menu-toggle {
+    margin-right: 0.3rem;
+    font-size: 1.2rem;
+    height: 32px;
+    width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  header .user-controls,
+  header .user-controls-logged-in {
+    gap: 0.2rem;
+    margin-left: 0.2rem;
+  }
+  /* Optional: hide nav for very small screens, show only burger */
+  @media (max-width: 480px) {
+    header #main-nav {
+      display: none;
+    }
+  }
 }
 
 @media (max-width: 768px) {
+  /* hide sidebar on mobile to prevent overlay */
+  .home-main > .sidebar {
+    display: none !important;
+  }
   .home-main {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
-  .info-sidebar {
-    margin-top: 2rem;
+  .home-main > .ai-chat {
+    width: 100%;
+    flex: none;
   }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  .home-main > .ai-chat {
+    width: 100%;
+    flex: none;
+  }
+  .home-main > .sidebar {
+    width: 100%;
+    flex: none;
+  }
+  .home-main > .sidebar {
+    margin: 0;
+  }
+  .sidebar > .stats {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+  .sidebar > .popular-projects,
+  .sidebar > .news-ai {
+    width: 100%;
+    padding: 0.75rem;
+  }
+  .ai-chat {
+    min-height: auto !important;
+  }
+  .chat-messages {
+    min-height: 180px;
+  }
+  .chat-input {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .chat-input #send-btn {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+  .suggestions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
 
 /* align textarea and send button bottoms */
@@ -485,4 +611,237 @@ button.stat-card:active {
   background-color: unset !important;
   background-image: none !important;
   color: inherit !important;
+}
+
+/* Overrides: remove background from individual chat messages */
+.chat-messages > div {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Make user input area white */
+#user-input {
+  background: #fff !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Override: Hide sidebar on mobile devices */
+@media (max-width: 768px) {
+  .home-main > .sidebar {
+    display: none !important;
+  }
+}
+
+/* Mobile override: hide sidebar and force chat full-width */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none !important;
+  }
+  .home-main {
+    display: block !important;
+  }
+  .home-main .ai-chat {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  .home-main .chat-messages,
+  .home-main .chat-input,
+  .home-main .suggestions {
+    width: 100% !important;
+  }
+}
+
+/* Mobile final override: hide sidebar and adjust layout */
+@media (max-width: 768px) {
+  .home-main {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  .home-main > .sidebar {
+    display: none !important;
+  }
+  .home-main > .ai-chat {
+    width: 100% !important;
+    margin: 1rem 0 !important;
+    padding: 1rem !important;
+  }
+  .chat-messages,
+  .chat-input,
+  .suggestions {
+    width: 100% !important;
+  }
+}
+
+/* Mobile quick fix: hide sidebar, ensure chat full-width */
+@media (max-width: 768px) {
+  .home-main .sidebar { display: none !important; }
+  .home-main { display: block !important; }
+  .home-main .ai-chat { width: 100% !important; margin: 0 auto !important; }
+  .home-main .chat-messages,
+  .home-main .chat-input,
+  .home-main .suggestions { width: 100% !important; }
+}
+
+/* Final mobile override: hide sidebar and full-width chat */
+@media (max-width: 768px) {
+  .sidebar { display: none !important; }
+  .home-main { display: flex !important; flex-direction: column !important; }
+  .home-main > .ai-chat { width: 100% !important; margin: 0 auto !important; }
+  .home-main .chat-messages,
+  .home-main .chat-input,
+  .home-main .suggestions { width: 100% !important; }
+}
+
+/* Final mobile override: hide sidebar and ensure full-width chat */
+@media (max-width: 768px) {
+  .home-main > .sidebar { display: none !important; }
+  .home-main { display: flex !important; flex-direction: column !important; }
+  .home-main > .ai-chat { width: 100% !important; margin: 0 !important; padding: 0 1rem !important; }
+  .home-main .chat-messages,
+  .home-main .chat-input,
+  .home-main .suggestions { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+}
+
+/* Mobile final fix: hide sidebar and full-width chat */
+@media (max-width: 768px) {
+  .home-main { display: flex !important; flex-direction: column !important; }
+  .home-main > .sidebar { display: none !important; }
+  .home-main > .ai-chat { width: 100% !important; margin: 0 !important; padding: 1rem !important; }
+  .chat-messages,
+  .chat-input,
+  .suggestions { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+}
+
+/* Mobile layout fix: hide sidebar and adjust container & chat full width */
+@media (max-width: 768px) {
+  .container {
+    width: auto !important;
+    max-width: none !important;
+    padding: 0 1rem !important;
+  }
+  .home-main {
+    display: block !important;
+  }
+  .home-main > .sidebar {
+    display: none !important;
+  }
+  .home-main > .ai-chat {
+    width: 100% !important;
+    margin: 1rem 0 !important;
+    padding: 1rem !important;
+  }
+}
+
+/* Mobile final override to fix layout */
+@media screen and (max-width: 768px) {
+  /* hide sidebar completely */
+  body > .container > main.home-main > .sidebar {
+    display: none !important;
+  }
+  /* make chat section take full width */
+  body > .container > main.home-main > .ai-chat {
+    width: 100% !important;
+    margin: 1rem 0 !important;
+    padding: 1rem !important;
+  }
+  /* ensure container is full width */
+  .container {
+    width: auto !important;
+    max-width: none !important;
+    padding: 0 1rem !important;
+  }
+  /* make inner chat elements full width */
+  .chat-messages,
+  .chat-input,
+  .suggestions {
+    width: 100% !important;
+  }
+}
+
+/* Mobile layout fix: hide sidebar and set chat full width */
+@media (max-width: 768px) {
+  body > .container > main.home-main > .sidebar {
+    display: none !important;
+  }
+  body > .container > main.home-main > section.ai-chat {
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 1rem !important;
+  }
+  .container {
+    max-width: 100% !important;
+    padding: 0 1rem !important;
+  }
+  .home-main {
+    flex-direction: column !important;
+  }
+}
+
+/* FINAL MOBILE OVERRIDE: hide sidebar and ensure chat is full width */
+@media screen and (max-width: 768px) {
+  .container {
+    max-width: 100% !important;
+    padding: 0 1rem !important;
+  }
+  .home-main {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  .home-main > .sidebar {
+    display: none !important;
+  }
+  .home-main > section.ai-chat {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 1rem !important;
+  }
+  .chat-messages,
+  .chat-input,
+  .suggestions {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+/* Mobile input full width & logo resize */
+@media screen and (max-width: 768px) {
+  #user-input {
+    width: 100% !important;
+  }
+  header .logo img {
+    width: 40px !important;
+    height: auto !important;
+  }
+}
+
+/* Mobile enhancements: full-width user-input & smaller logo */
+@media screen and (max-width: 768px) {
+  #user-input,
+  .chat-input textarea {
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+  header .logo img {
+    width: 40px !important;
+    max-width: 40px !important;
+    height: auto !important;
+  }
+}
+
+/* Mobile full-width input and block spacing */
+@media screen and (max-width: 768px) {
+  .chat-messages { margin-bottom: 1rem !important; }
+  .chat-input { margin-bottom: 1rem !important; }
+  .chat-input .textarea-wrapper,
+  #user-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
 }
