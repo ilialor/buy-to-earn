@@ -1330,8 +1330,9 @@ function createOrderElement(order, isInPortfolio = false) {
     orderContent = `
       <h6 class="order-title">${order.title}</h6>
       <div class="order-meta">
+        <span><i class="fas fa-tag"></i> ${order.category || 'Категория не указана'}</span>
         <span><i class="fas fa-coins"></i> ${orderPrice} ${orderCurrency}</span>
-        <span><i class="fas fa-calendar-alt"></i> ${formatDate(order.createdAt)}</span>
+        <span><i class="fas fa-calendar"></i> ${formatDate(order.createdAt) || 'Дата не указана'}</span>
         <span class="user-badge"><i class="fas fa-user"></i> ${getCurrentUserId() === order.userId ? 'Вы' : order.userName || 'Пользователь'}</span>
       </div>
       <p>${order.description.substring(0, 100)}${order.description.length > 100 ? '...' : ''}</p>
@@ -1713,11 +1714,7 @@ document.addEventListener('DOMContentLoaded', function() {
     link.addEventListener('click', function(event) {
       const page = this.getAttribute('data-page');
       
-      // Используем улучшенную функцию проверки авторизации
-      let isAuthenticated = isUserAuthenticated();
-      console.log(`Page ${page}, auth status: ${isAuthenticated ? 'authenticated' : 'not authenticated'}`);
-      
-      // Explicitly handle 'home' nav to redirect to home.html
+      // Redirect Ailock (home) header link explicitly to home.html
       if (page === 'home') {
         event.preventDefault();
         window.location.href = 'home.html';
@@ -1736,7 +1733,7 @@ document.addEventListener('DOMContentLoaded', function() {
           // Даем время на отображение страницы, затем вызываем перевод
           setTimeout(translateDocument, 100);
         }
-      } else if (isAuthenticated) {
+      } else if (isUserAuthenticated()) {
         // Приватные страницы доступны только авторизованным пользователям
         if (page === 'portfolio') {
           loadUserPortfolio();
@@ -1916,7 +1913,7 @@ function renderUserOrders(orders) {
         <span><i class="fas fa-coins"></i> ${orderPrice} ${orderCurrency}</span>
         <span><i class="fas fa-calendar"></i> ${formatDate(order.createdAt) || 'Дата не указана'}</span>
       </div>
-      <p class="order-description">${(order.description || 'Описание отсутствует').substring(0, 150)}${order.description && order.description.length > 150 ? '...' : ''}</p>
+      <p>${(order.description || 'Описание отсутствует').substring(0, 150)}${order.description && order.description.length > 150 ? '...' : ''}</p>
       <div class="order-actions">
         <button class="btn btn-primary btn-sm view-order-details" data-order-id="${order.id}">
           <i class="fas fa-eye"></i> <span data-i18n="marketplace.viewDetails">Подробнее</span>
