@@ -965,7 +965,8 @@ function showError(message) {
 }
 
 // Функция для получения текущего пользователя
-function getCurrentUser() {
+// Экспортируем эту функцию, чтобы она была доступна в других модулях
+export function getCurrentUser() {
   if (window.auth && window.auth.currentUser) {
     return window.auth.currentUser;
   }
@@ -1348,8 +1349,8 @@ function createOrderElement(order, isInPortfolio = false) {
         <span class="funded-amount">${order.fundedAmount}</span> / <span class="total-amount">${order.totalAmount}</span>
       </div>
       <div class="order-dates">
-        <span>Created: ${formatDate(order.createdAt)}</span>
-        <span>Updated: ${formatDate(order.updatedAt)}</span>
+        <span>Created: ${formatOrderDate(order.createdAt)}</span>
+        <span>Updated: ${formatOrderDate(order.updatedAt)}</span>
       </div>
       <p class="order-description">${order.description}</p>
       <div class="order-milestones">
@@ -1358,7 +1359,7 @@ function createOrderElement(order, isInPortfolio = false) {
             <div class="milestone-desc">${milestone.description}</div>
             <div class="milestone-info">
               <span class="milestone-amount">${milestone.amount}</span>
-              <span class="milestone-deadline">${formatDate(milestone.deadline)}</span>
+              <span class="milestone-deadline">${formatOrderDate(milestone.deadline)}</span>
             </div>
           </div>
         `).join('')}
@@ -1775,13 +1776,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Заглушки для функций, которые будут реализованы позже
 
-// Получение инвестиций пользователя
-async function getUserInvestments(userId) {
-  console.log('Получение инвестиций пользователя:', userId);
-  // Заглушка, вернет пустой массив
-  return [];
-}
-
 // Отображение инвестиций пользователя
 function renderUserInvestments(investments) {
   console.log('Отображение инвестиций пользователя:', investments);
@@ -1914,7 +1908,7 @@ function renderUserOrders(orders) {
       <div class="order-meta">
         <span><i class="fas fa-tag"></i> ${order.category || 'Категория не указана'}</span>
         <span><i class="fas fa-coins"></i> ${orderPrice} ${orderCurrency}</span>
-        <span><i class="fas fa-calendar"></i> ${formatDate(order.createdAt) || 'Дата не указана'}</span>
+        <span><i class="fas fa-calendar"></i> ${formatOrderDate(order.createdAt) || 'Дата не указана'}</span>
       </div>
       <p class="order-description">${(order.description || 'Описание отсутствует').substring(0, 150)}${order.description && order.description.length > 150 ? '...' : ''}</p>
       <div class="order-actions">
@@ -1946,8 +1940,8 @@ function renderUserOrders(orders) {
   console.log('Завершено отображение заказов пользователя');
 }
 
-// Вспомогательная функция для форматирования даты
-function formatDate(timestamp) {
+// Вспомогательная функция для форматирования даты для заказов
+function formatOrderDate(timestamp) {
   if (!timestamp) return 'Неизвестно';
   
   let date;
@@ -2055,7 +2049,7 @@ function displayOrderDetailsModal(order) {
       </div>
       <div class="modal-row">
         <div class="modal-row-label">Дата создания:</div>
-        <div class="modal-row-value">${formatDate(order.createdAt)}</div>
+        <div class="modal-row-value">${formatOrderDate(order.createdAt)}</div>
       </div>
       <div class="modal-row">
         <div class="modal-row-label">Описание:</div>
