@@ -1676,6 +1676,29 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize UI
   initializeUI();
   
+  // Mobile auth buttons invoke desktop handlers
+  const mobileConnect = document.getElementById('connect-wallet-mobile');
+  if (mobileConnect) {
+    mobileConnect.addEventListener('click', () => {
+      const desktopConnect = document.getElementById('connect-wallet-btn');
+      if (desktopConnect) desktopConnect.click();
+    });
+  }
+  const mobileSignIn = document.getElementById('sign-in-mobile');
+  if (mobileSignIn) {
+    mobileSignIn.addEventListener('click', () => {
+      const desktopSignIn = document.getElementById('sign-in-btn');
+      if (desktopSignIn) desktopSignIn.click();
+    });
+  }
+  const mobileMenu = document.getElementById('mobile-menu');
+  if (mobileMenu) {
+    mobileMenu.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelector('header').classList.toggle('menu-open');
+    });
+  }
+
   // Глобальный метод для проверки авторизации
   window.checkAuthentication = isUserAuthenticated;
   
