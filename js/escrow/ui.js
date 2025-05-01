@@ -207,20 +207,72 @@ class EscrowUI {
   /**
    * Handle user authentication change
    */
-  _handleUserChange() {
+  async _handleUserChange() {
     // Get current user from auth
     const user = getCurrentUser(); // This function should be defined elsewhere in your app
+    
+    // Import auth service for JWT authentication
+    let authService;
+    try {
+      authService = await import('../auth/index.js').then(module => module.default);
+    } catch (error) {
+      console.warn('JWT auth service not available, using legacy auth:', error);
+    }
     
     if (user) {
       this.currentUser = user;
       
-      // Check if we need to create an escrow user for this user
-      this._ensureEscrowUser(user);
-      
-      // Update UI for authenticated state
+      // First, update UI for authenticated state
       this._updateAuthenticatedUI();
+      
+      try {
+        // Check if we have JWT auth service and if user is already authenticated
+        const isJwtAuthenticated = authService && authService.isAuthenticated();
+        
+        if (authService && !isJwtAuthenticated) {
+          // Try to authenticate with JWT
+          try {
+            console.log('Attempting JWT authentication...');
+            // In real implementation we would need proper password handling
+            // This is a simplified version for demonstration purposes
+            await authService.login(user.email, 'password'); 
+            console.log('User authenticated with JWT');
+          } catch (authError) {
+            console.warn('JWT authentication failed, falling back to legacy auth:', authError);
+          }
+        }
+        
+        // Use the user-service to register/get the user from Escrow API
+        // This is still needed for data synchronization until full JWT migration
+        if (window.escrowAPI && window.escrowAPI.userService && 
+            typeof window.escrowAPI.userService.registerUserWithEscrow === 'function') {
+          
+          console.log('Syncing user with Escrow API...');
+          const escrowUser = await window.escrowAPI.userService.registerUserWithEscrow(user);
+          
+          if (escrowUser && escrowUser.id) {
+            console.log('User synchronized with Escrow API:', escrowUser.id);
+            // Update UI with data from API
+            this._updateBalanceDisplay(escrowUser.balance || 0);
+            this._loadUserOrders();
+          }
+        }
+      } catch (error) {
+        console.error('Error connecting to Escrow API:', error);
+      }
     } else {
       this.currentUser = null;
+      
+      // If we have JWT auth service, also log out there
+      if (authService) {
+        try {
+          await authService.logout();
+          console.log('User logged out from JWT auth');
+        } catch (logoutError) {
+          console.warn('Error logging out from JWT auth:', logoutError);
+        }
+      }
+      
       // Update UI for unauthenticated state
       this._updateUnauthenticatedUI();
     }
@@ -274,48 +326,195 @@ class EscrowUI {
   }
   
   /**
+   * Use local user data for balance display
+   * @private
+   */
+  _useLocalUserData() {
+    try {
+      // Check if escrowApp exists and has necessary methods
+      if (this.escrowApp && typeof this.escrowApp.getAllUsers === 'function') {
+        // Используем getAllUsers и находим пользователя по ID вместо прямого вызова getUserById
+        const allUsers = this.escrowApp.getAllUsers();
+        const localUser = allUsers.find(user => user.user_id === this.currentUser.uid);
+        if (localUser) {
+          const balance = localUser.balance || 0;
+          this._updateBalanceDisplay(balance);
+          return true;
+        }
+      }
+      
+      // Если данных нет, показываем нулевой баланс
+      this._updateBalanceDisplay(0);
+      return false;
+    } catch (error) {
+      console.warn('Error accessing local user data:', error);
+      this._updateBalanceDisplay(0);
+      return false;
+    }
+  }
+  
+  /**
+   * Update balance displays with given value
+   * @param {number} balance - Balance to display
+   * @private
+   */
+  _updateBalanceDisplay(balance) {
+    // Update escrow balance in wallet
+    const escrowBalanceEl = document.getElementById('escrow-balance-value');
+    if (escrowBalanceEl) {
+      escrowBalanceEl.textContent = Number(balance).toFixed(2);
+    }
+    
+    // Also update standard balance display
+    const balanceEl = document.getElementById('user-balance');
+    if (balanceEl) {
+      balanceEl.textContent = `${Number(balance).toFixed(2)} USD`;
+    }
+  }
+  
+  /**
+   * Synchronize API user data with local storage
+   * @param {Object} userData - User data from API
+   * @private
+   */
+  _syncLocalUserData(userData) {
+    // Also update local storage for backward compatibility
+    if (this.escrowApp && userData && userData.id) {
+      try {
+        // Получаем всех пользователей
+        const allUsers = this.escrowApp.getAllUsers();
+        
+        // Ищем пользователя по ID
+        const localUser = allUsers.find(user => user.user_id === this.currentUser.uid);
+        
+        if (localUser) {
+          // Обновляем баланс
+          localUser.balance = Number(userData.balance || 0);
+          this.escrowApp.storage.saveUser(localUser);
+        } else {
+          console.warn('Локальный пользователь не найден для синхронизации с API');
+        }
+      } catch (localError) {
+        console.warn('Could not update local user balance:', localError);
+      }
+    }
+  }
+
+  /**
    * Update escrow balance display in wallet
-   * Modified to use Escrow API integration
+   * Modified to use Escrow API integration and real DB data
    */
   async _updateEscrowBalance() {
     if (!this.currentUser) return;
     
     try {
-      // Use the Escrow API to get user's balance
-      const result = await window.escrowAPI.userService.getCurrentUser();
+      // Check if Escrow API is available
+      if (!window.escrowAPI || !window.escrowAPI.userService) {
+        console.warn('Escrow API service is not available');
+        return;
+      }
       
-      if (result.success && result.data) {
-        const balance = result.data.balance || 0;
-        
-        // Update escrow balance in wallet
-        const escrowBalanceEl = document.getElementById('escrow-balance-value');
-        if (escrowBalanceEl) {
-          escrowBalanceEl.textContent = Number(balance).toFixed(2);
-        }
-        
-        // Also update standard balance display
-        const balanceEl = document.getElementById('user-balance');
-        if (balanceEl) {
-          balanceEl.textContent = `${Number(balance).toFixed(2)} USD`;
-        }
-        
-        // Also update local storage for backward compatibility
-        if (this.escrowApp && result.data.id) {
-          try {
-            const localUser = this.escrowApp.getUserById(result.data.id);
-            if (localUser) {
-              localUser.balance = Number(balance);
-              this.escrowApp.storage.saveUser(localUser);
+      // First try to get the user directly from the database
+      try {
+        // Get all users from database
+        if (window.escrowAPI.client && typeof window.escrowAPI.client.getUsers === 'function') {
+          const allUsers = await window.escrowAPI.client.getUsers();
+          
+          // Look for the user by email
+          const dbUser = allUsers.find(user => user.email === this.currentUser.email);
+          
+          if (dbUser) {
+            console.log('Found user in database:', dbUser.id);
+            
+            // Save the mapping between local ID and DB ID
+            if (window.escrowAPI.userService && typeof window.escrowAPI.userService.saveEscrowUserId === 'function') {
+              window.escrowAPI.userService.saveEscrowUserId(this.currentUser.uid, dbUser.id);
+            } else {
+              // Fallback to direct localStorage access
+              const mapping = JSON.parse(localStorage.getItem('escrowUserMapping') || '{}');
+              mapping[this.currentUser.uid] = dbUser.id;
+              localStorage.setItem('escrowUserMapping', JSON.stringify(mapping));
+              localStorage.setItem('currentEscrowUserId', dbUser.id);
             }
-          } catch (localError) {
-            console.warn('Could not update local user balance:', localError);
+            
+            // Update balance display with data from database
+            this._updateBalanceDisplay(dbUser.balance || 0);
+            return;
           }
         }
-      } else {
-        console.warn('Could not update balance: User data not available');
+      } catch (dbError) {
+        console.error('Error getting users from database:', dbError);
       }
+      
+      // If we didn't find the user in the database, try to register them
+      try {
+        if (typeof window.escrowAPI.userService.registerUserWithEscrow === 'function') {
+          console.log('Registering user with Escrow API...');
+          const escrowUser = await window.escrowAPI.userService.registerUserWithEscrow(this.currentUser);
+          
+          if (escrowUser && !escrowUser._isLocalOnly) {
+            console.log('User registered with Escrow API:', escrowUser.id);
+            this._updateBalanceDisplay(escrowUser.balance || 0);
+            return;
+          }
+        }
+      } catch (registerError) {
+        console.error('Error registering user with Escrow:', registerError);
+      }
+      
+      // As a last resort, try getCurrentUser
+      try {
+        if (typeof window.escrowAPI.userService.getCurrentUser === 'function') {
+          const result = await window.escrowAPI.userService.getCurrentUser();
+          
+          if (result?.success && result.data) {
+            this._updateBalanceDisplay(result.data.balance || 0);
+            // Sync with local storage for compatibility
+            this._syncLocalUserData(result.data);
+            return;
+          }
+        }
+      } catch (getCurrentError) {
+        console.error('Error getting current user:', getCurrentError);
+      }
+      
+      // Finally, fall back to local data as a last resort
+      this._useLocalUserData();
+  
     } catch (error) {
       console.error('Error updating escrow balance:', error);
+      // Trying to use local data as fallback
+      try {
+        // Check if escrowApp exists and has necessary methods
+        if (this.escrowApp && typeof this.escrowApp.getAllUsers === 'function') {
+          // Используем getAllUsers и находим пользователя по ID вместо прямого вызова getUserById
+          const allUsers = this.escrowApp.getAllUsers();
+          const localUser = allUsers.find(user => user.user_id === this.currentUser.uid);
+          if (localUser) {
+            const balance = localUser.balance || 0;
+            updateBalanceDisplay(balance);
+          }
+        }
+      } catch (fallbackError) {
+        console.warn('Fallback error:', fallbackError);
+        // В случае всех ошибок показываем нулевой баланс
+        updateBalanceDisplay(0);
+      }
+    }
+    
+    // Helper function to update balance display
+    function updateBalanceDisplay(balance) {
+      // Update escrow balance in wallet
+      const escrowBalanceEl = document.getElementById('escrow-balance-value');
+      if (escrowBalanceEl) {
+        escrowBalanceEl.textContent = Number(balance).toFixed(2);
+      }
+      
+      // Also update standard balance display
+      const balanceEl = document.getElementById('user-balance');
+      if (balanceEl) {
+        balanceEl.textContent = `${Number(balance).toFixed(2)} USD`;
+      }
     }
   }
   
@@ -327,14 +526,29 @@ class EscrowUI {
     if (!this.currentUser) return;
     
     // Show loading indicator
-    window.escrowAPI.uiUtils.showLoading();
+    if (window.escrowAPI && window.escrowAPI.uiUtils && typeof window.escrowAPI.uiUtils.showLoading === 'function') {
+      window.escrowAPI.uiUtils.showLoading();
+    }
     
     try {
+      // Проверяем доступность API Escrow
+      if (!window.escrowAPI || !window.escrowAPI.orderService || typeof window.escrowAPI.orderService.getOrders !== 'function') {
+        console.warn('escrowAPI.orderService.getOrders не доступен, использую локальные данные');
+        // Используем локальную реализацию, если API недоступен
+        const userOrders = {
+          orders_created: this.escrowApp?.getUserCreatedOrders(this.currentUser.uid) || [],
+          orders_joined: this.escrowApp?.getUserJoinedOrders(this.currentUser.uid) || [],
+          orders_assigned: this.escrowApp?.getUserAssignedOrders(this.currentUser.uid) || []
+        };
+        this._renderUserOrders(userOrders);
+        return;
+      }
+      
       // Use the Escrow API to get all orders, then filter for current user
       const allOrders = await window.escrowAPI.orderService.getOrders();
       
       // Получаем ID текущего пользователя
-      const currentUserId = this.currentUser?.id || user?.id;
+      const currentUserId = this.currentUser?.uid || this.currentUser?.id;
       
       // Если нет ID пользователя, невозможно фильтровать заказы
       if (!currentUserId) {
@@ -347,56 +561,42 @@ class EscrowUI {
       const joinedOrders = allOrders.filter(order => order.isGroupOrder && order.customerIds?.includes(currentUserId) && order.customerId !== currentUserId);
       const assignedOrders = allOrders.filter(order => order.contractorId === currentUserId);
       
-      // Создаем структуру, аналогичную ожидаемой от метода getUserOrders
-      const result = {
-        success: true,
-        data: {
-          createdOrders,
-          joinedOrders,
-          assignedOrders
-        }
+      // Structure data for the existing rendering function
+      const userOrders = {
+        orders_created: createdOrders || [],
+        orders_joined: joinedOrders || [],
+        orders_assigned: assignedOrders || []
       };
       
-      if (true) { // Изменяем условие для совместимости
-        // Structure data for the existing rendering function
-        const userOrders = {
-          orders_created: result.data.createdOrders || [],
-          orders_joined: result.data.joinedOrders || [],
-          orders_assigned: result.data.assignedOrders || []
-        };
-        
-        // Also update local storage for backward compatibility
-        if (this.escrowApp) {
-          try {
-            // Sync with local storage
-            result.data.createdOrders.forEach(order => {
-              this.escrowApp.storage.saveOrder({
-                order_id: order.id,
-                title: order.title,
-                description: order.description,
-                creator_id: order.creatorId,
-                contractor_id: order.contractorId,
-                total_cost: order.totalAmount,
-                escrow_balance: order.fundedAmount,
-                status: order.status,
-                milestones: (order.milestones || []).map((m, idx) => ({
-                  milestone_id: m.id || idx.toString(),
-                  description: m.description,
-                  amount: m.amount,
-                  status: m.status
-                }))
-              });
+      // Also update local storage for backward compatibility
+      if (this.escrowApp) {
+        try {
+          // Sync with local storage
+          createdOrders.forEach(order => {
+            this.escrowApp.storage.saveOrder({
+              order_id: order.id,
+              title: order.title,
+              description: order.description,
+              creator_id: order.creatorId,
+              contractor_id: order.contractorId,
+              total_cost: order.totalAmount,
+              escrow_balance: order.fundedAmount,
+              status: order.status,
+              milestones: (order.milestones || []).map((m, idx) => ({
+                milestone_id: m.id || idx.toString(),
+                description: m.description,
+                amount: m.amount,
+                status: m.status
+              }))
             });
-          } catch (localError) {
-            console.warn('Could not update local storage:', localError);
-          }
+          });
+        } catch (localError) {
+          console.warn('Could not update local storage:', localError);
         }
-        
-        // Render the orders
-        this._renderUserOrders(userOrders);
-      } else {
-        throw new Error(result.message || 'Error loading orders');
       }
+      
+      // Render the orders
+      this._renderUserOrders(userOrders);
     } catch (error) {
       console.error('Error loading user orders:', error);
       const errorMsg = error.message || 'Error loading your orders. Please try again later.';

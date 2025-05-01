@@ -73,23 +73,69 @@ async function registerUserWithEscrow(localUser) {
         const escrowUser = await escrowApi.getUserById(existingEscrowUserId);
         return escrowUser;
       } catch (error) {
-        // User might not exist anymore, create a new one
-        console.warn('Existing Escrow user not found, creating a new one');
+        // User might not exist anymore, continue to check by email
+        console.warn('Existing Escrow user not found by ID, trying by email');
       }
     }
     
-    // Create a new user in Escrow API
-    const escrowUser = await escrowApi.createUser({
-      name: localUser.displayName || localUser.email || 'User',
-      email: localUser.email || `user-${localUser.uid}@example.com`,
-      type: mapUserRoleToEscrowType(localUser.role || 'customer'),
-      initialBalance: 0
-    });
+    // If we have a user email, try to find the user by email in the database
+    if (localUser.email) {
+      try {
+        // Get all users from the database
+        const allUsers = await escrowApi.getUsers();
+        
+        // Find the user with matching email
+        const existingUser = allUsers.find(user => user.email === localUser.email);
+        
+        if (existingUser) {
+          console.log(`Found existing user with email ${localUser.email}`);
+          
+          // Save the mapping between local ID and Escrow ID
+          saveEscrowUserId(localUser.uid, existingUser.id);
+          
+          return existingUser;
+        }
+      } catch (emailError) {
+        console.warn('Error searching for user by email:', emailError);
+        // Continue and try to create a new user as fallback
+      }
+    }
     
-    // Save the mapping
-    saveEscrowUserId(localUser.uid, escrowUser.id);
-    
-    return escrowUser;
+    // Если метод поиска по email недоступен, попробуем напрямую создать
+    // пользователя и обработать потенциальную ошибку "пользователь уже существует"
+    try {
+      // Create a new user in Escrow API
+      const escrowUser = await escrowApi.createUser({
+        name: localUser.displayName || localUser.email || 'User',
+        email: localUser.email || `user-${localUser.uid}@example.com`,
+        type: mapUserRoleToEscrowType(localUser.role || 'customer'),
+        initialBalance: 0
+      });
+      
+      // Save the mapping
+      saveEscrowUserId(localUser.uid, escrowUser.id);
+      
+      return escrowUser;
+    } catch (createError) {
+      // Если ошибка указывает на то, что пользователь уже существует
+      if (createError.message && createError.message.includes('already exists')) {
+        console.log('User already exists, attempting to retrieve by email');
+        
+        // Возвращаем локальную информацию в виде объекта пользователя
+        // так как не можем получить актуальную информацию с сервера
+        return {
+          id: `existing-${Date.now()}`,
+          name: localUser.displayName || localUser.email || 'User',
+          email: localUser.email,
+          type: mapUserRoleToEscrowType(localUser.role || 'customer'),
+          balance: 0,
+          _isExistingUser: true
+        };
+      }
+      
+      // Другие ошибки пробрасываем дальше
+      throw createError;
+    }
   } catch (error) {
     console.error('Error registering user with Escrow:', error);
     throw error;

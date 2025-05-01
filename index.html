@@ -25,8 +25,8 @@
     <link rel="stylesheet" href="styles/i18n.css">
     <link rel="stylesheet" href="styles/escrow.css">
   
-    <!-- Local Auth System -->
-    <script src="js/local-auth.js"></script>
+    <!-- Authentication Service -->
+    <script type="module" src="js/auth-service.js"></script>
     
     <!-- Internationalization -->
     <script type="module" src="locales/index.js"></script>
@@ -80,8 +80,8 @@
             <div class="user-controls user-controls-auth">
                 <button class="btn btn-outline" id="connect-wallet-btn" data-i18n="wallet.connectWallet"><i class="fas fa-wallet"></i> Connect Wallet</button>
                 <button class="btn btn-primary" id="sign-in-btn" data-i18n="auth.signIn"><i class="fas fa-user"></i> Sign In</button>
-              </div>
-              <div class="user-controls-logged-in">
+            </div>
+            <div class="user-controls-logged-in" style="display: none;">
                 <div class="btn btn-outline" id="wallet-balance-display" data-modal="deposit-funds-modal">
                   <i class="fas fa-wallet"></i> <span id="wallet-balance-value">0.00</span> ETH
                 </div>
@@ -173,7 +173,8 @@
                                 </div>
                                 <div class="order-actions">
                                     <button class="btn btn-primary btn-sm participate-btn" data-order-id="1" data-i18n="marketplace.participate"><i class="fas fa-plus"></i> Participate</button>
-                                    <button class="btn btn-outline btn-sm" data-i18n="marketplace.details"><i class="fas fa-info-circle"></i> Details</button>
+                                    <button class="btn btn-outline btn-sm btn-details" data-order-id="1" data-i18n="marketplace.details"><i class="fas fa-info-circle"></i> Details</button>
+                                    <button class="btn btn-outline-info btn-sm interest-only-btn" data-order-id="1"><i class="fas fa-star-o"></i> <span data-i18n="marketplace.interestOnly">Interest Only</span></button>
                                 </div>
                             </div>
                         </div>
@@ -1368,7 +1369,7 @@
         }
 
         // Create an order element with improved styling
-        function createOrderElement(order, isInPortfolio = false) {
+        async function createOrderElement(order, isInPortfolio = false) {
             const orderItem = document.createElement('div');
             orderItem.className = isInPortfolio ? 'order-item user-order-card' : 'order-item card mb-3';
             orderItem.id = `order-${order.id}`;
@@ -1377,6 +1378,27 @@
             const orderPrice = typeof order.budget === 'number' ? order.budget : 
                               (typeof order.budget === 'string' ? parseFloat(order.budget) : 0);
             const orderCurrency = order.currency || 'USD';
+            
+            // Check if the user has marked this order as "Interest Only"
+            // By default, set to false until API check completes
+            let isInterestOnly = false;
+            
+            // Start API check if user is authenticated
+            if (isUserAuthenticated()) {
+                checkInterestStatus(order.id).then(interested => {
+                    // Update button appearance once we know the status
+                    const interestBtn = orderItem.querySelector('.interest-only-btn');
+                    if (interestBtn && interested) {
+                        isInterestOnly = true;
+                        interestBtn.classList.remove('btn-outline-info');
+                        interestBtn.classList.add('btn-info');
+                        interestBtn.querySelector('i').classList.remove('fa-star-o');
+                        interestBtn.querySelector('i').classList.add('fa-star');
+                    }
+                }).catch(err => {
+                    console.error('Error checking interest status:', err);
+                });
+            }
             
             let orderContent = '';
             
@@ -1398,6 +1420,9 @@
                             <button class="btn btn-sm btn-success participate-btn" data-order-id="${order.id}">
                                 <i class="fas fa-handshake"></i> <span data-i18n="marketplace.participate">Participate</span>
                             </button>
+                            <button class="btn btn-sm ${isInterestOnly ? 'btn-info' : 'btn-outline-info'} interest-only-btn" data-order-id="${order.id}">
+                                <i class="fas ${isInterestOnly ? 'fa-star' : 'fa-star-o'}"></i> <span data-i18n="marketplace.interestOnly">Interest Only</span>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1415,9 +1440,14 @@
                             <button class="btn btn-sm btn-primary view-order-details" data-order-id="${order.id}">
                                 <i class="fas fa-eye"></i> <span data-i18n="marketplace.viewDetails">View Details</span>
                             </button>
-                            <button class="btn btn-sm btn-success participate-btn" data-order-id="${order.id}">
-                                <i class="fas fa-handshake"></i> <span data-i18n="marketplace.participate">Participate</span>
-                            </button>
+                            <div>
+                                <button class="btn btn-sm btn-success participate-btn" data-order-id="${order.id}">
+                                    <i class="fas fa-handshake"></i> <span data-i18n="marketplace.participate">Participate</span>
+                                </button>
+                                <button class="btn btn-sm ${isInterestOnly ? 'btn-info' : 'btn-outline-info'} interest-only-btn" data-order-id="${order.id}">
+                                    <i class="fas ${isInterestOnly ? 'fa-star' : 'fa-star-o'}"></i> <span data-i18n="marketplace.interestOnly">Interest Only</span>
+                                </button>
+                            </div>
                         </div>
                         ${getCurrentUserId() === order.userId ? '<span class="badge bg-info float-end user-order-badge" data-i18n="marketplace.yourOrder">Your Order</span>' : ''}
                     </div>
@@ -1472,15 +1502,134 @@
                 });
             }
             
+            // Добавляем обработчик событий для кнопки "Interest Only"
+            const interestOnlyBtn = orderItem.querySelector('.interest-only-btn');
+            if (interestOnlyBtn) {
+                interestOnlyBtn.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    toggleInterestOnly(orderId, this);
+                });
+            }
+            
             return orderItem;
+        }
+
+        // Function to toggle the Interest Only status for an order
+        async function toggleInterestOnly(orderId, buttonElement) {
+            try {
+                // Check if user is authenticated
+                if (!isUserAuthenticated()) {
+                    showModal('auth-modal');
+                    return;
+                }
+                
+                // Show loading state
+                const originalInnerHTML = buttonElement.innerHTML;
+                buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                buttonElement.disabled = true;
+                
+                const isCurrentlyInterested = buttonElement.classList.contains('btn-info');
+                
+                // Make API call to the escrow service
+                const response = await fetch(`${apiBaseUrl}/api/orders/interest-only`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${await getAuthToken()}`
+                    },
+                    body: JSON.stringify({ orderId })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                // Update button appearance based on API response
+                if (result.action === 'removed') {
+                    buttonElement.classList.remove('btn-info');
+                    buttonElement.classList.add('btn-outline-info');
+                    buttonElement.querySelector('i').classList.remove('fa-star');
+                    buttonElement.querySelector('i').classList.add('fa-star-o');
+                    showNotification(getCurrentLanguageMessage('notification.interestRemoved'), 'info');
+                } else if (result.action === 'added') {
+                    buttonElement.classList.remove('btn-outline-info');
+                    buttonElement.classList.add('btn-info');
+                    buttonElement.querySelector('i').classList.remove('fa-star-o');
+                    buttonElement.querySelector('i').classList.add('fa-star');
+                    showNotification(getCurrentLanguageMessage('notification.interestAdded'), 'success');
+                }
+                
+                // Re-enable button and restore original content
+                buttonElement.disabled = false;
+                buttonElement.innerHTML = originalInnerHTML;
+                
+                // Apply i18n to the button text again
+                if (window.applyI18n) {
+                    window.applyI18n(buttonElement.querySelector('[data-i18n]'));
+                }
+                
+            } catch (error) {
+                console.error('Error toggling interest:', error);
+                showNotification(getCurrentLanguageMessage('notification.error'), 'danger');
+                
+                // Make sure button is restored in case of error
+                if (buttonElement) {
+                    buttonElement.disabled = false;
+                    buttonElement.innerHTML = originalInnerHTML || '';
+                }
+            }
+        }
+        
+        // Check if the user has marked interest in an order
+        async function checkInterestStatus(orderId) {
+            try {
+                // Don't check if user isn't authenticated
+                if (!isUserAuthenticated()) {
+                    return false;
+                }
+                
+                const response = await fetch(`${apiBaseUrl}/api/orders/interest-only`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${await getAuthToken()}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                return result.interestedOrderIds && result.interestedOrderIds.includes(orderId);
+            } catch (error) {
+                console.error('Error checking interest status:', error);
+                return false;
+            }
         }
     </script>
 
-
-
     <!-- App Scripts -->
-    <script src="js/auth.js"></script>
+    <!-- <script src="js/auth.js"></script> -->
     <script src="js/db.js"></script>
+    
+    <!-- Interest Only functionality -->
+    <script type="module">
+        // Import and initialize interest-only functionality
+        import { initInterestOnlyButtons } from './js/interest-only-handler.js';
+        
+        // Make available globally if needed
+        window.initInterestOnlyButtons = initInterestOnlyButtons;
+        
+        // API base URL for interest-only functionality
+        window.apiBaseUrl = window.apiBaseUrl || '';
+        
+        // Dispatch custom event when orders are updated
+        window.dispatchOrdersUpdated = () => {
+            document.dispatchEvent(new CustomEvent('ordersUpdated'));
+        };
+    </script>
     <script type="module" src="js/ui.js"></script>
     <script type="module" src="js/revenue-calculator.js"></script>
 

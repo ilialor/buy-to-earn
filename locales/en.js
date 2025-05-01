@@ -49,6 +49,7 @@ const en = {
     title: "Marketplace",
     subtitle: "Discover and participate in co-intent projects, fund ideas, and earn from future sales.",
     explore: "Explore",
+    interestOnly: "Interest Only",
     submit: "Submit Order",
     executor: "Become Executor",
     applyExecutor: "Apply as Executor",
@@ -214,6 +215,26 @@ const en = {
     faq_products_types_a: "The platform supports various digital products including books, software, online courses, research papers, designs, and more. Any digital product that can be tokenized and distributed is eligible.",
     faq_become_executor_q: "How do I become an executor?",
     faq_become_executor_a: "To become an executor, you need to apply through the \"Become Executor\" section. You'll be asked to provide details about your skills, experience, and the types of projects you can execute. Once approved, you can start accepting orders."
+  },
+  
+  // Notifications
+  notification: {
+    success: "Success",
+    error: "Error",
+    warning: "Warning",
+    info: "Information",
+    copied: "Copied to clipboard",
+    loginRequired: "Login required",
+    orderCreated: "Order created successfully",
+    participateSuccess: "Successfully joined the order",
+    interestAdded: "You have been added to the interested buyers list",
+    interestRemoved: "You have been removed from the interested buyers list",
+    send: "Send",
+    submit: "Submit",
+    back: "Back",
+    next: "Next",
+    yes: "Yes",
+    no: "No"
   },
   
   // Common

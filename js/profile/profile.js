@@ -3,7 +3,30 @@
  * Handles loading and updating user profile data
  */
 
-import { getUserProfile, updateUserProfile, changePassword, updateNotificationPreferences } from '../api/user-service.js';
+// Import API services with error handling
+let getUserProfile, updateUserProfile, changePassword, updateNotificationPreferences;
+try {
+  const userService = await import('../api/user-service.js');
+  getUserProfile = userService.getUserProfile;
+  updateUserProfile = userService.updateUserProfile;
+  changePassword = userService.changePassword;
+  updateNotificationPreferences = userService.updateNotificationPreferences;
+} catch (error) {
+  console.error('Error importing user service:', error);
+  // Fallback implementations that show error UI
+  getUserProfile = async () => {
+    throw new Error('Сервис профиля временно недоступен');
+  };
+  updateUserProfile = async () => {
+    throw new Error('Сервис обновления профиля временно недоступен');
+  };
+  changePassword = async () => {
+    throw new Error('Сервис смены пароля временно недоступен');
+  };
+  updateNotificationPreferences = async () => {
+    throw new Error('Сервис настройки уведомлений временно недоступен');
+  };
+}
 
 // DOM elements
 const profileLoading = document.getElementById('profile-loading');
@@ -86,6 +109,18 @@ function showFormError(errorElement, message) {
  * Load user profile data
  */
 async function loadUserProfile() {
+  if (!profileLoading || !profileError || !profileContent) {
+    console.error('Profile DOM elements not found');
+    // Try to get elements again
+    initProfileElements();
+    
+    // If still not found, show error in console and return
+    if (!profileLoading || !profileError || !profileContent) {
+      console.error('Critical error: Profile DOM elements not available');
+      return;
+    }
+  }
+  
   profileLoading.style.display = 'flex';
   profileError.style.display = 'none';
   profileContent.style.display = 'none';
@@ -252,14 +287,27 @@ async function handleNotificationUpdate(event) {
  * Initialize profile functionality
  */
 function initProfile() {
-  // Load profile data
-  loadUserProfile();
+  console.log('Initializing profile...');
   
-  // Set up event listeners
-  retryButton.addEventListener('click', loadUserProfile);
-  profileForm.addEventListener('submit', handleProfileUpdate);
-  passwordForm.addEventListener('submit', handlePasswordChange);
-  notificationForm.addEventListener('submit', handleNotificationUpdate);
+  // Initialize elements
+  initProfileElements();
+  
+  // Set up profile form handlers
+  if (profileForm) profileForm.addEventListener('submit', handleProfileUpdate);
+  if (passwordForm) passwordForm.addEventListener('submit', handlePasswordChange);
+  if (notificationForm) notificationForm.addEventListener('submit', handleNotificationUpdate);
+  if (retryButton) retryButton.addEventListener('click', loadUserProfile);
+  
+  // Load profile data
+  setTimeout(() => {
+    loadUserProfile().catch(error => {
+      console.error('Error loading profile:', error);
+      if (profileError) {
+        profileError.style.display = 'block';
+        profileLoading.style.display = 'none';
+      }
+    });
+  }, 500); // Небольшая задержка для обеспечения загрузки DOM
 }
 
 // Export the init function
