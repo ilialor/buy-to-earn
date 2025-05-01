@@ -37,6 +37,7 @@ const es = {
     title: "Mercado",
     subtitle: "Descubra y participe en proyectos, financie ideas y gane con ventas futuras.",
     explore: "Explorar",
+    interestOnly: "Interesante",
     submit: "Enviar Orden",
     executor: "Convertirse en Ejecutor",
     applyExecutor: "Aplicar como Ejecutor",
