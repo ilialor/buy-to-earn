@@ -19,10 +19,10 @@
     border: none !important;
   }
   .container {
-    width: 100vw !important;
+    width: 100% !important;
     max-width: 100vw !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    padding: 0 1rem !important;
+    margin: 0 auto !important;
   }
   header {
     display: flex !important;
@@ -31,8 +31,8 @@
     justify-content: flex-start !important;
     height: 48px !important;
     min-height: 48px !important;
-    padding: 0 0.5rem !important;
-    gap: 0.5rem !important;
+    padding: 0 1rem !important;
+    gap: 0.75rem !important;
     background: #fff !important;
     box-shadow: none !important;
   }
@@ -67,14 +67,23 @@
   }
   .ai-chat {
     margin: 0 !important;
-    padding: 0.5rem 0.3rem !important;
+    padding: 0 !important;
     border-radius: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .chat-messages,
+  .chat-input,
+  .suggestions,
+  #user-input,
+  #send-btn {
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   .chat-messages,
   .chat-input,
   .suggestions {
-    width: 100% !important;
-    margin: 0 0 0.5rem 0 !important;
+    margin: 0 0 16px 0 !important;
     padding: 0 !important;
   }
   #user-input, .chat-input textarea {
@@ -82,6 +91,7 @@
     min-width: 100% !important;
     box-sizing: border-box !important;
     margin: 0 !important;
+    padding: 0.5rem !important;
   }
   .btn-version {
     background: transparent !important;
@@ -112,7 +122,7 @@
   /* Brand colors and hover for mobile auth buttons */
   #connect-wallet-mobile,
   #sign-in-mobile {
-    background-color: #007bff !important;
+    background: transparent !important;
     color: #fff !important;
     border-radius: 4px !important;
     transition: transform 0.2s ease, background-color 0.2s ease !important;
@@ -122,7 +132,7 @@
   #connect-wallet-mobile:hover,
   #sign-in-mobile:hover {
     transform: scale(1.1) !important;
-    background-color: #0056b3 !important;
+    background: transparent !important;
   }
 
   /* Reduce space between auth icons and menu */
@@ -156,19 +166,108 @@
   /* Chat input spacing */
   .chat-input {
     display: flex !important;
-    align-items: center !important;
-    gap: 1rem !important;
-  }
-  .chat-input textarea {
-    flex: 1 !important;
-    width: auto !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 16px !important;
+    margin: 0 !important;
   }
   .chat-input .textarea-wrapper {
-    margin-right: 1rem !important;
-    flex: 1 !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  .chat-input textarea {
+    width: 100% !important;
+    flex: none !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
   }
   #send-btn {
-    margin-left: 1rem !important;
+    width: 100% !important;
+    margin: 0 0 30px 0 !important;
     flex: 0 0 auto !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Unify width of all blocks in mobile version */
+  #notification-container,
+  .page-content,
+  .sidebar,
+  .ai-chat {
+    width: 100% !important;
+    margin: 0 auto 1rem !important;
+  }
+
+  /* Gradient icons, header spacing, and chat block alignment */
+  #connect-wallet-mobile i,
+  #sign-in-mobile i {
+    background: linear-gradient(180deg, #3367B1, #19759f) !important;
+    background-clip: text !important;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block !important;
+  }
+  header .menu-toggle {
+    margin-left: 0.1rem !important;
+  }
+  .suggestions {
+    width: 100% !important;
+    margin: 16px 0 0 0 !important;
+    box-sizing: border-box !important;
+  }
+  .suggestions .suggestion-btn {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 0 10px 0 !important;
+    box-sizing: border-box !important;
+  }
+  .chat-input #send-btn {
+    margin: 0 !important;
+  }
+
+  /* Chat messages padding for alignment */
+  .chat-messages {
+    width: 100% !important;
+    padding: 0.5rem !important;
+    box-sizing: border-box !important;
+    margin: 0 0 16px 0 !important;
+  }
+
+  /* Global container max-width and footer styling */
+  .container {
+    max-width: 520px !important;
+    margin: 0 auto !important;
+    padding: 0 1rem !important;
+  }
+  footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 8px !important;
+  }
+  .footer-nav {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+  .footer-nav a {
+    margin: 0 !important;
+  }
+  .social-icons {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+
+  /* Align chat messages and input width for mobile */
+  .ai-chat .chat-messages,
+  .ai-chat .chat-input {
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+  #user-input {
+    width: 100% !important;
+    padding-left: 0.5rem !important;
   }
 }
