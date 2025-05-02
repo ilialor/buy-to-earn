@@ -211,15 +211,39 @@ class EscrowUI {
     // Get current user from auth
     const user = getCurrentUser(); // This function should be defined elsewhere in your app
     
+    // Import auth service for JWT authentication
+    let authService;
+    try {
+      authService = await import('../auth/index.js').then(module => module.default);
+    } catch (error) {
+      console.warn('JWT auth service not available, using legacy auth:', error);
+    }
+    
     if (user) {
       this.currentUser = user;
       
       // First, update UI for authenticated state
       this._updateAuthenticatedUI();
       
-      // Then check if the user exists in the Escrow API and use that data
       try {
+        // Check if we have JWT auth service and if user is already authenticated
+        const isJwtAuthenticated = authService && authService.isAuthenticated();
+        
+        if (authService && !isJwtAuthenticated) {
+          // Try to authenticate with JWT
+          try {
+            console.log('Attempting JWT authentication...');
+            // In real implementation we would need proper password handling
+            // This is a simplified version for demonstration purposes
+            await authService.login(user.email, 'password'); 
+            console.log('User authenticated with JWT');
+          } catch (authError) {
+            console.warn('JWT authentication failed, falling back to legacy auth:', authError);
+          }
+        }
+        
         // Use the user-service to register/get the user from Escrow API
+        // This is still needed for data synchronization until full JWT migration
         if (window.escrowAPI && window.escrowAPI.userService && 
             typeof window.escrowAPI.userService.registerUserWithEscrow === 'function') {
           
@@ -238,6 +262,17 @@ class EscrowUI {
       }
     } else {
       this.currentUser = null;
+      
+      // If we have JWT auth service, also log out there
+      if (authService) {
+        try {
+          await authService.logout();
+          console.log('User logged out from JWT auth');
+        } catch (logoutError) {
+          console.warn('Error logging out from JWT auth:', logoutError);
+        }
+      }
+      
       // Update UI for unauthenticated state
       this._updateUnauthenticatedUI();
     }

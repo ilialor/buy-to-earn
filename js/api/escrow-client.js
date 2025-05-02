@@ -22,16 +22,27 @@ export class EscrowClient {
    * @returns {Promise<any>} - Promise with response data
    */
   async request(endpoint, method = 'GET', body = null) {
+    // Import auth service for JWT tokens
+    const authService = await import('../auth/index.js').then(module => module.default);
+    
     const url = `${this.baseUrl}${endpoint}`;
     const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.apiKey}`
+      'Content-Type': 'application/json'
     };
+    
+    // Add JWT token if available
+    const token = authService.getAccessToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    } else if (this.apiKey) {
+      // Fallback to API key if no JWT token
+      headers['Authorization'] = `Bearer ${this.apiKey}`;
+    }
 
     const options = {
       method,
       headers,
-      credentials: 'include'
+      credentials: 'include' // Important for cookies
     };
 
     if (body) {
@@ -39,7 +50,19 @@ export class EscrowClient {
     }
 
     try {
-      const response = await fetch(url, options);
+      let response = await fetch(url, options);
+      
+      // Handle authentication errors
+      if (response.status === 401 && token) {
+        // Try to refresh token
+        const refreshed = await authService.refreshToken();
+        if (refreshed) {
+          // Update token in headers and retry request
+          headers['Authorization'] = `Bearer ${authService.getAccessToken()}`;
+          options.headers = headers;
+          response = await fetch(url, options);
+        }
+      }
       
       if (!response.ok) {
         const errorData = await response.json();
