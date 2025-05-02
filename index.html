@@ -80,8 +80,8 @@
             <div class="user-controls user-controls-auth">
                 <button class="btn btn-outline" id="connect-wallet-btn" data-i18n="wallet.connectWallet"><i class="fas fa-wallet"></i> Connect Wallet</button>
                 <button class="btn btn-primary" id="sign-in-btn" data-i18n="auth.signIn"><i class="fas fa-user"></i> Sign In</button>
-              </div>
-              <div class="user-controls-logged-in">
+            </div>
+            <div class="user-controls-logged-in" style="display: none;">
                 <div class="btn btn-outline" id="wallet-balance-display" data-modal="deposit-funds-modal">
                   <i class="fas fa-wallet"></i> <span id="wallet-balance-value">0.00</span> ETH
                 </div>
@@ -173,7 +173,8 @@
                                 </div>
                                 <div class="order-actions">
                                     <button class="btn btn-primary btn-sm participate-btn" data-order-id="1" data-i18n="marketplace.participate"><i class="fas fa-plus"></i> Participate</button>
-                                    <button class="btn btn-outline btn-sm" data-i18n="marketplace.details"><i class="fas fa-info-circle"></i> Details</button>
+                                    <button class="btn btn-outline btn-sm btn-details" data-order-id="1" data-i18n="marketplace.details"><i class="fas fa-info-circle"></i> Details</button>
+                                    <button class="btn btn-outline-info btn-sm interest-only-btn" data-order-id="1"><i class="fas fa-star-o"></i> <span data-i18n="marketplace.interestOnly">Interest Only</span></button>
                                 </div>
                             </div>
                         </div>
@@ -1612,6 +1613,23 @@
     <!-- App Scripts -->
     <script src="js/auth.js"></script>
     <script src="js/db.js"></script>
+    
+    <!-- Interest Only functionality -->
+    <script type="module">
+        // Import and initialize interest-only functionality
+        import { initInterestOnlyButtons } from './js/interest-only-handler.js';
+        
+        // Make available globally if needed
+        window.initInterestOnlyButtons = initInterestOnlyButtons;
+        
+        // API base URL for interest-only functionality
+        window.apiBaseUrl = window.apiBaseUrl || '';
+        
+        // Dispatch custom event when orders are updated
+        window.dispatchOrdersUpdated = () => {
+            document.dispatchEvent(new CustomEvent('ordersUpdated'));
+        };
+    </script>
     <script type="module" src="js/ui.js"></script>
     <script type="module" src="js/revenue-calculator.js"></script>
 
