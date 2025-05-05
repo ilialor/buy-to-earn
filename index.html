@@ -19,6 +19,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
+    <!-- AOS Animation Library -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    
     <!-- Custom CSS -->
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/notification.css">   
@@ -45,6 +48,9 @@
 
 <body>
     <div id="notification-container" class="notification-container"></div>
+    <div class="floating-faq-button" id="faq-button">
+        <i class="fas fa-comments"></i>
+    </div>
     <div class="container">
         <header>
             <div class="logo">
@@ -103,29 +109,63 @@
         <!-- Marketplace Page -->
         <div class="page-content active" id="marketplace">
             <div class="marketplace-header">
-                <div class="ailock-image">
-                    <img src="images/cat_agent.png" alt="Ailock" class="ailock-avatar">
-                </div>
                 <div class="marketplace-intro">
-                    <p class="marketplace-quote">Discover and participate in co-intent projects, fund ideas, and earn from future sales.</p>
-                    <div class="stats">
-                        <div class="stat-card">
-                            <div class="stat-value">235</div>
-                            <div class="stat-label">Active Projects</div>
+                    <h1 class="marketplace-title" data-i18n="hero.title">Buy to Earn</h1>
+                    <p class="marketplace-quote" data-i18n="hero.quote">Participate in collective commerce to earn from every success</p>
+                    <p class="marketplace-quote-ru">Участвуйте в коллективной коммерции, чтобы зарабатывать на каждом успехе</p>
+                    <div class="hero-cta-buttons">
+                        <button class="btn btn-primary btn-hero btn-teal">Join Now</button>
+                        <button class="btn btn-outline btn-hero">Learn More</button>
+                    </div>
+                </div>
+                <div class="stats-container">
+                    <div class="stats-grid">
+                        <div class="stats-row">
+                            <div class="stat-card" data-aos="fade-up" data-aos-delay="100" data-tooltip="Смотрите активные проекты">
+                                <div class="stat-header">
+                                    <div class="stat-value">
+                                        <div class="stat-icon">🚀</div>
+                                        <span data-count="235">235</span>
+                                    </div>
+                                    <div class="stat-growth"><span class="growth-arrow">↑</span> 12%</div>
+                                </div>
+                                <div class="stat-label">Active Projects</div>
+                            </div>
+                            <div class="stat-card" data-aos="fade-up" data-aos-delay="200" data-tooltip="Присоединяйтесь к сообществу инвесторов">
+                                <div class="stat-header">
+                                    <div class="stat-value">
+                                        <div class="stat-icon">👥</div>
+                                        <span data-count="12450">12,450</span>
+                                    </div>
+                                    <div class="stat-growth"><span class="growth-arrow">↑</span> 8%</div>
+                                </div>
+                                <div class="stat-label">Participants</div>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-value">1,450</div>
-                            <div class="stat-label">Participants</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">$1.2M</div>
-                            <div class="stat-label">Total Invested</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">$3.5M</div>
-                            <div class="stat-label">Revenue Generated</div>
+                        <div class="stats-row">
+                            <div class="stat-card" data-aos="fade-up" data-aos-delay="300" data-tooltip="Смотрите общий объем инвестиций">
+                                <div class="stat-header">
+                                    <div class="stat-value">
+                                        <div class="stat-icon">💰</div>
+                                        <span data-count="3500000">$3.5M</span>
+                                    </div>
+                                    <div class="stat-growth"><span class="growth-arrow">↑</span> 15%</div>
+                                </div>
+                                <div class="stat-label">Total Invested</div>
+                            </div>
+                            <div class="stat-card" data-aos="fade-up" data-aos-delay="400" data-tooltip="Смотрите общую прибыль">
+                                <div class="stat-header">
+                                    <div class="stat-value">
+                                        <div class="stat-icon">📈</div>
+                                        <span data-count="5200000">$5.2M</span>
+                                    </div>
+                                    <div class="stat-growth"><span class="growth-arrow">↑</span> 22%</div>
+                                </div>
+                                <div class="stat-label">Revenue Generated</div>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
             
@@ -159,15 +199,68 @@
                             <option value="completed">Completed</option>
                         </select>
                     </div>
+                    <div class="filter-group">
+                        <select id="rating-filter" class="filter-select">
+                            <option value="">All Ratings</option>
+                            <option value="4.5">4.5+ ⭐</option>
+                            <option value="4.0">4.0+ ⭐</option>
+                            <option value="3.5">3.5+ ⭐</option>
+                            <option value="3.0">3.0+ ⭐</option>
+                        </select>
+                    </div>
                     <div class="filter-group search-group">
                         <input type="text" id="search-filter" class="filter-input" placeholder="Search projects...">
                     </div>
+                    <div class="filter-group more-filters-group">
+                        <button id="more-filters-btn" class="btn btn-outline btn-sm">More Filters</button>
+                    </div>
                 </div>
                 
-                <h2 class="active-orders-title">Active Orders</h2>
+                <!-- Extended Filters (hidden by default) -->
+                <div class="extended-filters" id="extended-filters" style="display: none;">
+                    <div class="extended-filter-row">
+                        <div class="extended-filter-group">
+                            <label>ROI Range</label>
+                            <div class="range-inputs">
+                                <input type="number" min="0" max="100" placeholder="Min %" class="filter-input">
+                                <span>-</span>
+                                <input type="number" min="0" max="100" placeholder="Max %" class="filter-input">
+                            </div>
+                        </div>
+                        <div class="extended-filter-group">
+                            <label>Creator Verification</label>
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="verified-creators">
+                                <label for="verified-creators">Verified creators only</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="extended-filter-row">
+                        <div class="extended-filter-group">
+                            <label>Time Left</label>
+                            <select class="filter-select">
+                                <option value="">Any time</option>
+                                <option value="less7">Less than 7 days</option>
+                                <option value="7-14">7-14 days</option>
+                                <option value="15-30">15-30 days</option>
+                                <option value="more30">More than 30 days</option>
+                            </select>
+                        </div>
+                        <div class="extended-filter-group">
+                            <label>Funding Status</label>
+                            <select class="filter-select">
+                                <option value="">Any funding</option>
+                                <option value="less50">< 50% funded</option>
+                                <option value="50-75">50-75% funded</option>
+                                <option value="75plus">75%+ funded</option>
+                                <option value="over">Overfunded</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="project-grid">
-                    <!-- Project Card 1 -->
+                     <!-- Project Card 1 -->
                     <div class="project-card">
                         <div class="project-card-header">
                             <img src="images/project-logo.png" alt="Project Logo" class="project-logo">
@@ -178,6 +271,10 @@
                                     <span class="category"><i class="fas fa-tag"></i> Education</span>
                                     <span class="participants"><i class="fas fa-users"></i> 24 Participants</span>
                                 </div>
+                                <div class="project-metrics">
+                                    <span class="roi">15-25% ROI</span>
+                                    <span class="creator-rating"><i class="fas fa-star"></i> 4.8</span>
+                                </div>
                             </div>
                         </div>
                         <p class="project-description">A comprehensive book explaining blockchain technology to beginners with real-world examples and case studies.</p>
@@ -185,20 +282,26 @@
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width: 48%;"></div>
                             </div>
-                            <div class="progress-text">$2,400 / $5,000</div>
+                            <div class="progress-text">
+                                <span>$2,400 / $5,000</span>
+                                <span class="progress-percentage">(48%)</span>
+                            </div>
                         </div>
                         <div class="stages-progress">
                             <div class="stages-bar">
-                                <div class="stage-segment stage-completed" style="width: 25%;"></div>
-                                <div class="stage-segment stage-current" style="width: 25%;"></div>
-                                <div class="stage-segment stage-upcoming" style="width: 25%;"></div>
-                                <div class="stage-segment stage-upcoming" style="width: 25%;"></div>
+                                <div class="stage-segment stage-completed" style="width: 33.33%;"></div>
+                                <div class="stage-segment stage-completed" style="width: 33.33%;"></div>
+                                <div class="stage-segment stage-current" style="width: 33.33%;"></div>
                             </div>
-                            <div class="stages-text">2/4 Complete</div>
+                            <div class="stages-text">3/3 In Progress</div>
                         </div>
                         <div class="project-footer">
-                            <span class="time-left"><i class="fas fa-clock"></i> 15 days left</span>
-                            <a href="#" class="details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                            <span class="time-left"><i class="fas fa-clock"></i> 8 days left</span>
+                            <div class="project-actions">
+                                <a href="#" class="favorite-btn" title="Add to Interesting"><i class="far fa-star"></i></a>
+                                <a href="#" class="details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                                <a href="#" class="join-btn">Join <i class="fas fa-sign-in-alt"></i></a>
+                            </div>
                         </div>
                     </div>
                     
@@ -232,7 +335,11 @@
                         </div>
                         <div class="project-footer">
                             <span class="time-left"><i class="fas fa-clock"></i> 8 days left</span>
-                            <a href="#" class="details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                            <div class="project-actions">
+                                <a href="#" class="favorite-btn" title="Add to Interesting"><i class="far fa-star"></i></a>
+                                <a href="#" class="details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                                <a href="#" class="join-btn">Join <i class="fas fa-sign-in-alt"></i></a>
+                            </div>
                         </div>
                     </div>
                     
@@ -241,11 +348,15 @@
                         <div class="project-card-header">
                             <img src="images/sustainable-living.png" alt="Sustainable Living Logo" class="project-logo">
                             <div class="project-info">
-                                <h4 class="project-title">Sustainable Living Online Course</h4>
+                                <h4 class="project-title">Online Course on Data Science</h4>
                                 <div class="project-meta">
                                     <span class="status status-open">Active</span>
                                     <span class="category"><i class="fas fa-tag"></i> Education</span>
-                                    <span class="participants"><i class="fas fa-users"></i> 32 Participants</span>
+                                    <span class="participants"><i class="fas fa-users"></i> 18 Participants</span>
+                                </div>
+                                <div class="project-metrics">
+                                    <span class="roi">10-18% ROI</span>
+                                    <span class="creator-rating"><i class="fas fa-star"></i> 4.2</span>
                                 </div>
                             </div>
                         </div>
@@ -254,7 +365,10 @@
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width: 77%;"></div>
                             </div>
-                            <div class="progress-text">$3,100 / $4,000</div>
+                            <div class="progress-text">
+                                <span>$4,800 / $6,000</span>
+                                <span class="progress-percentage">(80%)</span>
+                            </div>
                         </div>
                         <div class="stages-progress">
                             <div class="stages-bar">
@@ -267,7 +381,10 @@
                         </div>
                         <div class="project-footer">
                             <span class="time-left"><i class="fas fa-clock"></i> 12 days left</span>
-                            <a href="#" class="details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                            <div class="project-actions">
+                                <a href="#" class="details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                                <a href="#" class="join-btn">Join <i class="fas fa-sign-in-alt"></i></a>
+                            </div>
                         </div>
                     </div>
                     
@@ -276,11 +393,15 @@
                         <div class="project-card-header">
                             <img src="images/digital-art.png" alt="Digital Art Logo" class="project-logo">
                             <div class="project-info">
-                                <h4 class="project-title">Digital Art Collection: Future Cities</h4>
+                                <h4 class="project-title">Digital Art Collection</h4>
                                 <div class="project-meta">
                                     <span class="status status-open">Active</span>
                                     <span class="category"><i class="fas fa-tag"></i> Art</span>
-                                    <span class="participants"><i class="fas fa-users"></i> 68 Participants</span>
+                                    <span class="participants"><i class="fas fa-users"></i> 28 Participants</span>
+                                </div>
+                                <div class="project-metrics">
+                                    <span class="roi">18-28% ROI</span>
+                                    <span class="creator-rating"><i class="fas fa-star"></i> 4.3</span>
                                 </div>
                             </div>
                         </div>
@@ -289,7 +410,10 @@
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width: 84%;"></div>
                             </div>
-                            <div class="progress-text">$6,300 / $7,500</div>
+                            <div class="progress-text">
+                                <span>$1,200 / $3,000</span>
+                                <span class="progress-percentage">(40%)</span>
+                            </div>
                         </div>
                         <div class="stages-progress">
                             <div class="stages-bar">
@@ -303,7 +427,10 @@
                         </div>
                         <div class="project-footer">
                             <span class="time-left"><i class="fas fa-clock"></i> 5 days left</span>
-                            <a href="#" class="details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                            <div class="project-actions">
+                                <a href="#" class="details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                                <a href="#" class="join-btn">Join <i class="fas fa-sign-in-alt"></i></a>
+                            </div>
                         </div>
                     </div>
                     
@@ -312,11 +439,15 @@
                         <div class="project-card-header">
                             <img src="images/mobile-app.png" alt="Mobile App Logo" class="project-logo">
                             <div class="project-info">
-                                <h4 class="project-title">Eco-Friendly Shopping App</h4>
+                                <h4 class="project-title">AI-Powered Design Tool</h4>
                                 <div class="project-meta">
                                     <span class="status status-open">Active</span>
                                     <span class="category"><i class="fas fa-tag"></i> Software</span>
-                                    <span class="participants"><i class="fas fa-users"></i> 42 Participants</span>
+                                    <span class="participants"><i class="fas fa-users"></i> 36 Participants</span>
+                                </div>
+                                <div class="project-metrics">
+                                    <span class="roi">20-30% ROI</span>
+                                    <span class="creator-rating"><i class="fas fa-star"></i> 4.5</span>
                                 </div>
                             </div>
                         </div>
@@ -325,7 +456,10 @@
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width: 35%;"></div>
                             </div>
-                            <div class="progress-text">$3,500 / $10,000</div>
+                            <div class="progress-text">
+                                <span>$8,500 / $10,000</span>
+                                <span class="progress-percentage">(85%)</span>
+                            </div>
                         </div>
                         <div class="stages-progress">
                             <div class="stages-bar">
@@ -340,7 +474,10 @@
                         </div>
                         <div class="project-footer">
                             <span class="time-left"><i class="fas fa-clock"></i> 20 days left</span>
-                            <a href="#" class="details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                            <div class="project-actions">
+                                <a href="#" class="details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                                <a href="#" class="join-btn">Join <i class="fas fa-sign-in-alt"></i></a>
+                            </div>
                         </div>
                     </div>
                     
@@ -375,7 +512,10 @@
                         </div>
                         <div class="project-footer">
                             <span class="time-left"><i class="fas fa-clock"></i> 14 days left</span>
-                            <a href="#" class="details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                            <div class="project-actions">
+                                <a href="#" class="details-btn">Details <i class="fas fa-arrow-right"></i></a>
+                                <a href="#" class="join-btn">Join <i class="fas fa-sign-in-alt"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1440,6 +1580,116 @@
 
     <!-- Escrow Module -->
     <script type="module" src="js/escrow/index.js"></script>
+    
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // Initialize AOS animations and UI functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS animations
+            AOS.init({
+                duration: 800,
+                easing: 'ease-out',
+                once: true
+            });
+            
+            // More Filters toggle functionality
+            const moreFiltersBtn = document.getElementById('more-filters-btn');
+            const extendedFilters = document.getElementById('extended-filters');
+            
+            if (moreFiltersBtn && extendedFilters) {
+                moreFiltersBtn.addEventListener('click', function() {
+                    const isVisible = extendedFilters.style.display !== 'none';
+                    extendedFilters.style.display = isVisible ? 'none' : 'block';
+                    moreFiltersBtn.textContent = isVisible ? 'More Filters' : 'Less Filters';
+                });
+            }
+            
+            // Animate numbers in statistics
+            const animateNumbers = () => {
+                const statValues = document.querySelectorAll('.stat-value[data-count]');
+                
+                statValues.forEach(statValue => {
+                    const target = parseInt(statValue.getAttribute('data-count'));
+                    let current = 0;
+                    let increment = target / 50; // Adjust speed
+                    let displayValue = statValue.textContent;
+                    
+                    // Handle special formatting
+                    const isMonetary = displayValue.includes('$');
+                    const isMillion = displayValue.includes('M');
+                    
+                    const updateCounter = () => {
+                        current += increment;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(timer);
+                        }
+                        
+                        // Format the number appropriately
+                        let formattedValue;
+                        if (isMonetary && isMillion) {
+                            formattedValue = '$' + (current / 1000000).toFixed(1) + 'M';
+                        } else if (isMonetary) {
+                            formattedValue = '$' + Math.round(current).toLocaleString();
+                        } else if (displayValue.includes('%')) {
+                            formattedValue = Math.round(current) + '%';
+                        } else {
+                            formattedValue = Math.round(current).toLocaleString();
+                        }
+                        
+                        statValue.textContent = formattedValue;
+                    };
+                    
+                    const timer = setInterval(updateCounter, 30);
+                });
+            };
+            
+            // Start animation when elements are in view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateNumbers();
+                        observer.disconnect();
+                    }
+                });
+            });
+            
+            const statsContainer = document.querySelector('.stats-container');
+            if (statsContainer) {
+                observer.observe(statsContainer);
+            }
+            
+            // FAQ button functionality
+            const faqButton = document.getElementById('faq-button');
+            if (faqButton) {
+                faqButton.addEventListener('click', function() {
+                    alert('Чат с поддержкой будет доступен в ближайшее время!');
+                });
+            }
+            
+            // Hero CTA buttons functionality
+            const startInvestingBtn = document.querySelector('.hero-cta-buttons .btn-primary');
+            const learnMoreBtn = document.querySelector('.hero-cta-buttons .btn-outline');
+            
+            if (startInvestingBtn) {
+                startInvestingBtn.addEventListener('click', function() {
+                    // Scroll to project grid
+                    const projectGrid = document.querySelector('.project-grid');
+                    if (projectGrid) {
+                        projectGrid.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            }
+            
+            if (learnMoreBtn) {
+                learnMoreBtn.addEventListener('click', function() {
+                    // Navigate to docs page
+                    window.location.href = 'docs.html';
+                });
+            }
+        });
+    </script>
 
     <script type="module">
         import escrowUI from './js/escrow/ui.js';
@@ -1510,6 +1760,72 @@
             }, 100);
         });
     </script>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-row">
+                <div class="footer-col">
+                    <h4>Co-Intent</h4>
+                    <p>Invest Together. Profit Together.</p>
+                    <p>Connect with like-minded investors to fund promising projects and earn from every success.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Projects</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Risk Disclosure</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Connect With Us</h4>
+                    <div class="social-links">
+                        <a href="https://twitter.com/cointent" target="_blank" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://t.me/cointent" target="_blank" class="social-link">
+                            <i class="fab fa-telegram-plane"></i>
+                        </a>
+                        <a href="https://github.com/cointent" target="_blank" class="social-link">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                    <div class="trust-elements">
+                        <div class="trust-badge" data-aos="fade-up" data-aos-delay="100">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Защищено смарт-контрактами</span>
+                        </div>
+                        <div class="trust-badge" data-aos="fade-up" data-aos-delay="200">
+                            <i class="fas fa-chart-line"></i>
+                            <span><strong>89%</strong> успешных проектов</span>
+                        </div>
+                        <div class="security-partners">
+                            <span>Аудит безопасности:</span>
+                            <img src="images/certik-logo.png" alt="CertiK" class="partner-logo">
+                            <img src="images/hacken-logo.png" alt="Hacken" class="partner-logo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="users-online">
+                    <div class="online-indicator"></div>
+                    <span>Сейчас онлайн: <strong>342</strong> пользователя</span>
+                </div>
+                <p class="copyright">© 2025 Co-Intent. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 
 </html>
