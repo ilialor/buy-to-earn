@@ -6,6 +6,12 @@
 // Import profile module
 import { initProfile } from './profile/profile.js';
 
+// Import auth service for authentication
+import authService from './auth-service.js';
+
+// Import interest handler for favorite buttons
+import { initInterestOnlyButtons } from './interest-only-handler.js';
+
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize UI components
@@ -1613,6 +1619,12 @@ function navigateToPage(page) {
 
 // Глобальная функция для проверки авторизации - улучшенная версия
 function isUserAuthenticated() {
+  // Проверяем наличие нового сервиса авторизации
+  if (authService && typeof authService.isAuthenticated === 'function') {
+    return authService.isAuthenticated();
+  }
+
+  // Если новый сервис недоступен, используем резервный метод
   // Проверка наличия глобальных объектов auth и localStorage
   if (!window.auth) {
     // Проверяем локальную авторизацию через localStorage
@@ -1675,6 +1687,11 @@ function isUserAuthenticated() {
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize UI
   initializeUI();
+  
+  // Initialize interest buttons (favorite stars)
+  if (typeof initInterestOnlyButtons === 'function') {
+    initInterestOnlyButtons();
+  }
   
   // Mobile auth buttons invoke desktop handlers
   const mobileConnect = document.getElementById('connect-wallet-mobile');
