@@ -5,7 +5,8 @@
 
 class AuthService {
   constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost';
+    // Используем window.apiBaseUrl вместо process.env, который не работает в браузере
+    this.baseUrl = window.apiBaseUrl || window.API_BASE_URL || 'http://localhost';
     this.accessToken = localStorage.getItem('access_token') || null;
     this.refreshToken = this.getCookie('refresh_token') || null;
     this.currentUser = null;
@@ -70,12 +71,8 @@ class AuthService {
   async refreshToken() {
     try {
       const response = await fetch(`${this.baseUrl}/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refresh_token: this.refreshToken }),
-        credentials: 'include',
+        method: 'PUT', // Изменено с POST на PUT для соответствия API Gateway
+        credentials: 'include', // Cookie передаются автоматически
       });
 
       if (!response.ok) {
@@ -102,9 +99,8 @@ class AuthService {
   async logout() {
     try {
       const response = await fetch(`${this.baseUrl}/auth/logout`, {
-        method: 'POST',
+        method: 'DELETE', // Изменено с POST на DELETE для соответствия API Gateway
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.accessToken}`,
         },
         credentials: 'include',

@@ -3,7 +3,7 @@
  * Provides login/registration UI for JWT authentication
  */
 
-import authService from './jwt-service.js';
+import authService from '../auth-service.js';
 
 class AuthForm {
   constructor(containerId = 'auth-form-container') {

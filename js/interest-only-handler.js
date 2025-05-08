@@ -3,8 +3,43 @@
  * This module manages both static and dynamic interest-only buttons
  */
 
+// Import auth service
+import authService from './auth-service.js';
+
+// При необходимости импортируем утилиты UI
+// Импортируем showModal если эта функция существует или создаем свою
+import { showModal as uiShowModal } from './ui.js';
+
 // Store API base URL from global config or default value
 const apiBaseUrl = window.apiBaseUrl || '';
+
+// Используем импортированную функцию showModal или создаем заглушку
+const showModal = uiShowModal || window.showModal || function(modalId) {
+  const modalElement = document.getElementById(modalId);
+  if (modalElement) {
+    modalElement.style.display = 'flex';
+  } else {
+    console.warn(`Modal with ID ${modalId} not found`);
+    // Fallback - redirect to login
+    window.location.href = '/login.html';
+  }
+};
+
+/**
+ * Check if user is authenticated
+ * @returns {boolean} Authentication status
+ */
+function isUserAuthenticated() {
+  return authService.isAuthenticated();
+}
+
+/**
+ * Get authentication token
+ * @returns {Promise<string>} Auth token
+ */
+async function getAuthToken() {
+  return authService.accessToken;
+}
 
 /**
  * Initialize all interest-only buttons on the page
@@ -78,15 +113,24 @@ async function updateButtonStatus(button, orderId) {
  * @param {HTMLElement} buttonElement - Button element that was clicked
  */
 export async function toggleInterestOnly(orderId, buttonElement) {
+  // Store original HTML before any operations
+  const originalInnerHTML = buttonElement?.innerHTML || '';
+  
   try {
     // Check if user is authenticated
     if (!isUserAuthenticated()) {
-      showModal('auth-modal');
+      // Show auth modal for unauthenticated users
+      if (typeof showModal === 'function') {
+        showModal('auth-modal');
+      } else {
+        console.warn('Auth modal function not found');
+        // Redirect to login page as fallback
+        window.location.href = '/login.html';
+      }
       return;
     }
     
     // Show loading state
-    const originalInnerHTML = buttonElement.innerHTML;
     buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     buttonElement.disabled = true;
     
@@ -134,12 +178,18 @@ export async function toggleInterestOnly(orderId, buttonElement) {
     
   } catch (error) {
     console.error('Error toggling interest:', error);
-    showNotification(getCurrentLanguageMessage('notification.error'), 'danger');
+    
+    // Use safe notification display
+    if (typeof getCurrentLanguageMessage === 'function' && typeof showNotification === 'function') {
+      showNotification(getCurrentLanguageMessage('notification.error'), 'danger');
+    } else {
+      console.error('Could not show notification: function not available');
+    }
     
     // Make sure button is restored in case of error
     if (buttonElement) {
       buttonElement.disabled = false;
-      buttonElement.innerHTML = originalInnerHTML || '';
+      buttonElement.innerHTML = originalInnerHTML;
     }
   }
 }
@@ -173,6 +223,66 @@ export async function checkInterestStatus(orderId) {
     console.error('Error checking interest status:', error);
     return false;
   }
+}
+
+// Функция showModal уже определена выше в начале файла
+
+/**
+ * Helper function to show notification
+ * Fallback if global function is not available
+ */
+function getCurrentLanguageMessage(key) {
+  // Try to use global function if available
+  if (typeof window.getCurrentLanguageMessage === 'function') {
+    return window.getCurrentLanguageMessage(key);
+  }
+  
+  // Fallback messages
+  const messages = {
+    'notification.error': 'Произошла ошибка',
+    'notification.interestAdded': 'Добавлено в интересующие',
+    'notification.interestRemoved': 'Удалено из интересующих'
+  };
+  
+  return messages[key] || key;
+}
+
+/**
+ * Helper function to show notification
+ * Fallback if global function is not available 
+ */
+function showNotification(message, type) {
+  // Try to use global function if available
+  if (typeof window.showNotification === 'function') {
+    window.showNotification(message, type);
+    return;
+  }
+  
+  // Simple fallback notification
+  console.log(`[${type}] ${message}`);
+  
+  // Create simple toast notification
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<div class="toast-body">${message}</div>`;
+  toast.style.position = 'fixed';
+  toast.style.top = '10px';
+  toast.style.right = '10px';
+  toast.style.zIndex = '9999';
+  toast.style.backgroundColor = type === 'danger' ? '#f8d7da' : 
+                               type === 'success' ? '#d4edda' : 
+                               type === 'info' ? '#d1ecf1' : '#fff3cd';
+  toast.style.color = '#212529';
+  toast.style.padding = '0.75rem 1.25rem';
+  toast.style.borderRadius = '0.25rem';
+  toast.style.boxShadow = '0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)';
+  
+  document.body.appendChild(toast);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    document.body.removeChild(toast);
+  }, 3000);
 }
 
 // Initialization - call on DOM ready

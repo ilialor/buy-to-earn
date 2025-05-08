@@ -1,4 +1,4 @@
-<!-- Auth Modal -->
+<!-- Auth Modal - JWT Authentication via Nginx API Gateway -->
 <div class="modal auth-modal" id="auth-modal">
   <div class="auth-content">
     <div class="auth-tabs">
@@ -14,25 +14,16 @@
         <p class="auth-subtitle">Войдите в свой аккаунт</p>
       </div>
       
-      <div class="social-login-buttons">
-        <button class="btn btn-google" id="google-sign-in">
-          <i class="fab fa-google"></i> Войти через Google
-        </button>
-      </div>
-      
-      <div class="auth-divider">
-        <span>или</span>
-      </div>
-      
       <form id="sign-in-form">
         <div class="form-group">
           <label for="sign-in-email">Email</label>
-          <input type="email" id="sign-in-email" placeholder="Введите email" required>
+          <input type="email" id="sign-in-email" name="email" placeholder="Введите email" required>
         </div>
         <div class="form-group">
           <label for="sign-in-password">Пароль</label>
-          <input type="password" id="sign-in-password" placeholder="Введите пароль" required>
+          <input type="password" id="sign-in-password" name="password" placeholder="Введите пароль" required>
         </div>
+        <div class="form-error" id="sign-in-error"></div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Войти</button>
       </form>
       
@@ -49,29 +40,24 @@
         <p class="auth-subtitle">Создайте новый аккаунт</p>
       </div>
       
-      <div class="social-login-buttons">
-        <button class="btn btn-google" id="google-sign-up">
-          <i class="fab fa-google"></i> Зарегистрироваться через Google
-        </button>
-      </div>
-      
-      <div class="auth-divider">
-        <span>или</span>
-      </div>
-      
       <form id="sign-up-form">
         <div class="form-group">
           <label for="sign-up-name">Имя</label>
-          <input type="text" id="sign-up-name" placeholder="Введите имя" required>
+          <input type="text" id="sign-up-name" name="name" placeholder="Введите имя" required>
         </div>
         <div class="form-group">
           <label for="sign-up-email">Email</label>
-          <input type="email" id="sign-up-email" placeholder="Введите email" required>
+          <input type="email" id="sign-up-email" name="email" placeholder="Введите email" required>
         </div>
         <div class="form-group">
           <label for="sign-up-password">Пароль</label>
-          <input type="password" id="sign-up-password" placeholder="Введите пароль" required>
+          <input type="password" id="sign-up-password" name="password" placeholder="Введите пароль" required>
         </div>
+        <div class="form-group">
+          <label for="sign-up-confirm-password">Подтвердите пароль</label>
+          <input type="password" id="sign-up-confirm-password" name="confirmPassword" placeholder="Подтвердите пароль" required>
+        </div>
+        <div class="form-error" id="sign-up-error"></div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Зарегистрироваться</button>
       </form>
       
@@ -90,8 +76,9 @@
       <form id="reset-password-form">
         <div class="form-group">
           <label for="reset-email">Email</label>
-          <input type="email" id="reset-email" placeholder="Введите email" required>
+          <input type="email" id="reset-email" name="email" placeholder="Введите email" required>
         </div>
+        <div class="form-error" id="reset-error"></div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Отправить инструкцию</button>
       </form>
       
@@ -100,6 +87,15 @@
       </div>
     </div>
     
-    <button class="modal-close">&times;</button>
+    <!-- Auth Success Message -->
+    <div class="auth-tab-content" id="auth-success-tab">
+      <div class="auth-header success">
+        <i class="fas fa-check-circle success-icon"></i>
+        <h3 class="auth-title">Успешно!</h3>
+        <p class="auth-subtitle" id="auth-success-message">Действие выполнено успешно.</p>
+      </div>
+      <button class="btn btn-primary" id="auth-success-close" style="width: 100%;">Продолжить</button>
+    </div>
   </div>
-</div> 
+  <span class="close-modal">&times;</span>
+</div>

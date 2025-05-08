@@ -3,6 +3,9 @@
  * This file contains UI utility functions
  */
 
+// Импортируем сервис аутентификации
+import authService from './auth-service.js';
+
 // Import profile module
 import { initProfile } from './profile/profile.js';
 
@@ -1105,7 +1108,7 @@ function renderPortfolioStatistics(statistics) {
   // Проверяем, существует ли секция для статистики
   let statsSection = contentArea.querySelector('.statistics-card');
   
-  // Если секция не существует, создаем её
+  // Если секции нет, создаем её
   if (!statsSection) {
     console.log('Создание секции для статистики портфолио');
     statsSection = document.createElement('div');
@@ -1613,62 +1616,55 @@ function navigateToPage(page) {
 
 // Глобальная функция для проверки авторизации - улучшенная версия
 function isUserAuthenticated() {
-  // Проверка наличия глобальных объектов auth и localStorage
-  if (!window.auth) {
-    // Проверяем локальную авторизацию через localStorage
-    try {
-      const localAuthKey = 'localAuth_currentUser';
-      const storedUser = localStorage.getItem(localAuthKey);
-      
-      if (storedUser) {
-        console.log('User authenticated via localStorage');
-        return true;
-      }
-    } catch (e) {
-      console.error('Error checking localStorage auth:', e);
-    }
-    
-    // Проверяем, была ли уже инициализирована локальная авторизация
-    if (!localStorage.getItem('localAuth_initialized')) {
-      console.debug('Auth service not initialized yet, attempting to initialize local auth');
-      if (typeof initLocalAuth === 'function') {
-        try {
-          initLocalAuth();
-          localStorage.setItem('localAuth_initialized', 'true');
-          
-          // Проверяем еще раз после инициализации
-          const storedUser = localStorage.getItem('localAuth_currentUser');
-          return !!storedUser;
-        } catch (e) {
-          console.error('Failed to initialize local auth:', e);
-        }
-      }
-    }
-    
-    return false;
+  // Сначала пробуем использовать централизованный AuthService
+  if (authService && typeof authService.isAuthenticated === 'function') {
+    return authService.isAuthenticated();
   }
   
-  // Проверка текущего пользователя через глобальный auth объект
-  if (window.auth.currentUser) {
-    return true;
-  }
-  
-  // Дополнительная проверка локальной авторизации через localStorage
+  // Запасной вариант - проверка через localStorage
   try {
-    // Проверяем, есть ли в localStorage данные о текущем пользователе
+    // Проверяем токен доступа в localStorage
+    const accessToken = localStorage.getItem('access_token');
+    if (accessToken) {
+      console.log('User authenticated via access_token');
+      return true;
+    }
+    
+    // Проверяем сохраненного пользователя
+    const currentUser = localStorage.getItem('current_user');
+    if (currentUser) {
+      console.log('User authenticated via current_user in localStorage');
+      return true;
+    }
+    
+    // Для обратной совместимости - проверка через старый метод
     const localAuthKey = 'localAuth_currentUser';
     const storedUser = localStorage.getItem(localAuthKey);
-    
     if (storedUser) {
-      console.log('User authenticated via localStorage');
+      console.log('User authenticated via legacy localStorage key');
       return true;
     }
   } catch (e) {
-    console.error('Error checking localStorage auth:', e);
+    console.error('Error checking auth state:', e);
+  }
+  
+  // Также проверяем window.auth для обратной совместимости
+  if (window.auth && window.auth.currentUser) {
+    return true;
   }
   
   // Если ни один из методов не подтвердил авторизацию
   return false;
+}
+
+// Глобальная функция для получения токена аутентификации
+async function getAuthToken() {
+  if (authService && authService.accessToken) {
+    return authService.accessToken;
+  }
+  
+  // Запасной вариант - получение из localStorage
+  return localStorage.getItem('access_token') || null;
 }
 
 // Document ready
@@ -1699,8 +1695,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Глобальный метод для проверки авторизации
+  // Глобальные методы для авторизации
+  window.isUserAuthenticated = isUserAuthenticated;
   window.checkAuthentication = isUserAuthenticated;
+  window.getAuthToken = getAuthToken;
   
   // Добавляем переменную для отслеживания, закрыл ли пользователь окно авторизации
   window.authDialogClosed = false;
