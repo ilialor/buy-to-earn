@@ -59,8 +59,8 @@ function initializeModals() {
   });
 }
 
-// Show a modal by ID
-function showModal(modalId) {
+// Export for use in other modules
+export function showModal(modalId) {
   const modal = document.getElementById(modalId);
   if (!modal) {
     console.error(`Модальное окно с ID "${modalId}" не найдено`);
@@ -93,8 +93,8 @@ function showModal(modalId) {
   };
 }
 
-// Close a modal by ID
-function closeModal(modalId) {
+// Export for use in other modules
+export function closeModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
     modal.style.display = 'none';
@@ -362,6 +362,9 @@ function initializeUI() {
   setupAuthListeners();
   setupUIListeners();
   
+  // Обновляем UI в зависимости от статуса авторизации
+  updateAuthUI();
+  
   // Проверяем состояние авторизации при инициализации
   if (auth && auth.currentUser) {
     console.log("Пользователь авторизован:", auth.currentUser.uid);
@@ -391,6 +394,34 @@ function initializeUI() {
     } else if (activePage === 'profile' && auth && auth.currentUser) {
       // Initialize profile if navigating directly to profile page
       initProfile();
+    }
+  }
+}
+
+// Обновить UI в зависимости от статуса авторизации
+function updateAuthUI() {
+  const isAuth = isUserAuthenticated();
+  const authControls = document.querySelector('.user-controls-auth');
+  const loggedInControls = document.querySelector('.user-controls-logged-in');
+  
+  if (authControls && loggedInControls) {
+    if (isAuth) {
+      // Если пользователь авторизован, показываем блок для авторизованных
+      authControls.style.display = 'none';
+      loggedInControls.style.display = 'flex';
+      
+      // Обновляем информацию о пользователе
+      const userDisplayName = document.getElementById('user-display-name');
+      if (userDisplayName) {
+        const userName = authService && authService.currentUser ? 
+          (authService.currentUser.displayName || authService.currentUser.email || 'Пользователь') : 
+          'Пользователь';
+        userDisplayName.textContent = userName;
+      }
+    } else {
+      // Если пользователь не авторизован, показываем блок для неавторизованных
+      authControls.style.display = 'flex';
+      loggedInControls.style.display = 'none';
     }
   }
 }
@@ -510,16 +541,30 @@ function setupAuthListeners() {
 
 // Set up UI interaction listeners
 function setupUIListeners() {
-  // Обработчик клика по аватару пользователя
-  const userAvatar = document.getElementById('user-info');
-  if (userAvatar) {
-    userAvatar.addEventListener('click', function(e) {
+  // Обработчик клика по блоку информации пользователя
+  const userInfo = document.getElementById('user-info');
+  if (userInfo) {
+    userInfo.addEventListener('click', function(e) {
+      console.log('User info block clicked');
       const dropdown = document.getElementById('user-dropdown');
       if (dropdown) {
         dropdown.classList.toggle('show');
         e.stopPropagation();
       }
     });
+    
+    // Добавим обработчик и для аватара отдельно, чтобы гарантировать срабатывание
+    const userAvatar = document.getElementById('user-avatar');
+    if (userAvatar) {
+      userAvatar.addEventListener('click', function(e) {
+        console.log('User avatar clicked');
+        const dropdown = document.getElementById('user-dropdown');
+        if (dropdown) {
+          dropdown.classList.toggle('show');
+          e.stopPropagation();
+        }
+      });
+    }
 
     // Закрытие дропдауна при клике вне него
     document.addEventListener('click', function(e) {

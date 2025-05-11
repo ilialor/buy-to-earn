@@ -70,10 +70,10 @@ class LocalAuth {
         
         // Проверяем, существует ли пользователь
         const users = this._getUsers();
-        if (users.find(u => u.email === email)) {
-          console.error('LocalAuth: пользователь с таким email уже существует', email);
-          return reject({ code: 'auth/email-already-in-use', message: 'Пользователь с таким email уже существует' });
-        }
+        // if (users.find(u => u.email === email)) {
+        //   console.error('LocalAuth: пользователь с таким email уже существует', email);
+        //   return reject({ code: 'auth/email-already-in-use', message: 'Пользователь с таким email уже существует' });
+        // }
         
         // Создаем нового пользователя
         const newUser = {

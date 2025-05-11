@@ -6,24 +6,14 @@
 // Import auth service
 import authService from './auth-service.js';
 
-// При необходимости импортируем утилиты UI
-// Импортируем showModal если эта функция существует или создаем свою
-import { showModal as uiShowModal } from './ui.js';
+// Import UI utilities - showModal function
+import { showModal } from './ui.js';
 
 // Store API base URL from global config or default value
 const apiBaseUrl = window.apiBaseUrl || '';
 
-// Используем импортированную функцию showModal или создаем заглушку
-const showModal = uiShowModal || window.showModal || function(modalId) {
-  const modalElement = document.getElementById(modalId);
-  if (modalElement) {
-    modalElement.style.display = 'flex';
-  } else {
-    console.warn(`Modal with ID ${modalId} not found`);
-    // Fallback - redirect to login
-    window.location.href = '/login.html';
-  }
-};
+// Use local development mode flag
+const isLocalDevelopment = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
 /**
  * Check if user is authenticated
@@ -60,7 +50,7 @@ export async function initInterestOnlyButtons() {
     button.addEventListener('click', function() {
       const orderId = this.getAttribute('data-order-id');
       if (orderId) {
-        toggleInterestOnly(orderId, this);
+        toggleInterestOnly(orderId);
       } else {
         console.error('Button is missing data-order-id attribute');
       }
@@ -69,7 +59,7 @@ export async function initInterestOnlyButtons() {
     // Mark as initialized to prevent duplicate handlers
     button.dataset.handlerAttached = 'true';
     
-    // Check current status
+    // Check current status - for local development, use localStorage
     const orderId = button.getAttribute('data-order-id');
     if (orderId) {
       updateButtonStatus(button, orderId);
@@ -78,7 +68,7 @@ export async function initInterestOnlyButtons() {
 }
 
 /**
- * Update interest-only button status based on current state from API
+ * Update interest-only button status based on current state
  * @param {HTMLElement} button - Button element to update
  * @param {string} orderId - Order ID to check status for
  */
@@ -89,36 +79,32 @@ async function updateButtonStatus(button, orderId) {
       return;
     }
     
-    // Get current interest status from API
-    const isInterested = await checkInterestStatus(orderId);
+    // Get current interest status - from localStorage for local dev, API for production
+    let isInterested;
     
-    // Update button appearance based on status
-    if (isInterested) {
-      // For btn style buttons
-      button.classList.remove('btn-outline-info');
-      button.classList.add('btn-info');
-      
-      // For star icon style
-      const icon = button.querySelector('i');
-      if (icon) {
-        // Support both fa-star-o (old) and far fa-star (new) icons
-        icon.classList.remove('fa-star-o');
-        icon.classList.remove('far');
-        icon.classList.add('fas');
-        icon.classList.add('fa-star');
+    if (isLocalDevelopment) {
+      // Use localStorage for local development
+      try {
+        const interestedOrders = JSON.parse(localStorage.getItem('interestedOrders') || '[]');
+        isInterested = interestedOrders.includes(orderId);
+      } catch (err) {
+        console.warn('Could not read interest state from localStorage', err);
+        isInterested = false;
       }
     } else {
-      // For btn style buttons
-      button.classList.remove('btn-info');
-      button.classList.add('btn-outline-info');
-      
-      // For star icon style
-      const icon = button.querySelector('i');
-      if (icon) {
-        icon.classList.remove('fas');
-        icon.classList.remove('fa-star');
-        icon.classList.add('far');
-        icon.classList.add('fa-star-o');
+      // Use API for production
+      isInterested = await checkInterestStatus(orderId);
+    }
+    
+    // Update button appearance based on status
+    const icon = button.querySelector('i');
+    if (icon) {
+      if (isInterested) {
+        icon.className = 'fas fa-star';
+        button.title = 'Remove from Interesting';
+      } else {
+        icon.className = 'far fa-star';
+        button.title = 'Add to Interesting';
       }
     }
   } catch (error) {
@@ -127,35 +113,75 @@ async function updateButtonStatus(button, orderId) {
 }
 
 /**
- * Toggle interest-only status for an order
+ * Toggle interest status for an order
  * @param {string} orderId - Order ID to toggle interest for
- * @param {HTMLElement} buttonElement - Button element that was clicked
+ * @returns {Promise<boolean>} New interest status
  */
-export async function toggleInterestOnly(orderId, buttonElement) {
-  // Store original HTML before any operations
-  const originalInnerHTML = buttonElement?.innerHTML || '';
-  
+async function toggleInterestOnly(orderId) {
+  // Check if user is authenticated
+  if (!isUserAuthenticated()) {
+    console.log('User not authenticated, showing auth modal');
+    showModal('auth-modal');
+    return false;
+  }
+
   try {
-    // Check if user is authenticated
-    if (!isUserAuthenticated()) {
-      // Show auth modal for unauthenticated users
-      if (typeof showModal === 'function') {
-        showModal('auth-modal');
-      } else {
-        console.warn('Auth modal function not found');
-        // Redirect to login page as fallback
-        window.location.href = '/login.html';
+    console.log(`Toggling interest for order: ${orderId}`);
+    
+    // Optimistically update UI to improve perceived performance
+    const buttons = document.querySelectorAll(`.favorite-btn[data-order-id="${orderId}"], .interest-only-btn[data-order-id="${orderId}"]`);
+    let isInterested = false;
+    
+    buttons.forEach(button => {
+      // Add loading state
+      button.classList.add('loading');
+      
+      // Check current state for optimistic update
+      const icon = button.querySelector('i');
+      isInterested = icon?.className.includes('fas fa-star') ? false : true;
+    });
+    
+    // For local development environment, use mock data instead of API
+    if (isLocalDevelopment) {
+      console.log('Using mock interest toggle in local development mode');
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Update all matching buttons for this order
+      buttons.forEach(button => {
+        button.classList.remove('loading');
+        
+        // Update icon to filled or empty star based on local state
+        const icon = button.querySelector('i');
+        if (icon) {
+          icon.className = isInterested ? 'fas fa-star' : 'far fa-star';
+          button.title = isInterested ? 'Remove from Interesting' : 'Add to Interesting';
+        }
+      });
+      
+      // Store interest state in localStorage for persistence
+      try {
+        const interestedOrders = JSON.parse(localStorage.getItem('interestedOrders') || '[]');
+        if (isInterested) {
+          if (!interestedOrders.includes(orderId)) {
+            interestedOrders.push(orderId);
+          }
+        } else {
+          const index = interestedOrders.indexOf(orderId);
+          if (index > -1) {
+            interestedOrders.splice(index, 1);
+          }
+        }
+        localStorage.setItem('interestedOrders', JSON.stringify(interestedOrders));
+      } catch (err) {
+        console.warn('Could not save interest state to localStorage', err);
       }
-      return;
+      
+      return isInterested;
     }
     
-    // Show loading state
-    buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    buttonElement.disabled = true;
-    
-    const isCurrentlyInterested = buttonElement.classList.contains('btn-info');
-    
-    // Make API call to the escrow service
+    // Make API request to toggle interest for production
     const response = await fetch(`${apiBaseUrl}/api/orders/interest-only`, {
       method: 'POST',
       headers: {
@@ -164,70 +190,31 @@ export async function toggleInterestOnly(orderId, buttonElement) {
       },
       body: JSON.stringify({ orderId })
     });
-    
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-    
+
+    // Get actual state from the API response
     const result = await response.json();
+    isInterested = result.isInterested;
     
-    // Update button appearance based on API response
-    if (result.action === 'removed') {
-      // For btn style buttons
-      buttonElement.classList.remove('btn-info');
-      buttonElement.classList.add('btn-outline-info');
+    // Update all matching buttons for this order
+    buttons.forEach(button => {
+      button.classList.remove('loading');
       
-      // For star icon style
-      const icon = buttonElement.querySelector('i');
+      // Update icon to filled or empty star based on response
+      const icon = button.querySelector('i');
       if (icon) {
-        icon.classList.remove('fas');
-        icon.classList.remove('fa-star');
-        icon.classList.add('far');
-        icon.classList.add('fa-star');
+        icon.className = isInterested ? 'fas fa-star' : 'far fa-star';
+        button.title = isInterested ? 'Remove from Interesting' : 'Add to Interesting';
       }
-      
-      showNotification(getCurrentLanguageMessage('notification.interestRemoved'), 'info');
-    } else if (result.action === 'added') {
-      // For btn style buttons
-      buttonElement.classList.remove('btn-outline-info');
-      buttonElement.classList.add('btn-info');
-      
-      // For star icon style
-      const icon = buttonElement.querySelector('i');
-      if (icon) {
-        icon.classList.remove('far');
-        icon.classList.remove('fa-star-o');
-        icon.classList.add('fas');
-        icon.classList.add('fa-star');
-      }
-      
-      showNotification(getCurrentLanguageMessage('notification.interestAdded'), 'success');
-    }
-    
-    // Re-enable button and restore original content
-    buttonElement.disabled = false;
-    buttonElement.innerHTML = originalInnerHTML;
-    
-    // Apply i18n to the button text again
-    if (window.applyI18n) {
-      window.applyI18n(buttonElement.querySelector('[data-i18n]'));
-    }
-    
+    });
+
+    return isInterested;
   } catch (error) {
     console.error('Error toggling interest:', error);
-    
-    // Use safe notification display
-    if (typeof getCurrentLanguageMessage === 'function' && typeof showNotification === 'function') {
-      showNotification(getCurrentLanguageMessage('notification.error'), 'danger');
-    } else {
-      console.error('Could not show notification: function not available');
-    }
-    
-    // Make sure button is restored in case of error
-    if (buttonElement) {
-      buttonElement.disabled = false;
-      buttonElement.innerHTML = originalInnerHTML;
-    }
+    // Restore original state and show error
+    document.querySelectorAll(`.favorite-btn[data-order-id="${orderId}"], .interest-only-btn[data-order-id="${orderId}"]`).forEach(button => {
+      button.classList.remove('loading');
+    });
+    return false;
   }
 }
 
@@ -243,6 +230,18 @@ export async function checkInterestStatus(orderId) {
       return false;
     }
     
+    // For local development, use localStorage
+    if (isLocalDevelopment) {
+      try {
+        const interestedOrders = JSON.parse(localStorage.getItem('interestedOrders') || '[]');
+        return interestedOrders.includes(orderId);
+      } catch (err) {
+        console.warn('Could not read interest state from localStorage', err);
+        return false;
+      }
+    }
+    
+    // For production, use API
     const response = await fetch(`${apiBaseUrl}/api/orders/interest-only`, {
       method: 'GET',
       headers: {
@@ -262,33 +261,11 @@ export async function checkInterestStatus(orderId) {
   }
 }
 
-// Функция showModal уже определена выше в начале файла
-
 /**
  * Helper function to show notification
  * Fallback if global function is not available
  */
-function getCurrentLanguageMessage(key) {
-  // Try to use global function if available
-  if (typeof window.getCurrentLanguageMessage === 'function') {
-    return window.getCurrentLanguageMessage(key);
-  }
-  
-  // Fallback messages
-  const messages = {
-    'notification.error': 'Произошла ошибка',
-    'notification.interestAdded': 'Добавлено в интересующие',
-    'notification.interestRemoved': 'Удалено из интересующих'
-  };
-  
-  return messages[key] || key;
-}
-
-/**
- * Helper function to show notification
- * Fallback if global function is not available 
- */
-function showNotification(message, type) {
+function showNotification(message, type = 'info') {
   // Try to use global function if available
   if (typeof window.showNotification === 'function') {
     window.showNotification(message, type);
