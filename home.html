@@ -31,6 +31,17 @@
     <script src="js/local-auth.js"></script>
     <script type="module" src="locales/index.js"></script>
     <script type="module" src="js/i18n.js"></script>
+    
+    <!-- Authentication Services -->
+    <script type="module" src="js/auth/index.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    
+    <!-- Escrow API Integration -->
+    <script type="module">
+        import * as escrowAPI from './js/api/index.js';
+        // Make escrowAPI available globally
+        window.escrowAPI = escrowAPI;
+    </script>
 </head>
 
 <body>

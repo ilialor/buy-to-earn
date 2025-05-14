@@ -505,6 +505,35 @@ async function signUpWithEmail(email, password, name) {
       throw new Error('Система авторизации недоступна');
     }
     
+    // Проверяем существование пользователя в БД через публичный эндпоинт
+    try {
+      if (window.apiBaseUrl) {
+        console.log('Проверка существования пользователя в БД:', email);
+        const checkResponse = await fetch(`${window.apiBaseUrl}/api/auth/check-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email })
+        });
+        
+        if (checkResponse.ok) {
+          const checkData = await checkResponse.json();
+          if (checkData.exists) {
+            console.error('Пользователь с таким email уже существует в БД:', email);
+            throw { code: 'auth/email-already-in-use', message: 'Пользователь с таким email уже существует' };
+          }
+        }
+      }
+    } catch (checkError) {
+      // Если это ошибка существования пользователя, пробрасываем дальше
+      if (checkError.code === 'auth/email-already-in-use') {
+        throw checkError;
+      }
+      // Если это другая ошибка проверки, просто логируем и продолжаем
+      console.warn('Ошибка проверки email в БД:', checkError);
+    }
+    
     console.log('Регистрация по email:', email);
     const res = await window.auth.createUserWithEmailAndPassword(email, password);
     
@@ -536,7 +565,7 @@ async function signUpWithEmail(email, password, name) {
         }
       }
       
-      // Создаем запись пользователя в Firestore (если доступен)
+      // Создаем запись пользователя 
       try {
         if (window.db) {
           await window.db.collection('users').doc(res.user.uid).set({
@@ -549,6 +578,46 @@ async function signUpWithEmail(email, password, name) {
       } catch (dbError) {
         console.error('Ошибка создания профиля в базе данных:', dbError);
         // Не рушим основной процесс регистрации, если БД недоступна
+      }
+      
+      // Сохраняем пользователя в основной БД через API
+      try {
+        // Проверяем наличие API для регистрации пользователя
+        if (window.escrowApi && window.escrowApi.userService && window.escrowApi.userService.registerUserWithEscrow) {
+          console.log('Регистрация пользователя через API...');
+          const apiResponse = await window.escrowApi.userService.registerUserWithEscrow({
+            uid: res.user.uid,
+            email: res.user.email,
+            displayName: name || res.user.email.split('@')[0],
+            createdAt: new Date()
+          });
+          console.log('Ответ API регистрации:', apiResponse);
+        } else if (window.apiBaseUrl) {
+          // Прямой вызов API, если escrowApi недоступен
+          console.log('Регистрация пользователя через прямой вызов API...');
+          const response = await fetch(`${window.apiBaseUrl}/api/users`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              uid: res.user.uid,
+              email: res.user.email,
+              displayName: name || res.user.email.split('@')[0],
+              createdAt: new Date()
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Ошибка API: ${response.status}`);
+          }
+          
+          const apiData = await response.json();
+          console.log('Ответ API регистрации:', apiData);
+        }
+      } catch (apiError) {
+        console.error('Ошибка регистрации пользователя через API:', apiError);
+        // Не рушим основной процесс регистрации, если API недоступен
       }
       
       // Закрываем модальное окно
