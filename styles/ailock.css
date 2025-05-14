@@ -1,0 +1,315 @@
+/* Ailock Integration Styles */
+
+.ailock-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.ailock-button {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1E8AB9, #20B2AA);
+    box-shadow: 0 4px 16px rgba(32, 178, 170, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.ailock-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(32, 178, 170, 0.4);
+}
+
+.ailock-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ailock-button:hover::before {
+    opacity: 1;
+}
+
+.ailock-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.ailock-pulse {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(32, 178, 170, 0.4);
+    opacity: 0;
+    transform: scale(1);
+    animation: ailockPulse 3s infinite;
+}
+
+@keyframes ailockPulse {
+    0% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    70% {
+        opacity: 0;
+        transform: scale(1.5);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.5);
+    }
+}
+
+.ailock-tooltip {
+    position: absolute;
+    top: -45px;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.ailock-button:hover .ailock-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.ailock-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid rgba(0, 0, 0, 0.8);
+}
+
+/* Ailock Chat Widget */
+.ailock-chat {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 350px;
+    height: 450px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0.95);
+    opacity: 0;
+    transform-origin: bottom right;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    z-index: 999;
+}
+
+.ailock-chat.active {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: all;
+}
+
+.ailock-chat-header {
+    background: linear-gradient(135deg, #1E8AB9, #20B2AA);
+    padding: 15px 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ailock-chat-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ailock-chat-title img {
+    width: 24px;
+    height: 24px;
+}
+
+.ailock-chat-title h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.ailock-chat-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.ailock-chat-close:hover {
+    opacity: 1;
+}
+
+.ailock-chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+}
+
+.ailock-message {
+    margin-bottom: 15px;
+    max-width: 80%;
+}
+
+.ailock-message.user {
+    margin-left: auto;
+    background-color: #e3f2fd;
+    padding: 10px 15px;
+    border-radius: 18px 18px 4px 18px;
+    color: #333;
+}
+
+.ailock-message.ai {
+    margin-right: auto;
+    background-color: white;
+    padding: 10px 15px;
+    border-radius: 18px 18px 18px 4px;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.ailock-chat-input {
+    padding: 15px;
+    border-top: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ailock-chat-input input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+}
+
+.ailock-chat-input input:focus {
+    border-color: #20B2AA;
+    box-shadow: 0 0 0 2px rgba(32, 178, 170, 0.1);
+}
+
+.ailock-chat-send {
+    background-color: #20B2AA;
+    color: white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ailock-chat-send:hover {
+    background-color: #1a8e87;
+    transform: scale(1.05);
+}
+
+/* First-time visitor hint */
+.ailock-hint {
+    position: absolute;
+    bottom: 80px;
+    right: 30px;
+    background-color: white;
+    padding: 12px 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 250px;
+    font-size: 14px;
+    color: #444;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.ailock-hint.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.ailock-hint::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    right: 25px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid white;
+}
+
+.ailock-hint-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    line-height: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .ailock-chat {
+        width: calc(100% - 40px);
+        height: 400px;
+        bottom: 90px;
+        right: 20px;
+    }
+    
+    .ailock-container {
+        bottom: 20px;
+        right: 20px;
+    }
+}
