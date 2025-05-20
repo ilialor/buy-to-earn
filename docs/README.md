@@ -1,4 +1,5 @@
 # Ateira:CoIntent - Documentation
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ilialor/buy-to-earn)
 
 ## Overview
 Ateira:CoIntent is the 'Buy-to-Earn' project is a platform for group orders using escrow functionality, ensuring secure transactions between customers and contractors. The platform allows you to:
