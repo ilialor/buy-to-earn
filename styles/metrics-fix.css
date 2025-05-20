@@ -1,0 +1,218 @@
+/**
+ * Metrics Fix CSS
+ * 
+ * This CSS file fixes the display of metrics in project cards and improves overall card layout
+ */
+
+/* Ensure project card has proper containment */
+.project-card {
+  position: relative !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  padding: 15px !important;
+  height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  border-radius: 8px !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.project-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Progress bar styles */
+.project-card .project-progress {
+  order: 3 !important;
+  margin-top: 5px !important;
+}
+
+/* Stages progress styles */
+.project-card .stages-progress {
+  order: 4 !important;
+}
+
+/* Project footer styles */
+.project-card .project-footer {
+  order: 5 !important;
+  margin-top: 5px !important;
+}
+
+/* Project title should be first */
+.project-card .project-title {
+  order: 0 !important;
+}
+
+/* Project meta data should come after title */
+.project-card .project-meta {
+  order: 1 !important;
+}
+
+/* Project metrics should come after meta data */
+.project-card .project-metrics {
+  order: 1 !important;
+}
+
+/* Completely restructure the project card header */
+.project-card .project-card-header {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  padding-bottom: 5px !important;
+  margin-bottom: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  min-height: 60px !important;
+  max-height: 70px !important;
+}
+
+/* Project logo styles */
+.project-card .project-logo {
+  height: 60px !important;
+  width: 60px !important;
+  object-fit: contain !important;
+  border-radius: 6px !important;
+  background-color: #f8f9fa !important;
+  padding: 5px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Adjust project info layout */
+.project-card .project-info {
+  display: flex !important;
+  flex-direction: column !important;
+  width: calc(100% - 70px) !important;
+  position: relative !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+  margin-left: 10px !important;
+  min-height: 60px !important;
+  justify-content: space-between !important;
+}
+
+/* Move metrics directly below the title */
+.project-card .project-metrics {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  margin-top: 0 !important;
+  margin-bottom: 5px !important;
+  width: 100% !important;
+  height: auto !important;
+  z-index: 1 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  order: 1 !important;
+  flex-wrap: nowrap !important;
+  gap: 5px !important;
+  white-space: nowrap !important;
+}
+
+/* Style ROI element */
+.project-card .project-metrics .roi {
+  display: inline-block !important;
+  font-weight: bold !important;
+  color: #2a9d8f !important;
+  margin-right: 8px !important;
+  background-color: rgba(42, 157, 143, 0.1) !important;
+  padding: 3px 8px !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  letter-spacing: 0.2px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Style rating element */
+.project-card .project-metrics .creator-rating {
+  display: inline-block !important;
+  color: #e9c46a !important;
+  background-color: rgba(233, 196, 106, 0.1) !important;
+  padding: 3px 8px !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  letter-spacing: 0.2px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Make project title clearer */
+.project-card .project-title {
+  width: 100% !important;
+  margin-top: 0 !important;
+  margin-bottom: 5px !important;
+  font-size: 16px !important;
+  line-height: 1.3 !important;
+  font-weight: bold !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  white-space: normal !important;
+  max-height: 42px !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  order: 0 !important;
+  color: #333 !important;
+}
+
+/* Adjust project meta data */
+.project-card .project-meta {
+  margin-top: 0 !important;
+  margin-bottom: 5px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 5px !important;
+  order: 2 !important;
+}
+
+/* Style status, category and participants */
+.project-card .project-meta span {
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+/* Style for status when moved to metrics */
+.project-card .project-metrics .status {
+  display: inline-block !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  order: -1 !important; /* Помещаем статус перед ROI */
+  margin-right: 8px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Style for Active status */
+.project-card .project-metrics .status-open {
+  color: #4caf50 !important;
+  background-color: rgba(76, 175, 80, 0.1) !important;
+  padding: 3px 8px !important;
+  border-radius: 4px !important;
+  font-weight: bold !important;
+  letter-spacing: 0.2px !important;
+}
+
+/* Ensure project description has proper spacing */
+.project-card .project-description {
+  margin-top: 30px !important;
+  margin-bottom: 10px !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+  padding-top: 10px !important;
+  min-height: 80px !important;
+  max-height: 104px !important;
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 5 !important;
+  line-clamp: 5 !important;
+  -webkit-box-orient: vertical !important;
+  line-height: 1.4 !important;
+  font-size: 13px !important;
+  order: 2 !important;
+  color: #555 !important;
+  text-align: justify !important;
+}

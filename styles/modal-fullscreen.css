@@ -1,0 +1,399 @@
+/**
+ * Стили для полноэкранного модального окна
+ */
+
+/* Переопределение базовых стилей модального окна */
+.modal#project-details-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 9999 !important;
+}
+
+/* Стили контента модального окна */
+#project-details-modal .modal-content {
+  background-color: #fff !important;
+  border-radius: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-shadow: none !important;
+  position: relative !important;
+  max-height: 100vh !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  margin: 0 !important;
+  transition: all 0.5s ease !important;
+}
+
+/* Состояние свернутого модального окна */
+#project-details-modal .modal-content.minimized {
+  height: 60px !important;
+  overflow: hidden !important;
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 300px !important;
+  border-radius: 0 10px 0 0 !important;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+#project-details-modal .modal-content.minimized .modal-body,
+#project-details-modal .modal-content.minimized .project-metrics-container,
+#project-details-modal .modal-content.minimized .project-stages-container {
+  display: none !important;
+}
+
+#project-details-modal .modal-content.minimized .modal-header {
+  padding: 10px 15px !important;
+  border-radius: 0 10px 0 0 !important;
+}
+
+/* Тело модального окна */
+#project-details-modal .modal-body {
+  padding: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: calc(100vh - 60px) !important;
+  overflow-y: auto !important;
+  background-color: #f8f9fa !important;
+}
+
+/* Секция с информацией о проекте и создателе */
+.project-info-section {
+  display: grid !important;
+  grid-template-columns: 2fr 1fr !important;
+  grid-gap: 20px !important;
+  margin-bottom: 30px !important;
+}
+
+/* Блок О проекте */
+.project-about-block {
+  background-color: #fff !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+  padding: 20px !important;
+}
+
+/* Заголовок проекта */
+.project-header {
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 20px !important;
+}
+
+.project-logo {
+  width: 80px !important;
+  height: 80px !important;
+  margin-right: 20px !important;
+  flex-shrink: 0 !important;
+}
+
+.project-logo-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 8px !important;
+}
+
+.project-title-container {
+  flex-grow: 1 !important;
+}
+
+.project-badges {
+  display: flex !important;
+  gap: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+.badge {
+  padding: 5px 10px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: white !important;
+}
+
+.badge-gamefi {
+  background-color: #6c5ce7 !important;
+}
+
+.badge-trending {
+  background-color: #e17055 !important;
+}
+
+.project-title {
+  font-size: 24px !important;
+  margin: 0 !important;
+  color: #333 !important;
+}
+
+/* Описание проекта */
+.section-title {
+  font-size: 18px !important;
+  color: #333 !important;
+  margin-bottom: 15px !important;
+  font-weight: 600 !important;
+  border-bottom: 2px solid #eee !important;
+  padding-bottom: 8px !important;
+}
+
+.project-description {
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  color: #555 !important;
+  margin-bottom: 20px !important;
+}
+
+/* Метрики проекта */
+.project-metrics-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  background-color: #f9f9f9 !important;
+  border-radius: 8px !important;
+  padding: 15px !important;
+}
+
+.metric-label {
+  font-size: 12px !important;
+  color: #777 !important;
+  margin-bottom: 5px !important;
+  font-weight: 500 !important;
+}
+
+.rating-stars {
+  display: flex !important;
+  align-items: center !important;
+  color: #f1c40f !important;
+  font-size: 16px !important;
+}
+
+.rating-value {
+  margin-left: 8px !important;
+  color: #333 !important;
+  font-weight: 600 !important;
+}
+
+.roi-value, .status-value {
+  display: flex !important;
+  align-items: center !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #333 !important;
+}
+
+.roi-value i, .status-value i {
+  margin-right: 8px !important;
+  color: #2ecc71 !important;
+}
+
+.status-icon {
+  color: #3498db !important;
+}
+
+/* Блок О создателе */
+.creator-about-block {
+  background-color: #fff !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+  padding: 20px !important;
+}
+
+/* Блок метрик проекта */
+.project-metrics-container {
+  background-color: #fff !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+  padding: 20px !important;
+  margin-bottom: 30px !important;
+}
+
+.project-metrics {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  grid-template-rows: auto auto !important;
+  grid-gap: 20px !important;
+}
+
+.metric-item {
+  text-align: center !important;
+  padding: 15px !important;
+  background-color: #f9f9f9 !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.metric-item:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.metric-item .metric-label {
+  font-size: 14px !important;
+  color: #777 !important;
+  margin-bottom: 8px !important;
+}
+
+.metric-item .metric-value {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #333 !important;
+}
+
+.metric-progress {
+  grid-column: 1 / -1 !important;
+  padding: 15px !important;
+  background-color: #f9f9f9 !important;
+  border-radius: 8px !important;
+}
+
+.progress-container {
+  width: 100% !important;
+}
+
+.progress-bar {
+  height: 10px !important;
+  background-color: #e0e0e0 !important;
+  border-radius: 5px !important;
+  overflow: hidden !important;
+  margin-bottom: 10px !important;
+}
+
+.progress-fill {
+  height: 100% !important;
+  background: linear-gradient(135deg, #1E8AB9, #20B2AA) !important;
+  border-radius: 5px !important;
+}
+
+.progress-info {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.progress-percent {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #333 !important;
+}
+
+.creator-info {
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 15px !important;
+}
+
+.creator-avatar {
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  margin-right: 15px !important;
+  flex-shrink: 0 !important;
+}
+
+.creator-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.creator-details {
+  flex-grow: 1 !important;
+}
+
+.creator-name {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: #333 !important;
+  margin: 0 0 5px 0 !important;
+}
+
+.creator-role {
+  font-size: 14px !important;
+  color: #777 !important;
+  margin: 0 0 10px 0 !important;
+}
+
+.creator-stats {
+  display: flex !important;
+  gap: 15px !important;
+}
+
+.creator-stat {
+  display: flex !important;
+  align-items: center !important;
+  font-size: 13px !important;
+  color: #555 !important;
+}
+
+.creator-stat i {
+  margin-right: 5px !important;
+  color: #3498db !important;
+}
+
+.creator-bio {
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  color: #555 !important;
+}
+
+/* Заголовок модального окна */
+#project-details-modal .modal-header {
+  padding: 15px 30px !important;
+  background: linear-gradient(135deg, #1E8AB9, #20B2AA) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+#project-details-modal .modal-header .modal-title {
+  font-size: 24px !important;
+  color: white !important;
+  font-weight: 700 !important;
+}
+
+/* Кнопки управления модальным окном */
+#project-details-modal .modal-controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 15px !important;
+}
+
+#project-details-modal .modal-minimize {
+  font-size: 24px !important;
+  color: white !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  opacity: 0.8 !important;
+  transition: opacity 0.3s !important;
+}
+
+#project-details-modal .modal-minimize:hover {
+  opacity: 1 !important;
+}
+
+#project-details-modal .modal-close {
+  font-size: 28px !important;
+  color: white !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  opacity: 0.8 !important;
+  transition: opacity 0.3s !important;
+}
+
+#project-details-modal .modal-close:hover {
+  opacity: 1 !important;
+}

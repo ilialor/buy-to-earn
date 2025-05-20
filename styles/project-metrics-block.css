@@ -1,0 +1,134 @@
+/**
+ * Project Metrics Block Styles
+ * 
+ * Стили для блока метрик проекта на странице деталей проекта
+ */
+
+/* Project Metrics Block */
+.project-metrics-block {
+  grid-column: 1 / -1 !important;
+  padding: 20px 30px !important;
+  background-color: #fff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+  margin-bottom: 20px !important;
+}
+
+.metrics-item {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 10px !important;
+  padding: 8px 0 !important;
+}
+
+.metrics-label {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #555 !important;
+}
+
+.metrics-value {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #2a9d8f !important;
+}
+
+.metrics-additional-info {
+  margin-top: 20px !important;
+  border-top: 1px solid #eee !important;
+  padding-top: 15px !important;
+}
+
+.metrics-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  margin-bottom: 15px !important;
+}
+
+.metrics-row .metrics-item {
+  flex: 0 0 48% !important;
+  margin-bottom: 0 !important;
+}
+
+/* Progress Bar Styles */
+.project-metrics-block .metric-progress {
+  margin: 15px 0 25px 0 !important;
+}
+
+.project-metrics-block .progress-container {
+  width: 100% !important;
+}
+
+.project-metrics-block .progress-bar {
+  height: 10px !important;
+  background-color: #e9ecef !important;
+  border-radius: 5px !important;
+  overflow: hidden !important;
+  margin-bottom: 5px !important;
+}
+
+.project-metrics-block .progress-fill {
+  height: 100% !important;
+  background-color: #2a9d8f !important;
+  border-radius: 5px !important;
+  transition: width 0.5s ease !important;
+}
+
+.project-metrics-block .progress-info {
+  display: flex !important;
+  justify-content: flex-end !important;
+  font-size: 14px !important;
+  color: #6c757d !important;
+}
+
+/* AIlock Button Styles */
+.ailock-button-container {
+  display: flex !important;
+  justify-content: center !important;
+  margin-top: 25px !important;
+  padding-top: 15px !important;
+  border-top: 1px solid #eee !important;
+}
+
+.ailock-calculate-btn {
+  background: linear-gradient(135deg, #6C5CE7, #4834D4) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 25px !important;
+  padding: 12px 25px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 10px rgba(72, 52, 212, 0.3) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.ailock-calculate-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 15px rgba(72, 52, 212, 0.4) !important;
+}
+
+.ailock-calculate-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 5px rgba(72, 52, 212, 0.3) !important;
+}
+
+.ailock-calculate-btn i {
+  font-size: 16px !important;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+  .metrics-row {
+    flex-direction: column !important;
+  }
+  
+  .metrics-row .metrics-item {
+    flex: 0 0 100% !important;
+    margin-bottom: 10px !important;
+  }
+}

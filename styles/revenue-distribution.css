@@ -1,0 +1,114 @@
+/**
+ * Revenue Distribution Block Styles
+ * 
+ * Стили для блока распределения доходов в модальном окне проекта
+ */
+
+/* Основной контейнер блока распределения доходов */
+.revenue-distribution-block {
+  background-color: #ffffff !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+  padding: 20px !important;
+  margin-bottom: 20px !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Заголовок блока */
+.revenue-distribution-block .section-title {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 20px !important;
+  color: #333 !important;
+  border-bottom: 1px solid #eee !important;
+  padding-bottom: 10px !important;
+}
+
+/* Контейнер для круговой диаграммы */
+.revenue-chart-container {
+  width: 100% !important;
+  height: 200px !important;
+  margin: 0 auto 20px !important;
+  position: relative !important;
+}
+
+/* Контейнер для SVG-диаграммы */
+.revenue-chart-svg {
+  width: 100% !important;
+  height: 200px !important;
+  margin: 0 auto 20px !important;
+  position: relative !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* Легенда диаграммы */
+.revenue-legend {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin-bottom: 20px !important;
+}
+
+/* Элемент легенды */
+.legend-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+/* Цветной квадрат легенды */
+.legend-color {
+  width: 15px !important;
+  height: 15px !important;
+  border-radius: 3px !important;
+}
+
+/* Текст легенды */
+.legend-text {
+  font-size: 0.9rem !important;
+  color: #555 !important;
+}
+
+/* Контейнер для маленькой кнопки Айлока */
+.ailock-button-container.small {
+  text-align: center !important;
+  margin-top: 10px !important;
+}
+
+/* Маленькая кнопка "Спросить Айлока" */
+.ailock-ask-btn {
+  background-color: #f0f0f0 !important;
+  color: #555 !important;
+  border: none !important;
+  border-radius: 20px !important;
+  padding: 8px 15px !important;
+  font-size: 0.85rem !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+.ailock-ask-btn:hover {
+  background-color: #e0e0e0 !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+}
+
+.ailock-ask-btn i {
+  font-size: 0.9rem !important;
+}
+
+/* Медиа-запрос для мобильных устройств */
+@media (max-width: 768px) {
+  .revenue-chart-container {
+    height: 180px !important;
+  }
+  
+  .legend-text {
+    font-size: 0.8rem !important;
+  }
+}
