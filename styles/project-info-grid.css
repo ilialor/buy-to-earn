@@ -1,0 +1,37 @@
+/**
+ * Project Info Grid Styles
+ * 
+ * Стили для двухколоночного контейнера с метриками и этапами проекта
+ */
+
+/* Основной контейнер для двухколоночного макета */
+.project-info-grid {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 20px !important;
+  margin-bottom: 30px !important;
+  width: 100% !important;
+}
+
+/* Блоки внутри сетки */
+.project-info-grid > div {
+  flex: 1 !important;
+  min-width: 0 !important;
+  max-width: calc(50% - 10px) !important;
+}
+
+/* Медиа-запрос для мобильных устройств */
+@media (max-width: 992px) {
+  .project-info-grid {
+    flex-direction: column !important;
+  }
+  
+  .project-info-grid > div {
+    max-width: 100% !important;
+    margin-bottom: 20px !important;
+  }
+  
+  .project-stages-block {
+    margin-top: 0 !important;
+  }
+}

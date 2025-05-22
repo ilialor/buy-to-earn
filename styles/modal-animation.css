@@ -1,0 +1,68 @@
+/**
+ * Modal Animation Styles
+ * 
+ * Styles for modal window animation and behavior
+ */
+
+/* Base modal state */
+.modal#project-details-modal {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  display: none;
+}
+
+/* Active modal state */
+.modal#project-details-modal.show {
+  opacity: 1;
+  visibility: visible;
+  display: flex;
+}
+
+/* Minimized modal state - ensure it doesn't block the page */
+#project-details-modal .modal-content.minimized {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 300px !important;
+  height: 60px !important;
+  z-index: 100 !important;
+  overflow: hidden !important;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* When modal is minimized, make sure it doesn't block the page */
+#project-details-modal.minimized-mode {
+  background-color: transparent !important;
+  pointer-events: none !important;
+}
+
+/* But allow interaction with the minimized content */
+#project-details-modal.minimized-mode .modal-content {
+  pointer-events: auto !important;
+}
+
+/* Стили для кнопки закрытия */
+#close-project-modal {
+  position: relative;
+  z-index: 9999;
+  cursor: pointer;
+  font-size: 28px;
+  color: white;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+#close-project-modal:hover {
+  opacity: 1;
+}
+
+/* Обеспечиваем видимость кнопки закрытия */
+.modal-controls {
+  position: relative;
+  z-index: 9999;
+}

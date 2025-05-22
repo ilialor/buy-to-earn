@@ -1,0 +1,56 @@
+/**
+ * Static Pie Chart Styles
+ * 
+ * CSS-only implementation of a pie chart as a fallback for when
+ * JavaScript-based charts fail to render.
+ */
+
+/* Контейнер для статической круговой диаграммы */
+.static-pie-chart {
+  position: relative !important;
+  width: 200px !important;
+  height: 200px !important;
+  border-radius: 50% !important;
+  background-color: #f0f0f0 !important;
+  margin: 0 auto !important;
+  overflow: hidden !important;
+}
+
+/* Сегмент круговой диаграммы */
+.pie-segment {
+  position: absolute !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform-origin: 50% 50% !important;
+  background-color: var(--color, #ccc) !important;
+}
+
+/* Игроки - 65% */
+.pie-segment.players {
+  clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 50% 0%) !important;
+  transform: rotate(0deg) !important;
+}
+
+/* Создатели - 25% */
+.pie-segment.creators {
+  clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 0% 100%, 0% 50%) !important;
+  transform: rotate(234deg) !important;
+}
+
+/* Платформа - 10% */
+.pie-segment.platform {
+  clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 50%) !important;
+  transform: rotate(324deg) !important;
+}
+
+/* Отверстие в центре для кольцевой диаграммы */
+.pie-hole {
+  position: absolute !important;
+  top: 25% !important;
+  left: 25% !important;
+  width: 50% !important;
+  height: 50% !important;
+  background-color: white !important;
+  border-radius: 50% !important;
+  z-index: 10 !important;
+}
