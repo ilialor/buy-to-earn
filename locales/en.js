@@ -8,7 +8,8 @@ const en = {
     portfolio: "My Portfolio",
     revenue: "Revenue Sharing",
     docs: "Documentation",
-    support: "Support"
+    support: "Support",
+    home: "Ailock"
   },
   
   // Auth
@@ -383,6 +384,12 @@ const en = {
     enter_valid_amount: "Milestone amount must be positive",
     joined_success: "Successfully joined the order",
     join_error: "Error joining order"
+  },
+
+  // Hero
+  hero: {
+    title: "Buy to Earn",
+    quote: "Buy to earn is a new way to earn money by buying products and services. It is a way to earn money by buying products and services. It is a way to earn money by buying products and services.",
   }
 };
 
