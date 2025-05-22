@@ -61,7 +61,7 @@ export class EscrowClient {
    * @returns {Promise<Object>} Created user object
    */
   async createUser(userData) {
-    return this.request('/users', 'POST', userData);
+    return this.request('/users/public', 'POST', userData);
   }
 
   /**

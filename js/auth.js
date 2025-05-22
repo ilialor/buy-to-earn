@@ -595,7 +595,7 @@ async function signUpWithEmail(email, password, name) {
         } else if (window.apiBaseUrl) {
           // Прямой вызов API, если escrowApi недоступен
           console.log('Регистрация пользователя через прямой вызов API...');
-          const response = await fetch(`${window.apiBaseUrl}/api/users`, {
+          const response = await fetch(`${window.apiBaseUrl}/api/users/public`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

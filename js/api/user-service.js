@@ -78,13 +78,40 @@ async function registerUserWithEscrow(localUser) {
       }
     }
     
-    // Create a new user in Escrow API
-    const escrowUser = await escrowApi.createUser({
-      name: localUser.displayName || localUser.email || 'User',
-      email: localUser.email || `user-${localUser.uid}@example.com`,
-      type: mapUserRoleToEscrowType(localUser.role || 'customer'),
-      initialBalance: 0
-    });
+    // Create a new user in Escrow API using the public endpoint
+    let escrowUser;
+    try {
+      // Try using the escrowApi client first
+      escrowUser = await escrowApi.createUser({
+        name: localUser.displayName || localUser.email || 'User',
+        email: localUser.email || `user-${localUser.uid}@example.com`,
+        type: mapUserRoleToEscrowType(localUser.role || 'customer'),
+        initialBalance: 0
+      });
+    } catch (clientError) {
+      console.warn('Error using escrowApi client, falling back to direct API call:', clientError);
+      // Fall back to direct API call if the client fails
+      const apiBaseUrl = window.apiBaseUrl || '';
+      const response = await fetch(`${apiBaseUrl}/api/users/public`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: localUser.displayName || localUser.email || 'User',
+          email: localUser.email || `user-${localUser.uid}@example.com`,
+          type: mapUserRoleToEscrowType(localUser.role || 'customer'),
+          initialBalance: 0,
+          externalId: localUser.uid
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      escrowUser = await response.json();
+    }
     
     // Save the mapping
     saveEscrowUserId(localUser.uid, escrowUser.id);
