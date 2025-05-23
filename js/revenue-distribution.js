@@ -18,11 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
         initRevenueChart();
     }, 1000);
     
-    // Также инициализируем диаграмму при открытии модального окна
-    $(document).on('shown.bs.modal', '#project-details-modal', function() {
-        console.log('Modal shown, initializing revenue chart');
-        setTimeout(initRevenueChart, 500);
-    });
+    // Проверяем поддержку Canvas и показываем запасной вариант, если нужно
+    checkCanvasSupport();
     
     // Инициализируем кнопку "Спросить Айлока"
     initAskAIlockButton();
@@ -132,6 +129,32 @@ function initAskAIlockButton() {
             // Show a tooltip or modal with information about revenue distribution
             showAIlockExplanation();
         });
+    }
+}
+
+/**
+ * Check if Canvas is supported and show fallback if needed
+ */
+function checkCanvasSupport() {
+    // Проверяем поддержку Canvas
+    const canvas = document.createElement('canvas');
+    const isCanvasSupported = !!(canvas.getContext && canvas.getContext('2d'));
+    
+    // Если Canvas не поддерживается или Chart.js не загружен
+    if (!isCanvasSupported || typeof Chart === 'undefined') {
+        console.log('Canvas or Chart.js not supported, showing fallback');
+        
+        // Скрываем контейнер Canvas
+        const canvasContainer = document.querySelector('.revenue-chart-container');
+        if (canvasContainer) {
+            canvasContainer.style.display = 'none';
+        }
+        
+        // Показываем запасной вариант диаграммы
+        const fallbackContainer = document.querySelector('.revenue-chart-fallback');
+        if (fallbackContainer) {
+            fallbackContainer.style.display = 'block';
+        }
     }
 }
 

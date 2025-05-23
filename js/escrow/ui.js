@@ -543,155 +543,16 @@ class EscrowUI {
   }
   
   /**
-   * Show order details modal
+   * Перенаправление на страницу деталей проекта
    */
   _showOrderDetails(orderId) {
     const order = this.escrowApp.orders[orderId];
     if (!order) return;
     
-    // Get order details
-    const orderDetails = this.escrowApp.viewOrderDetails(orderId);
-    
-    // Display in modal
-    const modalTitle = document.querySelector('#order-detail-modal .modal-title');
-    const modalContent = document.querySelector('#order-detail-modal .modal-content');
-    
-    if (modalTitle && modalContent) {
-      modalTitle.textContent = order.title || 'Order Details';
-      
-      // Get user info
-      const contractors = this.escrowApp.getAllUsers(UserType.CONTRACTOR);
-      const customers = this.escrowApp.getAllUsers(UserType.CUSTOMER);
-      const contractor = contractors.find(c => c.user_id === order.contractor_id);
-      const creator = customers.find(c => c.user_id === order.creator_id);
-      const representative = customers.find(c => c.user_id === order.representative_id);
-      
-      // Create html content
-      let contributorsHtml = '';
-      for (const [userId, amount] of Object.entries(order.contributions)) {
-        const contributor = customers.find(c => c.user_id === userId);
-        contributorsHtml += `<div class="contributor-item">
-          <span class="contributor-name">${this._escapeHtml(contributor?.name || 'Unknown')}</span>
-          <span class="contributor-amount">$${parseFloat(amount).toFixed(2)}</span>
-        </div>`;
-      }
-      
-      // Create milestones HTML
-      let milestonesHtml = '';
-      for (const milestone of orderDetails.milestones) {
-        const canMark = order.contractor_id === this._getCurrentEscrowUserId() && 
-                         milestone.status === MilestoneStatus.PENDING &&
-                         [OrderStatus.FUNDED, OrderStatus.IN_PROGRESS].includes(order.status);
-                         
-        const canSign = milestone.status === MilestoneStatus.COMPLETED_BY_CONTRACTOR && 
-                        milestone.act && 
-                        (this._getCurrentEscrowUserId() === order.representative_id ||
-                         this._getCurrentEscrowUserId() === order.contractor_id);
-                         
-        const actInfo = milestone.act ? `
-          <div class="act-info">
-            <div class="act-signatures">
-              <strong>Signatures:</strong> ${milestone.act.signatures.length > 0 ? 
-                milestone.act.signatures.join(', ') : 'None yet'}
-            </div>
-            <div class="act-status">
-              <strong>Status:</strong> ${milestone.act.is_complete ? 'Complete' : 'Waiting for signatures'}
-            </div>
-            ${canSign ? `<button class="btn btn-sm btn-primary sign-act-btn" 
-                          data-order-id="${order.order_id}" 
-                          data-milestone-id="${milestone.milestone_id}">
-                         Sign Act
-                       </button>` : ''}
-          </div>
-        ` : '';
-        
-        milestonesHtml += `
-          <div class="milestone-item milestone-status-${milestone.status.toLowerCase()}">
-            <div class="milestone-header">
-              <h4 class="milestone-title">${this._escapeHtml(milestone.description)}</h4>
-              <span class="milestone-amount">$${milestone.amount.toFixed(2)}</span>
-              <span class="milestone-status">${milestone.status}</span>
-            </div>
-            ${actInfo}
-            ${canMark ? `<button class="btn btn-sm btn-success mark-milestone-complete-btn" 
-                           data-order-id="${order.order_id}" 
-                           data-milestone-id="${milestone.milestone_id}">
-                          Mark Complete
-                        </button>` : ''}
-          </div>
-        `;
-      }
-      
-      // Create voting info
-      let votingHtml = '';
-      if ([OrderStatus.PENDING, OrderStatus.FUNDED, OrderStatus.IN_PROGRESS].includes(order.status)) {
-        votingHtml = `
-          <div class="voting-section">
-            <h4>Representative Voting</h4>
-            <p>Current Representative: ${this._escapeHtml(representative?.name || 'Unknown')}</p>
-            <button class="btn btn-primary vote-rep-btn" data-order-id="${order.order_id}">
-              Vote for Representative
-            </button>
-          </div>
-        `;
-      }
-      
-      modalContent.innerHTML = `
-        <div class="order-details">
-          <div class="order-info">
-            <div class="info-row">
-              <span class="info-label">Status:</span>
-              <span class="info-value">${order.status}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Contractor:</span>
-              <span class="info-value">${this._escapeHtml(contractor?.name || 'Unknown')}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Creator:</span>
-              <span class="info-value">${this._escapeHtml(creator?.name || 'Unknown')}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Representative:</span>
-              <span class="info-value">${this._escapeHtml(representative?.name || 'Unknown')}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Total Cost:</span>
-              <span class="info-value">$${order.total_cost.toFixed(2)}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Escrow Balance:</span>
-              <span class="info-value">$${order.escrow_balance.toFixed(2)}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Funding:</span>
-              <span class="info-value">${(order.escrow_balance / order.total_cost * 100).toFixed(1)}%</span>
-            </div>
-          </div>
-          
-          <div class="contributors-section">
-            <h4>Contributors</h4>
-            <div class="contributors-list">
-              ${contributorsHtml || '<p>No contributors yet</p>'}
-            </div>
-          </div>
-          
-          <div class="milestones-section">
-            <h4>Milestones</h4>
-            <div class="milestones-list">
-              ${milestonesHtml || '<p>No milestones defined</p>'}
-            </div>
-          </div>
-          
-          ${votingHtml}
-        </div>
-      `;
-      
-      // Show the modal
-      window.showModal('order-detail-modal');
-    }
+    // Перенаправляем на страницу деталей проекта
+    window.location.href = `project-details.html?id=${orderId}`;
   }
-  
+
   /**
    * Show voting modal
    */

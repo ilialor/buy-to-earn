@@ -1430,7 +1430,7 @@ function createOrderElement(order, isInPortfolio = false) {
   if (viewDetailsBtn) {
     viewDetailsBtn.addEventListener('click', function() {
       const orderId = this.getAttribute('data-order-id');
-      showOrderDetails(orderId);
+      window.location.href = `project-details.html?id=${orderId}`;
     });
   }
   
@@ -2009,7 +2009,7 @@ function renderUserOrders(orders) {
     if (viewDetailsBtn) {
       viewDetailsBtn.addEventListener('click', function() {
         const orderId = this.getAttribute('data-order-id');
-        showOrderDetails(orderId);
+        window.location.href = `project-details.html?id=${orderId}`;
       });
     }
   });
@@ -2053,44 +2053,18 @@ function formatOrderDate(timestamp) {
   }
 }
 
-// Функция для отображения деталей заказа
+// Функция для отображения деталей проекта - перенаправляет на отдельную страницу
 function showOrderDetails(orderId) {
-  console.log('Отображение деталей заказа:', orderId);
+  console.log('Переход на страницу деталей проекта:', orderId);
   
   if (!orderId) {
-    console.error('ID заказа не указан');
-    showNotification('Ошибка: ID заказа не указан', 'error');
+    console.error('ID проекта не указан');
+    showNotification('Ошибка: ID проекта не указан', 'error');
     return;
   }
   
-  // Сначала пытаемся найти заказ в локальном хранилище
-  let order = null;
-  try {
-    const localOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-    order = localOrders.find(o => o.id === orderId);
-  } catch (error) {
-    console.warn('Ошибка при получении заказа из локального хранилища:', error);
-  }
-  
-  if (order) {
-    displayOrderDetailsModal(order);
-    return;
-  }
-  
-  // Fetch from database if not in localStorage
-  getDocument('orders', orderId)
-    .then(orderData => {
-      if (orderData) {
-        displayOrderDetailsModal(orderData);
-      } else {
-        console.error('Order not found in database');
-        showNotification('Order not found', 'error');
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching order:', error);
-      showNotification('Error loading order: ' + error.message, 'error');
-    });
+  // Перенаправляем на страницу деталей проекта с передачей ID проекта
+  window.location.href = `project-details.html?id=${orderId}`;
 }
 
 // Функция для отображения модального окна с деталями заказа

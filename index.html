@@ -326,7 +326,7 @@
                             <span class="time-left"><i class="fas fa-clock"></i> 8 days left</span>
                             <div class="project-actions">
                                 <a href="javascript:void(0)" class="favorite-btn" data-order-id="1002" title="Add to Interesting"><i class="far fa-star"></i></a>
-                                <a href="javascript:void(0)" class="details-btn" data-order-id="1002" onclick="showOrderDetails('1002')">Details <i class="fas fa-arrow-right"></i></a>
+                                <a href="project-details.html?id=1002" class="details-btn" data-order-id="1002">Details <i class="fas fa-arrow-right"></i></a>
                                 <a href="javascript:void(0)" class="join-btn" data-order-id="1002" onclick="showParticipationModal('1002')">Join <i class="fas fa-sign-in-alt"></i></a>
                             </div>
                         </div>
@@ -371,7 +371,7 @@
                             <span class="time-left"><i class="fas fa-clock"></i> 8 days left</span>
                             <div class="project-actions">
                                 <a href="javascript:void(0)" class="favorite-btn" data-order-id="1002" title="Add to Interesting"><i class="far fa-star"></i></a>
-                                <a href="javascript:void(0)" class="details-btn" data-order-id="1002" onclick="showOrderDetails('1002')">Details <i class="fas fa-arrow-right"></i></a>
+                                <a href="project-details.html?id=1002" class="details-btn" data-order-id="1002">Details <i class="fas fa-arrow-right"></i></a>
                                 <a href="javascript:void(0)" class="join-btn" data-order-id="1002" onclick="showParticipationModal('1002')">Join <i class="fas fa-sign-in-alt"></i></a>
                             </div>
                         </div>
@@ -416,7 +416,7 @@
                         <div class="project-footer">
                             <span class="time-left"><i class="fas fa-clock"></i> 12 days left</span>
                             <div class="project-actions">
-                                <a href="javascript:void(0)" class="details-btn" data-order-id="1002" onclick="showOrderDetails('1002')">Details <i class="fas fa-arrow-right"></i></a>
+                                <a href="project-details.html?id=1002" class="details-btn" data-order-id="1002">Details <i class="fas fa-arrow-right"></i></a>
                                 <a href="javascript:void(0)" class="join-btn" data-order-id="1002" onclick="showParticipationModal('1002')">Join <i class="fas fa-sign-in-alt"></i></a>
                             </div>
                         </div>
@@ -462,7 +462,7 @@
                         <div class="project-footer">
                             <span class="time-left"><i class="fas fa-clock"></i> 5 days left</span>
                             <div class="project-actions">
-                                <a href="javascript:void(0)" class="details-btn" data-order-id="1002" onclick="showOrderDetails('1002')">Details <i class="fas fa-arrow-right"></i></a>
+                                <a href="project-details.html?id=1002" class="details-btn" data-order-id="1002">Details <i class="fas fa-arrow-right"></i></a>
                                 <a href="javascript:void(0)" class="join-btn" data-order-id="1002" onclick="showParticipationModal('1002')">Join <i class="fas fa-sign-in-alt"></i></a>
                             </div>
                         </div>
@@ -509,7 +509,7 @@
                         <div class="project-footer">
                             <span class="time-left"><i class="fas fa-clock"></i> 20 days left</span>
                             <div class="project-actions">
-                                <a href="javascript:void(0)" class="details-btn" data-order-id="1002" onclick="showOrderDetails('1002')">Details <i class="fas fa-arrow-right"></i></a>
+                                <a href="project-details.html?id=1002" class="details-btn" data-order-id="1002">Details <i class="fas fa-arrow-right"></i></a>
                                 <a href="javascript:void(0)" class="join-btn" data-order-id="1002" onclick="showParticipationModal('1002')">Join <i class="fas fa-sign-in-alt"></i></a>
                             </div>
                         </div>
@@ -554,7 +554,7 @@
                         <div class="project-footer">
                             <span class="time-left"><i class="fas fa-clock"></i> 14 days left</span>
                             <div class="project-actions">
-                                <a href="javascript:void(0)" class="details-btn" data-order-id="1002" onclick="showOrderDetails('1002')">Details <i class="fas fa-arrow-right"></i></a>
+                                <a href="project-details.html?id=1002" class="details-btn" data-order-id="1002">Details <i class="fas fa-arrow-right"></i></a>
                                 <a href="javascript:void(0)" class="join-btn" data-order-id="1002" onclick="showParticipationModal('1002')">Join <i class="fas fa-sign-in-alt"></i></a>
                             </div>
                         </div>
@@ -1308,360 +1308,9 @@
 
         <!-- Модальные окна для эскроу-функциональности -->
         
-        <!-- Модальное окно деталей проекта -->
-        <div class="modal" id="project-details-modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Детали проекта</h3>
-                    <div class="modal-controls">
-                        <button class="modal-minimize" id="minimize-modal"><i class="fas fa-minus"></i></button>
-                        <button type="button" class="modal-close" id="close-project-modal" style="background: none; border: none; font-size: 28px; color: white; cursor: pointer; padding: 0; margin: 0;">&times;</button>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <!-- Верхняя секция с информацией о проекте и создателе -->
-                    <div class="project-info-section">
-                        <!-- Блок О проекте -->
-                        <div class="project-about-block">
-                            <div class="project-header">
-                                <div class="project-logo">
-                                    <img src="images/project-logo.png" alt="AIgents Project" class="project-logo-img">
-                                </div>
-                                <div class="project-title-container">
-                                    <div class="project-badges">
-                                        <span class="badge badge-gamefi">GameFi</span>
-                                        <span class="badge badge-trending">Trending</span>
-                                    </div>
-                                    <h1 class="project-title">AIgents: Эволюционируй своего цифрового ассистента</h1>
-                                </div>
-                            </div>
-                            
-                            <div class="project-description-container">
-                                <h3 class="section-title">О проекте</h3>
-                                <p class="project-description">Революционная платформа для создания, обучения и монетизации персональных ИИ-агентов с использованием технологии блокчейн.</p>
-                            </div>
-                            
-                            <div class="project-metrics-row">
-                                <div class="project-rating">
-                                    <div class="metric-label">Рейтинг</div>
-                                    <div class="rating-stars">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star-half-alt"></i>
-                                        <span class="rating-value">4.5/5</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="project-roi">
-                                    <div class="metric-label">Ожидаемый ROI</div>
-                                    <div class="roi-value">
-                                        <i class="fas fa-chart-line"></i>
-                                        <span>215%</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="project-status">
-                                    <div class="metric-label">Статус</div>
-                                    <div class="status-value">
-                                        <i class="fas fa-circle status-icon"></i>
-                                        <span>В разработке</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Блок О создателе -->
-                        <div class="creator-about-block">
-                            <h3 class="section-title">О создателе</h3>
-                            <div class="creator-info">
-                                <div class="creator-avatar">
-                                    <img src="images/creator-avatar.jpg" alt="Creator" class="creator-img">
-                                </div>
-                                <div class="creator-details">
-                                    <h4 class="creator-name">Александр Иванов</h4>
-                                    <p class="creator-role">Ведущий разработчик</p>
-                                    <div class="creator-stats">
-                                        <div class="creator-stat">
-                                            <i class="fas fa-project-diagram"></i>
-                                            <span>5 проектов</span>
-                                        </div>
-                                        <div class="creator-stat">
-                                            <i class="fas fa-star"></i>
-                                            <span>4.8 рейтинг</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="creator-bio">Опытный разработчик с более чем 10-летним стажем в области искусственного интеллекта и блокчейн-технологий. Основатель нескольких успешных стартапов.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Отключаем grid-layout для модального окна -->
-                    <style>
-                        #project-details-modal .modal-body {
-                            display: block !important;
-                            padding: 20px !important;
-                        }
-                    </style>
-                    
-                    <!-- Трехколоночный контейнер для метрик, этапов и распределения доходов -->
-                    <div class="project-info-grid">
-                        <!-- Блок метрик проекта -->
-                        <div class="project-metrics-block">
-                            <h2 class="section-title">Метрики проекта</h2>
-                            
-                            <!-- Current Funding -->
-                            <div class="metrics-item">
-                                <div class="metrics-label">Текущее финансирование:</div>
-                                <div class="metrics-value">450 000 $ / 750 000 $</div>
-                            </div>
-                            
-                            <!-- Progress Bar -->
-                            <div class="metric-progress">
-                                <div class="progress-container">
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 60%"></div>
-                                    </div>
-                                    <div class="progress-info">
-                                        <div class="progress-percent">60% финансирования</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Additional Metrics -->
-                            <div class="metrics-additional-info">
-                                <div class="metrics-row">
-                                    <div class="metrics-item">
-                                        <div class="metrics-label">Минимальный взнос:</div>
-                                        <div class="metrics-value">25 $</div>
-                                    </div>
-                                    <div class="metrics-item">
-                                        <div class="metrics-label">Общее количество участников:</div>
-                                        <div class="metrics-value">320</div>
-                                    </div>
-                                </div>
-                                <div class="metrics-row">
-                                    <div class="metrics-item">
-                                        <div class="metrics-label">Оставшееся время:</div>
-                                        <div class="metrics-value">21 день</div>
-                                    </div>
-                                    <div class="metrics-item">
-                                        <div class="metrics-label">Прогресс финансирования:</div>
-                                        <div class="metrics-value">60%</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- AIlock Button -->
-                            <div class="ailock-button-container">
-                                <button class="ailock-calculate-btn">
-                                    <i class="fas fa-calculator"></i> AIlock посчитает
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Блок этапов проекта -->
-                        <div class="project-stages-block">
-                            <h2 class="section-title">Этапы проекта</h2>
-                            
-                            <!-- Временная шкала -->
-                            <div class="timeline">
-                                <!-- Этап 1: Концепция -->
-                                <div class="timeline-item completed" data-stage="concept">
-                                    <div class="timeline-point"></div>
-                                    <div class="timeline-content">
-                                        <h3 class="stage-title">Концепция</h3>
-                                        <div class="stage-details">
-                                            <p>Разработка концепции проекта и исследование рынка.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Этап 2: Альфа -->
-                                <div class="timeline-item completed" data-stage="alpha">
-                                    <div class="timeline-point"></div>
-                                    <div class="timeline-content">
-                                        <h3 class="stage-title">Альфа</h3>
-                                        <div class="stage-details">
-                                            <p>Разработка прототипа и тестирование основных функций.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Этап 3: Бета -->
-                                <div class="timeline-item current" data-stage="beta">
-                                    <div class="timeline-point"></div>
-                                    <div class="timeline-content">
-                                        <h3 class="stage-title">Бета</h3>
-                                        <div class="stage-details">
-                                            <p>Расширенное тестирование и доработка функционала.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Этап 4: Запуск -->
-                                <div class="timeline-item" data-stage="launch">
-                                    <div class="timeline-point"></div>
-                                    <div class="timeline-content">
-                                        <h3 class="stage-title">Запуск</h3>
-                                        <div class="stage-details">
-                                            <p>Официальный запуск платформы и маркетинговая кампания.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Этап 5: Расширение -->
-                                <div class="timeline-item" data-stage="expansion">
-                                    <div class="timeline-point"></div>
-                                    <div class="timeline-content">
-                                        <h3 class="stage-title">Расширение</h3>
-                                        <div class="stage-details">
-                                            <p>Интеграция с партнерами и расширение экосистемы.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Статус этапов -->
-                            <div class="stages-status">
-                                <span class="stages-completed">3/5 Завершено</span>
-                                <span class="stages-current">• Текущий: Бета-разработка</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Блок распределения доходов -->
-                        <div class="revenue-distribution-block">
-                            <h2 class="section-title">Распределение доходов</h2>
-                            
-                            <!-- Круговая диаграмма - Canvas вариант -->
-                            <div class="revenue-chart-container">
-                                <canvas id="revenueDistributionChart" width="200" height="200"></canvas>
-                            </div>
-                            
-                            <!-- SVG вариант диаграммы (более надежный) -->
-                            <div class="revenue-chart-svg" style="display: none;">
-                                <!-- SVG будет добавлен через JavaScript -->
-                            </div>
-                            
-                            <!-- Запасной вариант диаграммы в виде изображения -->
-                            <div class="revenue-chart-fallback" style="display: none;">
-                                <div class="static-pie-chart">
-                                    <div class="pie-segment players" style="--percentage: 65%; --color: #4CAF50;"></div>
-                                    <div class="pie-segment creators" style="--percentage: 25%; --color: #2196F3;"></div>
-                                    <div class="pie-segment platform" style="--percentage: 10%; --color: #FFC107;"></div>
-                                    <div class="pie-hole"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Легенда диаграммы -->
-                            <div class="revenue-legend">
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background-color: #4CAF50;"></div>
-                                    <div class="legend-text">Игроки: 65%</div>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background-color: #2196F3;"></div>
-                                    <div class="legend-text">Создатели: 25%</div>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background-color: #FFC107;"></div>
-                                    <div class="legend-text">Платформа: 10%</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Кнопка "Спросить Айлока" -->
-                            <div class="ailock-button-container small">
-                                <button class="ailock-ask-btn">
-                                    <i class="fas fa-question-circle"></i> Спросить Айлока
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- About Project -->
-                    <div class="project-about">
-                        <h2 class="section-title">О проекте</h2>
-                        <p class="about-text">
-                            AIgents — это революционная GameFi платформа, где игроки создают, тренируют и развивают цифровых ассистентов, называемых Нооситами. Эти ИИ-агенты обучаются на взаимодействиях, растут в возможностях и предоставляют реальную пользу как внутри, так и вне игровой среды.
-                        </p>
-                        <p class="about-text">
-                            Платформа объединяет игровые механики с практическим развитием ИИ, позволяя участникам зарабатывать вознаграждения, когда их агенты выполняют задачи и предоставляют услуги другим пользователям. По мере эволюции Нооситов они приобретают более продвинутые возможности и генерируют все больший доход для своих владельцев.
-                        </p>
-                    </div>
-                    
-                    <!-- Project Metrics -->
-                    <div class="project-metrics-block">
-                        <h2 class="section-title">Метрики проекта</h2>
-                        
-                        <!-- Current Funding -->
-                        <div class="metrics-item">
-                            <div class="metrics-label">Текущее финансирование:</div>
-                            <div class="metrics-value">450 000 $ / 750 000 $</div>
-                        </div>
-                        
-                        <!-- Progress Bar -->
-                        <div class="metric-progress">
-                            <div class="progress-container">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 60%"></div>
-                                </div>
-                                <div class="progress-info">
-                                    <div class="progress-percent">60% финансирования</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Additional Metrics -->
-                        <div class="metrics-additional-info">
-                            <div class="metrics-row">
-                                <div class="metrics-item">
-                                    <div class="metrics-label">Минимальный взнос:</div>
-                                    <div class="metrics-value">25 $</div>
-                                </div>
-                                <div class="metrics-item">
-                                    <div class="metrics-label">Общее количество участников:</div>
-                                    <div class="metrics-value">320</div>
-                                </div>
-                            </div>
-                            <div class="metrics-row">
-                                <div class="metrics-item">
-                                    <div class="metrics-label">Оставшееся время:</div>
-                                    <div class="metrics-value">21 день</div>
-                                </div>
-                                <div class="metrics-item">
-                                    <div class="metrics-label">Прогресс финансирования:</div>
-                                    <div class="metrics-value">60%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Join Project Section -->
-                    <div class="join-project-section">
-                        <button class="btn-join-project">Присоединиться к проекту</button>
-                        <div class="investment-options">
-                            <button class="investment-option">25 $</button>
-                            <button class="investment-option">100 $</button>
-                            <button class="investment-option">250 $</button>
-                            <button class="investment-option">500 $</button>
-                        </div>
-                        <div class="project-actions">
-                            <button class="action-button">
-                                <i class="fas fa-download"></i>
-                                <span>Whitepaper</span>
-                            </button>
-                            <button class="action-button">
-                                <i class="fas fa-share-alt"></i>
-                                <span>Поделиться</span>
-                            </button>
-                            <button class="action-button">
-                                <i class="fas fa-bookmark"></i>
-                                <span>Сохранить</span>
-                            </button>
-                        </div>
-                    </div>
+        <!-- Модальное окно деталей проекта удалено, теперь используется отдельная страница project-details.html -->
+        
+        <!-- Модальное окно создания группового заказа -->
                 </div>
             </div>
         </div>
