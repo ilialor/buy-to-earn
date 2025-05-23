@@ -8,7 +8,8 @@ const es = {
     portfolio: "Mi Portafolio",
     revenue: "Distribución de Ingresos",
     docs: "Documentación",
-    support: "Soporte"
+    support: "Soporte",
+    home: "Ailock"
   },
   
   // Auth
@@ -370,6 +371,12 @@ const es = {
       nonPaybackPoolShareError: "La Prioridad de No-Recuperados debe ser 0-100%.",
       unexpectedError: "Ocurrió un error inesperado durante el cálculo."
     }
+  },
+
+  // Hero
+  hero: {
+    title: "Buy to Earn",
+    quote: "Buy to earn is a new way to earn money by buying products and services. It is a way to earn money by buying products and services. It is a way to earn money by buying products and services.",
   }
 };
 

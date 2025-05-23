@@ -65,30 +65,76 @@ function getCurrentEscrowUserId() {
 async function registerUserWithEscrow(localUser) {
   try {
     // Check if we already have an Escrow user ID for this local user
-    const existingEscrowUserId = getEscrowUserId(localUser.uid);
+    const existingEscrowUserId = getEscrowUserId(localUser.id);
     
     if (existingEscrowUserId) {
-      // Try to get the user from Escrow API
-      try {
-        const escrowUser = await escrowApi.getUserById(existingEscrowUserId);
-        return escrowUser;
-      } catch (error) {
-        // User might not exist anymore, create a new one
-        console.warn('Existing Escrow user not found, creating a new one');
+      // We have a mapping, return a mock user object to avoid 401 calls
+      // The actual user data will be fetched later when properly authenticated
+      console.log('Found existing Escrow user mapping:', existingEscrowUserId);
+      return { 
+        id: existingEscrowUserId,
+        email: localUser.email,
+        name: localUser.displayName || localUser.email,
+        type: 'CUSTOMER'
+      };
+    }
+    
+    // Create or get existing user in Escrow API using the public endpoint
+    let escrowUser;
+    try {
+      // Try using the escrowApi client first
+      const result = await escrowApi.createUser({
+        name: localUser.displayName || localUser.email || 'User',
+        email: localUser.email || `user-${localUser.id}@example.com`,
+        type: mapUserRoleToEscrowType(localUser.role || 'customer'),
+        initialBalance: 0
+      });
+      
+      // Handle the new response format from the updated API
+      escrowUser = result.user || result; // Support both formats
+      if (result.userId && !escrowUser.id) {
+        escrowUser.id = result.userId;
+      }
+      
+    } catch (clientError) {
+      console.warn('Error using escrowApi client, falling back to direct API call:', clientError);
+      // Fall back to direct API call if the client fails
+      const apiBaseUrl = window.apiBaseUrl || '';
+      const response = await fetch(`${apiBaseUrl}/api/users/public/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: localUser.displayName || localUser.email || 'User',
+          email: localUser.email || `user-${localUser.id}@example.com`,
+          type: mapUserRoleToEscrowType(localUser.role || 'customer'),
+          initialBalance: 0,
+          externalId: localUser.id
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
+      }
+      
+      const result = await response.json();
+      escrowUser = result.user || result; // Support both formats
+      if (result.userId && !escrowUser.id) {
+        escrowUser.id = result.userId;
       }
     }
     
-    // Create a new user in Escrow API
-    const escrowUser = await escrowApi.createUser({
-      name: localUser.displayName || localUser.email || 'User',
-      email: localUser.email || `user-${localUser.uid}@example.com`,
-      type: mapUserRoleToEscrowType(localUser.role || 'customer'),
-      initialBalance: 0
-    });
+    // Ensure we have a valid user ID
+    if (!escrowUser || !escrowUser.id) {
+      throw new Error('Invalid user data received from API');
+    }
     
     // Save the mapping
-    saveEscrowUserId(localUser.uid, escrowUser.id);
+    saveEscrowUserId(localUser.id, escrowUser.id);
     
+    console.log('Successfully registered/retrieved Escrow user:', escrowUser.id);
     return escrowUser;
   } catch (error) {
     console.error('Error registering user with Escrow:', error);

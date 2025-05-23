@@ -48,10 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
           try {
             // Initialize API services with current user
-            await window.escrowAPI.userService.initUser(user);
-            console.log('Escrow API user initialized');
+            await window.escrowAPI.userService.registerUserWithEscrow(user);
+            console.log('Escrow API user registered/retrieved');
           } catch (error) {
-            console.error('Failed to initialize Escrow API user:', error);
+            console.error('Failed to register/retrieve Escrow API user:', error);
           }
         }
       });

@@ -3,27 +3,58 @@
  * This file contains functions for user authentication
  */
 
+// Ensure AuthService is initialized and assign it to window.auth for compatibility
+// This assumes auth-service.js is loaded before this script, 
+// and AuthService constructor handles its own full initialization.
+if (typeof AuthService !== 'undefined' && !window.authService) {
+  window.authService = new AuthService();
+  console.log('AuthService instance created from auth.js');
+}
+
+// Attempt to make AuthService compatible with existing window.auth checks
+if (window.authService && !window.auth) {
+    // Map AuthService methods to the expected window.auth interface if needed
+    // For now, let's assume direct usage of authService or make it the primary auth provider
+    window.auth = window.authService; // This makes AuthService the primary provider
+    console.log('window.auth is now pointing to window.authService');
+
+    // AuthService has its own onAuthStateChanged-like mechanism (addAuthStateListener)
+    // If existing code relies on window.auth.onAuthStateChanged, we might need a shim or direct replacement.
+    // For now, we rely on AuthService internal state management and UI updates.
+}
+
+// Variables to prevent multiple auth processing
+let isProcessingAuth = false;
+let lastAuthUserId = null;
+
 // Проверка и инициализация аутентификации
 function checkAndInitAuth() {
-  // Проверяем доступность Firebase или локальной авторизации
-  if (!window.auth) {
-    console.error('Authentication services not initialized - please check firebase-config.js and local-auth.js');
+  // Проверяем доступность window.auth (которое теперь должно быть AuthService)
+  if (!window.auth || typeof window.auth.isAuthenticated !== 'function') { // Check for a known AuthService method
+    console.error('Authentication services not initialized - please check auth-service.js and its setup.');
     showNotification('Ошибка инициализации системы авторизации', 'error');
     return false;
   }
 
-  // Auth state observer
-  window.auth.onAuthStateChanged((user) => {
-    if (user) {
-      // User is signed in
-      console.log('Auth state changed: user signed in', user.email);
-      updateUIOnAuth(user);
-    } else {
-      // User is signed out
-      console.log('Auth state changed: user signed out');
-      updateUIOnAuth(null);
-    }
-  });
+  // Auth state observer - using AuthService's listener mechanism
+  // window.auth (AuthService) should call the listener with the user object or null
+  if (typeof window.auth.addAuthStateListener === 'function') {
+    window.auth.addAuthStateListener((user) => {
+      // The user object from AuthService might be different from Firebase/LocalAuth user object.
+      // Ensure updateUIOnAuth can handle it.
+      if (user) {
+        // User is signed in
+        console.log('Auth.js: Auth state changed via AuthService listener: user signed in', user.email || user.id);
+        updateUIOnAuth(user);
+      } else {
+        // User is signed out
+        console.log('Auth.js: Auth state changed via AuthService listener: user signed out');
+        updateUIOnAuth(null);
+      }
+    });
+  } else {
+    console.warn('window.auth.addAuthStateListener is not a function. UI updates on auth state change might not work correctly.');
+  }
 
   // Set up modal functionality
   setupAuthModal();
@@ -166,10 +197,14 @@ function setupAuthFormListeners() {
           throw new Error(typeof t === 'function' ? t('auth.emptyCredentials') : 'Пожалуйста, введите email и пароль');
         }
         
-        console.log("Попытка входа: ", email);
-        await signInWithEmail(email, password);
+        console.log("Auth.js: Попытка входа через authService: ", email);
+        // Используем window.authService.login, которое должно быть тем же, что и window.auth.login
+        await window.auth.login({ email, password }); 
+        // После успешного входа, AuthService должен обновить UI и состояние
+        showNotification(typeof t === 'function' ? t('auth.loginSuccess') : 'Вход выполнен успешно!', 'success');
+        closeModal('auth-modal'); // Закрываем модальное окно после успешного входа
       } catch (error) {
-        console.error('Sign in error:', error);
+        console.error('Auth.js: Ошибка входа через signInWithEmail:', error);
         showNotification(getAuthErrorMessage(error.code) || error.message || (typeof t === 'function' ? t('auth.loginError') : 'Ошибка входа'), 'error');
       } finally {
         // Возвращаем кнопку в исходное состояние
@@ -210,10 +245,14 @@ function setupAuthFormListeners() {
           throw new Error(typeof t === 'function' ? t('auth.fillAllFields') : 'Пожалуйста, заполните все поля');
         }
         
-        console.log("Попытка регистрации: ", email);
-        await signUpWithEmail(email, password, name);
+        console.log("Auth.js: Попытка регистрации через authService: ", email);
+        // Используем window.authService.register, которое должно быть тем же, что и window.auth.register
+        await window.auth.register({ email, password, name });
+        // После успешной регистрации, AuthService должен обновить UI и состояние
+        showNotification(typeof t === 'function' ? t('auth.signupSuccess') : 'Регистрация прошла успешно! Теперь вы можете войти.', 'success');
+        activateTab('sign-in-tab'); // Переключаем на вкладку входа
       } catch (error) {
-        console.error('Sign up error:', error);
+        console.error('Auth.js: Ошибка регистрации через signUpWithEmail:', error);
         showNotification(getAuthErrorMessage(error.code) || error.message || (typeof t === 'function' ? t('auth.registerError') : 'Ошибка регистрации'), 'error');
       } finally {
         // Возвращаем кнопку в исходное состояние
@@ -252,7 +291,7 @@ function setupAuthFormListeners() {
         
         await resetPassword(email);
       } catch (error) {
-        console.error('Reset password error:', error);
+        console.error('Auth.js: Ошибка сброса пароля:', error);
         showNotification(getAuthErrorMessage(error.code) || error.message || 'Ошибка сброса пароля', 'error');
       } finally {
         // Возвращаем кнопку в исходное состояние
@@ -319,7 +358,7 @@ function setupAuthFormListeners() {
       try {
         await signOut();
       } catch (error) {
-        console.error('Sign out error:', error);
+        console.error('Auth.js: Ошибка выхода из системы:', error);
         showNotification(error.message || 'Ошибка выхода', 'error');
       } finally {
         signOutBtn.disabled = false;
@@ -376,24 +415,32 @@ function showNotification(message, type = 'info') {
 
 // Update UI based on auth state
 function updateUIOnAuth(user) {
-  const authControls = document.querySelector('.user-controls-auth');
-  const loggedInControls = document.querySelector('.user-controls-logged-in');
-  const userDisplayName = document.getElementById('user-display-name');
-  const userAvatar = document.getElementById('user-avatar');
+  // Prevent multiple simultaneous calls with the same user
+  if (user && user.id === lastAuthUserId && isProcessingAuth) {
+    console.log('Auth.js: Skipping duplicate auth processing for user', user.email || user.id);
+    return;
+  }
+  
+  if (isProcessingAuth) {
+    console.log('Auth.js: Auth processing already in progress, skipping');
+    return;
+  }
+  
+  isProcessingAuth = true;
+  lastAuthUserId = user ? user.id : null;
+  
+  try {
+    const authControls = document.querySelector('.user-controls-auth');
+    const loggedInControls = document.querySelector('.user-controls-logged-in');
+    const userDisplayName = document.getElementById('user-display-name');
+    const userAvatar = document.getElementById('user-avatar');
 
-  if (user) {
-    console.log('Updating UI for authenticated user', user.email);
-    
-    // Make user available globally for other components
-    window.currentUser = user;
-    
-    // Dispatch user authenticated event for other components
-    document.dispatchEvent(new CustomEvent('userAuthenticated', { detail: user }));
-    
-    // User is signed in, show logged in UI
-    if (authControls) authControls.style.display = 'none';
-    if (loggedInControls) {
-      loggedInControls.style.display = 'flex';
+    if (user) {
+      console.log('Auth.js: Updating UI for authenticated user', user.email || user.id);
+      
+      // Show logged in controls
+      if (authControls) authControls.style.display = 'none';
+      if (loggedInControls) loggedInControls.style.display = 'flex';
       
       // Update user info
       if (userDisplayName) {
@@ -415,7 +462,7 @@ function updateUIOnAuth(user) {
       // Загружаем баланс кошелька
       updateWalletBalance(user.uid);
       
-      // Synchronize with Escrow API if the module is loaded
+      // Synchronize with Escrow API if the module is loaded (only once per user)
       if (typeof window.escrowAPI !== 'undefined' && 
           typeof window.escrowAPI.userService !== 'undefined' && 
           typeof window.escrowAPI.userService.registerUserWithEscrow === 'function') {
@@ -432,33 +479,53 @@ function updateUIOnAuth(user) {
                   ? t('escrow.syncError') 
                   : 'Ошибка синхронизации с API эскроу-системы', 'warning');
               }
+            })
+            .finally(() => {
+              // Reset processing flag after Escrow sync is done
+              setTimeout(() => {
+                isProcessingAuth = false;
+              }, 1000);
             });
         } catch (error) {
           console.error('Error initializing Escrow API synchronization:', error);
+          setTimeout(() => {
+            isProcessingAuth = false;
+          }, 1000);
         }
+      } else {
+        // No Escrow API, reset flag immediately
+        setTimeout(() => {
+          isProcessingAuth = false;
+        }, 500);
       }
+    } else {
+      console.log('Auth.js: Updating UI for signed out user');
+      
+      // Show auth controls
+      if (authControls) authControls.style.display = 'flex';
+      if (loggedInControls) loggedInControls.style.display = 'none';
+      
+      // Clear user info
+      if (userDisplayName) userDisplayName.textContent = '';
+      if (userAvatar) userAvatar.innerHTML = '<i class="fas fa-user"></i>';
+      
+      // Clear wallet balance
+      updateWalletBalance(null);
+      
+      // Clear auth state
+      lastAuthUserId = null;
+      
+      // Reset processing flag
+      setTimeout(() => {
+        isProcessingAuth = false;
+      }, 500);
     }
-  } else {
-    console.log('Updating UI for signed out state');
-    
-    // Clear current user
-    window.currentUser = null;
-    
-    // Logout from Escrow API if the module is loaded
-    if (typeof window.escrowAPI !== 'undefined' && 
-        typeof window.escrowAPI.userService !== 'undefined' && 
-        typeof window.escrowAPI.userService.logoutFromEscrow === 'function') {
-      try {
-        window.escrowAPI.userService.logoutFromEscrow();
-        console.log('Logged out from Escrow API');
-      } catch (error) {
-        console.error('Error logging out from Escrow API:', error);
-      }
-    }
-    
-    // User is signed out, show auth controls
-    if (authControls) authControls.style.display = 'flex';
-    if (loggedInControls) loggedInControls.style.display = 'none';
+  } catch (error) {
+    console.error('Error in updateUIOnAuth:', error);
+    // Reset processing flag on error
+    setTimeout(() => {
+      isProcessingAuth = false;
+    }, 1000);
   }
 }
 
@@ -468,175 +535,42 @@ function updateUIOnAuth(user) {
 
 // Вход по email и паролю
 async function signInWithEmail(email, password) {
+  console.log('Auth.js: Глобальный вызов signInWithEmail', email);
+  if (!window.auth || typeof window.auth.login !== 'function') {
+    console.error('AuthService (window.auth) is not available or does not have a login method.');
+    throw new Error('Authentication service not available.');
+  }
   try {
-    // Проверяем доступность аутентификации
-    if (!window.auth) {
-      throw new Error('Система авторизации недоступна');
-    }
-    
-    console.log('Вход по email:', email);
-    const res = await window.auth.signInWithEmailAndPassword(email, password);
-    
-    if (res && res.user) {
-      console.log('Успешный вход:', res.user.email);
-      closeModal('auth-modal');
-      
-      // Показываем уведомление
-      showNotification(`Добро пожаловать, ${res.user.displayName || res.user.email}!`, 'success');
-      
-      // Log event в аналитику
-      if (window.analytics) {
-        window.analytics.logEvent('login', { method: 'email' });
-      }
-      
-      return res.user;
-    }
+    const user = await window.auth.login({ email, password });
+    console.log('Auth.js: Вход через signInWithEmail успешен', user);
+    // AuthService должен сам обновить UI и состояние
+    // showNotification('Вход выполнен успешно!', 'success'); // Уведомления могут быть в AuthService
+    // closeModal('auth-modal');
+    return user;
   } catch (error) {
-    console.error('Ошибка входа:', error);
+    console.error('Auth.js: Ошибка входа через signInWithEmail:', error);
+    // showNotification(getAuthErrorMessage(error.code) || error.message || 'Ошибка входа', 'error');
     throw error;
   }
 }
 
 // Регистрация по email и паролю
 async function signUpWithEmail(email, password, name) {
+  console.log('Auth.js: Глобальный вызов signUpWithEmail', email);
+  if (!window.auth || typeof window.auth.register !== 'function') {
+    console.error('AuthService (window.auth) is not available or does not have a register method.');
+    throw new Error('Authentication service not available.');
+  }
   try {
-    // Проверяем доступность аутентификации
-    if (!window.auth) {
-      throw new Error('Система авторизации недоступна');
-    }
-    
-    // Проверяем существование пользователя в БД через публичный эндпоинт
-    try {
-      if (window.apiBaseUrl) {
-        console.log('Проверка существования пользователя в БД:', email);
-        const checkResponse = await fetch(`${window.apiBaseUrl}/api/auth/check-email`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email })
-        });
-        
-        if (checkResponse.ok) {
-          const checkData = await checkResponse.json();
-          if (checkData.exists) {
-            console.error('Пользователь с таким email уже существует в БД:', email);
-            throw { code: 'auth/email-already-in-use', message: 'Пользователь с таким email уже существует' };
-          }
-        }
-      }
-    } catch (checkError) {
-      // Если это ошибка существования пользователя, пробрасываем дальше
-      if (checkError.code === 'auth/email-already-in-use') {
-        throw checkError;
-      }
-      // Если это другая ошибка проверки, просто логируем и продолжаем
-      console.warn('Ошибка проверки email в БД:', checkError);
-    }
-    
-    console.log('Регистрация по email:', email);
-    const res = await window.auth.createUserWithEmailAndPassword(email, password);
-    
-    if (res && res.user) {
-      console.log('Успешная регистрация:', res.user.email);
-      
-      // Обновляем профиль пользователя
-      if (name) {
-        try {
-          // Check which method is available in Firebase version
-          if (res.user.updateProfile) {
-            // Old Firebase version
-            await res.user.updateProfile({
-              displayName: name
-            });
-          } else if (window.auth && window.auth.currentUser) {
-            // New Firebase version
-            await window.auth.updateProfile(window.auth.currentUser, {
-              displayName: name
-            });
-          } else {
-            console.log('Profile update method not available, using local fallback');
-            // Fallback for when Firebase methods aren't available
-            res.user.displayName = name;
-          }
-        } catch (profileError) {
-          console.error('Error updating profile:', profileError);
-          // Continue despite profile update error
-        }
-      }
-      
-      // Создаем запись пользователя 
-      try {
-        if (window.db) {
-          await window.db.collection('users').doc(res.user.uid).set({
-            email: res.user.email,
-            displayName: name || res.user.email.split('@')[0],
-            createdAt: new Date(),
-            walletBalance: 0
-          }, { merge: true });
-        }
-      } catch (dbError) {
-        console.error('Ошибка создания профиля в базе данных:', dbError);
-        // Не рушим основной процесс регистрации, если БД недоступна
-      }
-      
-      // Сохраняем пользователя в основной БД через API
-      try {
-        // Проверяем наличие API для регистрации пользователя
-        if (window.escrowApi && window.escrowApi.userService && window.escrowApi.userService.registerUserWithEscrow) {
-          console.log('Регистрация пользователя через API...');
-          const apiResponse = await window.escrowApi.userService.registerUserWithEscrow({
-            uid: res.user.uid,
-            email: res.user.email,
-            displayName: name || res.user.email.split('@')[0],
-            createdAt: new Date()
-          });
-          console.log('Ответ API регистрации:', apiResponse);
-        } else if (window.apiBaseUrl) {
-          // Прямой вызов API, если escrowApi недоступен
-          console.log('Регистрация пользователя через прямой вызов API...');
-          const response = await fetch(`${window.apiBaseUrl}/api/users`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              uid: res.user.uid,
-              email: res.user.email,
-              displayName: name || res.user.email.split('@')[0],
-              createdAt: new Date()
-            })
-          });
-          
-          if (!response.ok) {
-            throw new Error(`Ошибка API: ${response.status}`);
-          }
-          
-          const apiData = await response.json();
-          console.log('Ответ API регистрации:', apiData);
-        }
-      } catch (apiError) {
-        console.error('Ошибка регистрации пользователя через API:', apiError);
-        // Не рушим основной процесс регистрации, если API недоступен
-      }
-      
-      // Закрываем модальное окно
-      closeModal('auth-modal');
-      
-      // Показываем уведомление
-      showNotification(`Аккаунт успешно создан, ${name || res.user.email}!`, 'success');
-      
-      // Log event в аналитику
-      if (window.analytics) {
-        window.analytics.logEvent('sign_up', { method: 'email' });
-      }
-      
-      return res.user;
-    } else {
-      throw new Error('Неизвестная ошибка при регистрации');
-    }
+    const user = await window.auth.register({ email, password, name });
+    console.log('Auth.js: Регистрация через signUpWithEmail успешна', user);
+    // AuthService должен сам обновить UI и состояние
+    // showNotification('Регистрация прошла успешно! Теперь вы можете войти.', 'success');
+    // activateTab('sign-in-tab');
+    return user;
   } catch (error) {
-    console.error('Ошибка регистрации:', error);
+    console.error('Auth.js: Ошибка регистрации через signUpWithEmail:', error);
+    // showNotification(getAuthErrorMessage(error.code) || error.message || 'Ошибка регистрации', 'error');
     throw error;
   }
 }
@@ -703,47 +637,33 @@ async function signInWithGoogle() {
 
 // Сброс пароля
 async function resetPassword(email) {
+  console.log('Auth.js: Глобальный вызов resetPassword', email);
+  if (!window.auth || typeof window.auth.resetPassword !== 'function') { // Предполагаем, что в AuthService есть resetPassword
+    console.error('AuthService (window.auth) is not available or does not have a resetPassword method.');
+    // Если метода нет в AuthService, нужно будет либо добавить его, либо обработать эту ситуацию
+    // Пока что просто выбросим ошибку, если метод не найден
+    // В качестве альтернативы, можно закомментировать эту функциональность, если она не используется или не реализована в AuthService
+    showNotification('Функция сброса пароля временно недоступна.', 'warning');
+    // throw new Error('Password reset service not available.'); 
+    return; // Не выбрасываем ошибку, а просто показываем уведомление
+  }
   try {
-    // Проверяем доступность аутентификации
-    if (!window.auth) {
-      throw new Error('Система авторизации недоступна');
-    }
-    
-    console.log('Сброс пароля для:', email);
-    await window.auth.sendPasswordResetEmail(email);
-    
-    // Показываем уведомление
-    showNotification(`Инструкции по сбросу пароля отправлены на ${email}`, 'success');
-    
-    // Переключаемся на экран входа
-    activateTab('sign-in-tab');
-    
-    return true;
+    await window.auth.resetPassword(email);
+    console.log('Auth.js: Запрос на сброс пароля отправлен для', email);
+    // showNotification('Инструкции по сбросу пароля отправлены на ваш email.', 'success');
   } catch (error) {
-    console.error('Ошибка сброса пароля:', error);
+    console.error('Auth.js: Ошибка сброса пароля:', error);
+    // showNotification(getAuthErrorMessage(error.code) || error.message || 'Ошибка сброса пароля', 'error');
     throw error;
   }
 }
 
 // Выход из системы
 async function signOut() {
-  try {
-    // Проверяем доступность аутентификации
-    if (!window.auth) {
-      throw new Error('Система авторизации недоступна');
-    }
-    
-    console.log('Выход из системы');
-    await window.auth.signOut();
-    
-    // Показываем уведомление
-    showNotification('Вы успешно вышли из системы', 'success');
-    
-    return true;
-  } catch (error) {
-    console.error('Ошибка выхода из системы:', error);
-    throw error;
+  if (window.auth && typeof window.auth.logout === 'function') {
+    return window.auth.logout();
   }
+  console.warn('Attempted to sign out, but no compatible auth service was found.');
 }
 
 // Обновление баланса кошелька
