@@ -8,6 +8,9 @@
 // Import the main authentication service
 import authService from '../auth-service.js';
 
+// Make auth service available globally for legacy code
+window.auth = authService;
+
 // Re-export the main auth service as default export
 export { authService as default };
 

@@ -823,13 +823,6 @@ class AuthService {
     });
   }
 
-  // Utility to get cookie by name
-  getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-  }
-
   /**
    * Setup handlers for page transitions to preserve auth state
    */
@@ -1016,18 +1009,6 @@ class AuthService {
   // Delete a cookie by setting its expiration in the past
   deleteCookie(name) {
     document.cookie = `${name}=; max-age=0; path=/`;
-  }
-  
-  // Get a cookie by name
-  getCookie(name) {
-    const cookies = document.cookie.split('; ');
-    for (const cookie of cookies) {
-      const [cookieName, cookieValue] = cookie.split('=');
-      if (cookieName === name) {
-        return cookieValue;
-      }
-    }
-    return null;
   }
 }
 
