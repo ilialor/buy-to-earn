@@ -22,11 +22,29 @@ export class EscrowClient {
    * @returns {Promise<any>} - Promise with response data
    */
   async request(endpoint, method = 'GET', body = null) {
-    const url = `${this.baseUrl}${endpoint}`;
+    const url = this.baseUrl + endpoint;
+    
     const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.apiKey}`
+      'Content-Type': 'application/json'
     };
+
+    // Add authorization header
+    if (this.apiKey) {
+      headers['Authorization'] = `Bearer ${this.apiKey}`;
+    } else {
+      // Try to get JWT token from AuthService for protected endpoints
+      if (typeof window !== 'undefined' && window.auth && typeof window.auth.getToken === 'function') {
+        const token = window.auth.getToken();
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      } else if (typeof window !== 'undefined' && window.authService && typeof window.authService.getToken === 'function') {
+        const token = window.authService.getToken();
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      }
+    }
 
     const options = {
       method,
@@ -42,6 +60,13 @@ export class EscrowClient {
       const response = await fetch(url, options);
       
       if (!response.ok) {
+        // If response is HTML (error page), log the status
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('text/html')) {
+          console.error(`API request failed with HTML response (${response.status}):`, await response.text().then(text => text.substring(0, 200)));
+          throw new Error(`API request error: ${response.status} ${response.statusText}`);
+        }
+        
         const errorData = await response.json();
         throw new Error(errorData.message || 'API request error');
       }
@@ -61,7 +86,7 @@ export class EscrowClient {
    * @returns {Promise<Object>} Created user object
    */
   async createUser(userData) {
-    return this.request('/users/public', 'POST', userData);
+    return this.request('/users/public/', 'POST', userData);
   }
 
   /**

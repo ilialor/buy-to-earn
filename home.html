@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="styles/mobile-header-fix.css">
 
     <!-- Local scripts -->
-    <script src="js/local-auth.js"></script>
+    <!-- <script src="js/local-auth.js"></script> -->
     <script type="module" src="locales/index.js"></script>
     <script type="module" src="js/i18n.js"></script>
     
@@ -41,6 +41,9 @@
         import * as escrowAPI from './js/api/index.js';
         // Make escrowAPI available globally
         window.escrowAPI = escrowAPI;
+    </script>
+    <script>
+        window.apiBaseUrl = 'https://api.ateira.online';
     </script>
 </head>
 

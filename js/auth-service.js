@@ -11,14 +11,14 @@ class AuthService {
     this.baseUrl = window.apiBaseUrl || window.API_BASE_URL || 'http://localhost';
     
     // Flag to determine operation mode (real server or mock)
-    this.useMockAuth = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    this.useMockAuth = false; //(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
     
     // Возвращаем использование localStorage даже для моковой авторизации,
     // т.к. другие модули (LocalAuth) используют localStorage
     this.storage = localStorage;
     
-    console.log('AuthService: Инициализация в режиме', this.useMockAuth ? 'мок' : 'реальный API');
-    console.log('AuthService: Используется хранилище localStorage для совместимости с LocalAuth');
+    // console.log('AuthService: Инициализация в режиме', this.useMockAuth ? 'мок' : 'реальный API');
+    // console.log('AuthService: Используется хранилище localStorage для совместимости с LocalAuth');
     
     // Инициализируем токены и пользователя
     this.accessToken = this.storage.getItem('access_token') || null;
@@ -216,7 +216,7 @@ class AuthService {
     
     // Real API login
     try {
-      const response = await fetch(`${this.baseUrl}/auth/login`, {
+      const response = await fetch('/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -256,6 +256,92 @@ class AuthService {
     }
   }
 
+  // Register user through Nginx API Gateway or mock for local development
+  async register(userData) {
+    // If using mock auth for local development
+    if (this.useMockAuth) {
+      console.log('Using mock auth register for local development');
+      try {
+        // Create mock tokens
+        this.accessToken = 'mock_access_token_reg_' + Date.now();
+        this.refreshToken = 'mock_refresh_token_reg_' + Date.now();
+        
+        // Store tokens
+        this.storage.setItem('access_token', this.accessToken);
+        
+        // Create mock user
+        this.currentUser = {
+          id: 'mock_user_reg_' + Date.now(),
+          email: userData.email || 'user@example.com',
+          displayName: userData.name || userData.email?.split('@')[0] || 'Registered User',
+          isVerified: false // Typically false until email verification
+        };
+        
+        // Store user
+        this.storage.setItem('current_user', JSON.stringify(this.currentUser));
+        
+        // Save auth state for page transitions
+        this.saveAuthState();
+        
+        // Notify listeners
+        this.notifyListeners();
+        
+        // Dispatch register event (or login, as registration often implies login)
+        document.dispatchEvent(new Event('register')); // Or 'login'
+        
+        return this.currentUser;
+      } catch (error) {
+        console.error('AuthService: Mock register failed', error);
+        throw error;
+      }
+    }
+    
+    // Real API register
+    try {
+      const response = await fetch('/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData), // userData should include { email, password, name }
+        credentials: 'include', 
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: `HTTP error! Status: ${response.status}` }));
+        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      // Assuming registration also returns tokens like login
+      this.accessToken = data.access_token; 
+      this.refreshToken = data.refresh_token;
+
+      // Store tokens
+      this.storage.setItem('access_token', this.accessToken);
+      // Consider setting refresh_token as a cookie if your backend expects it
+      // document.cookie = `refresh_token=${this.refreshToken}; path=/; HttpOnly; SameSite=None; Secure`;
+
+      // Fetch user profile (or use data from registration response if it's complete)
+      // If register response already contains full user profile, this might not be needed
+      await this.loadUserProfile(); 
+      
+      // Save auth state for page transitions
+      this.saveAuthState();
+      
+      // Notify listeners
+      this.notifyListeners();
+      
+      // Dispatch register/login event
+      document.dispatchEvent(new Event('register')); // Or 'login'
+
+      return this.currentUser;
+    } catch (error) {
+      console.error('AuthService: Registration failed', error);
+      throw error;
+    }
+  }
+
   // Refresh tokens through Nginx API Gateway
   async refreshToken() {
     // For mock auth, just return a new mock token
@@ -268,7 +354,7 @@ class AuthService {
     
     // Real API refresh
     try {
-      const response = await fetch(`${this.baseUrl}/auth/refresh`, {
+      const response = await fetch('/auth/refresh', {
         method: 'PUT',
         credentials: 'include',
       });
@@ -302,7 +388,7 @@ class AuthService {
       } else {
         // Real API logout - attempt to call server but don't wait for response
         try {
-          fetch(`${this.baseUrl}/auth/logout`, {
+          fetch('/auth/logout', {
             method: 'DELETE',
             headers: {
               'Authorization': `Bearer ${this.accessToken}`
@@ -362,7 +448,7 @@ class AuthService {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/api/user/profile`, {
+      const response = await fetch('/api/user/profile', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -407,6 +493,18 @@ class AuthService {
       this.checkLocalAuthUser();
     }
     return !!this.accessToken && !!this.currentUser;
+  }
+  
+  /**
+   * Get current JWT access token
+   * @returns {string|null} JWT access token or null if not authenticated
+   */
+  getToken() {
+    // Если токен не установлен, попробуем проверить LocalAuth
+    if (!this.accessToken) {
+      this.checkLocalAuthUser();
+    }
+    return this.accessToken;
   }
   
   /**
@@ -457,8 +555,8 @@ class AuthService {
       signInBtn.onclick = () => {
         console.log('AuthService: Клик по кнопке sign-in-btn');
         
-        // Проверяем, есть ли модальное окно авторизации
         const authModal = document.getElementById('auth-modal');
+        console.log('AuthService: Проверка authModal перед показом:', authModal);
         if (authModal) {
           this.showModal('auth-modal');
         } else {
@@ -641,9 +739,14 @@ class AuthService {
    */
   showModal(modalId) {
     const modal = document.getElementById(modalId);
+    console.log('AuthService showModal: попытка показать modalId:', modalId, 'Найденный элемент modal:', modal);
     if (modal) {
+      console.log('AuthService showModal: перед добавлением класса show, текущие классы:', modal.className);
       modal.classList.add('show');
+      console.log('AuthService showModal: после добавления класса show, текущие классы:', modal.className);
       document.body.style.overflow = 'hidden';
+    } else {
+      console.error('AuthService showModal: модальное окно с ID', modalId, 'НЕ НАЙДЕНО!');
     }
   }
   
