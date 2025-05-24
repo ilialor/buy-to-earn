@@ -18,12 +18,20 @@
     <link rel="stylesheet" href="styles/revenue-distribution.css">
     <link rel="stylesheet" href="styles/static-pie-chart.css">
     <link rel="stylesheet" href="styles/project-media-social.css">
+    <link rel="stylesheet" href="styles/metrics-fix.css">
+    <link rel="stylesheet" href="styles/modal-animation.css">
+    <link rel="stylesheet" href="styles/header-layout-fix.css">
+    <link rel="stylesheet" href="styles/ailock-button.css">
     
     <!-- Подключение Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
     <!-- Подключение AOS анимации -->
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    
+    <!-- Подключение Tippy.js для тултипов -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
     
     <!-- Local Auth System -->
     <script src="js/local-auth.js"></script>
@@ -63,9 +71,31 @@
 </head>
 <body>
     <div id="notification-container" class="notification-container"></div>
-    <div class="floating-faq-button" id="faq-button">
-        <i class="fas fa-comments"></i>
+    
+    <!-- Плавающая панель быстрых действий -->
+    <div class="quick-actions-panel" id="quick-actions-panel">
+        <div class="quick-action-item" data-tippy-content="Инвестировать в проект">
+            <i class="fas fa-coins"></i>
+        </div>
+        <div class="quick-action-item" data-tippy-content="Добавить в избранное">
+            <i class="fas fa-star"></i>
+        </div>
+        <div class="quick-action-item" data-tippy-content="Поделиться проектом">
+            <i class="fas fa-share-alt"></i>
+        </div>
+        <div class="quick-action-item" data-tippy-content="Связаться с командой">
+            <i class="fas fa-envelope"></i>
+        </div>
+        <div class="quick-action-item" data-tippy-content="Подписаться на обновления">
+            <i class="fas fa-bell"></i>
+        </div>
     </div>
+    
+    <!-- Индикатор прогресса прокрутки -->
+    <div class="scroll-progress-container">
+        <div class="scroll-progress-bar" id="scroll-progress-bar"></div>
+    </div>
+    
     <div class="container">
         <header>
             <div class="logo">
@@ -121,11 +151,93 @@
               </div>
         </header>
     
+    <!-- Breadcrumbs навигация -->
+    <div class="breadcrumbs">
+        <a href="index.html">Главная</a>
+        <i class="fas fa-chevron-right"></i>
+        <a href="index.html">Marketplace</a>
+        <i class="fas fa-chevron-right"></i>
+        <a href="#">GameFi</a>
+        <i class="fas fa-chevron-right"></i>
+        <span>AIgents: Эволюционируй своего цифрового ассистента</span>
+    </div>
+    
     <!-- Основное содержимое -->
     <main class="project-details-container">
         <div class="project-details-content">
+            <!-- Боковая навигация по разделам -->
+            <aside class="project-sidebar" id="project-sidebar">
+                <div class="sidebar-header">
+                    <h3>Навигация</h3>
+                    <button class="btn-toggle-sidebar" id="toggle-sidebar">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li class="active"><a href="#overview" onclick="scrollToElement('#overview')"><i class="fas fa-home"></i> Обзор</a></li>
+                        <li><a href="#about" onclick="scrollToElement('.project-about')"><i class="fas fa-info-circle"></i> О проекте</a></li>
+                        <li><a href="#timeline" onclick="scrollToElement('#timeline')"><i class="fas fa-stream"></i> Этапы</a></li>
+                        <li><a href="#revenue" onclick="scrollToElement('#revenue')"><i class="fas fa-chart-pie"></i> Распределение доходов</a></li>
+                        <li><a href="#media" onclick="scrollToElement('.project-media')"><i class="fas fa-photo-video"></i> Медиа</a></li>
+                        <li><a href="#team" onclick="scrollToElement('.project-team')"><i class="fas fa-users"></i> Команда</a></li>
+                        <li><a href="#similar" onclick="scrollToElement('.similar-projects')"><i class="fas fa-project-diagram"></i> Похожие проекты</a></li>
+                        <li><a href="#join" onclick="scrollToElement('.join-project-section')"><i class="fas fa-handshake"></i> Инвестировать</a></li>
+                    </ul>
+                </nav>
+                
+                <div class="sidebar-section">
+                    <h4>Статус проекта</h4>
+                    <div class="project-status-indicator">
+                        <div class="status-label">В разработке</div>
+                        <div class="status-progress">
+                            <div class="progress-bar" style="width: 60%;"></div>
+                        </div>
+                        <div class="status-percentage">60% завершено</div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h4>Ключевые метрики</h4>
+                    <div class="sidebar-metrics">
+                        <div class="sidebar-metric">
+                            <i class="fas fa-chart-line"></i>
+                            <span>ROI: 215%</span>
+                        </div>
+                        <div class="sidebar-metric">
+                            <i class="fas fa-star"></i>
+                            <span>Рейтинг: 4.5/5</span>
+                        </div>
+                        <div class="sidebar-metric">
+                            <i class="fas fa-users"></i>
+                            <span>Инвесторов: 128</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h4>Последние обновления</h4>
+                    <div class="recent-updates">
+                        <div class="update-item">
+                            <div class="update-date">21 мая</div>
+                            <div class="update-content">Запущена бета-версия платформы</div>
+                        </div>
+                        <div class="update-item">
+                            <div class="update-date">15 мая</div>
+                            <div class="update-content">Добавлены новые функции ИИ</div>
+                        </div>
+                        <div class="update-item">
+                            <div class="update-date">10 мая</div>
+                            <div class="update-content">Завершен этап альфа-тестирования</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            
+            <!-- Основной контент -->
+            <div class="main-content">
             <!-- Hero секция с баннером и логотипом проекта -->
-            <div class="project-hero">
+            <div class="project-hero" id="overview">
                 <img src="images/hexagon-background.jpg" alt="AIgents Project Banner" class="project-banner">
                 <div class="project-hero-overlay">
                     <div class="project-hero-content">
@@ -193,64 +305,98 @@
                 </div>
             </div>
             
-            <!-- Трехколоночный контейнер для метрик, этапов и распределения доходов -->
-            <div class="project-info-grid">
-                <!-- Блок метрик проекта -->
-                <div class="project-metrics-block">
-                    <h2 class="section-title">Метрики проекта</h2>
-                    
-                    <!-- Current Funding -->
-                    <div class="metrics-item">
-                        <div class="metrics-label">Текущее финансирование:</div>
-                        <div class="metrics-value">450 000 $ / 750 000 $</div>
-                    </div>
-                    
-                    <!-- Progress Bar -->
-                    <div class="metric-progress">
-                        <div class="progress-container">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 60%"></div>
-                            </div>
-                            <div class="progress-info">
-                                <div class="progress-percent">60% финансирования</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Additional Metrics -->
-                    <div class="metrics-additional-info">
-                        <div class="metrics-row">
-                            <div class="metrics-item">
-                                <div class="metrics-label">Минимальный взнос:</div>
-                                <div class="metrics-value">25 $</div>
-                            </div>
-                            <div class="metrics-item">
-                                <div class="metrics-label">Общее количество участников:</div>
-                                <div class="metrics-value">320</div>
-                            </div>
-                        </div>
-                        <div class="metrics-row">
-                            <div class="metrics-item">
-                                <div class="metrics-label">Оставшееся время:</div>
-                                <div class="metrics-value">21 день</div>
-                            </div>
-                            <div class="metrics-item">
-                                <div class="metrics-label">Прогресс финансирования:</div>
-                                <div class="metrics-value">60%</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- AIlock Button -->
-                    <div class="ailock-button-container">
-                        <button class="ailock-calculate-btn">
-                            <i class="fas fa-calculator"></i> AIlock посчитает
+            <!-- Дашборд проекта с ключевыми метриками -->
+            <div class="project-dashboard">
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title">Дашборд проекта</h2>
+                    <div class="dashboard-actions">
+                        <button class="btn-dashboard-action" data-tippy-content="Обновить данные">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="btn-dashboard-action" data-tippy-content="Настроить дашборд">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <button class="btn-dashboard-action" data-tippy-content="Развернуть на весь экран">
+                            <i class="fas fa-expand"></i>
                         </button>
                     </div>
                 </div>
                 
+                <div class="dashboard-metrics">
+                    <div class="dashboard-metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value">$1,250,000</div>
+                            <div class="metric-label">Собрано средств</div>
+                            <div class="metric-progress">
+                                <div class="progress-bar" style="width: 75%;"></div>
+                            </div>
+                            <div class="metric-target">Цель: $1,500,000</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value">128</div>
+                            <div class="metric-label">Инвесторов</div>
+                            <div class="metric-trend positive">
+                                <i class="fas fa-arrow-up"></i> +12% за неделю
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value">42 дня</div>
+                            <div class="metric-label">До запуска</div>
+                            <div class="metric-trend">
+                                <div class="countdown-timer" id="launch-countdown">42:15:30:22</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value">215%</div>
+                            <div class="metric-label">Прогноз ROI</div>
+                            <div class="metric-trend positive">
+                                <i class="fas fa-arrow-up"></i> +5% за месяц
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value">$25</div>
+                            <div class="metric-label">Минимальный взнос</div>
+                            <button class="btn-ailock-calculate ailock-calculate-btn">
+                                <i class="fas fa-calculator"></i> AIlock посчитает
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Трехколоночный контейнер для метрик, этапов и распределения доходов -->
+            <div class="project-info-grid">
+
+                
                 <!-- Блок этапов проекта -->
-                <div class="project-stages-block">
+                <div class="project-stages-block" id="timeline">
                     <h2 class="section-title">Этапы проекта</h2>
                     
                     <!-- Временная шкала -->
@@ -416,7 +562,7 @@
                 </div>
                 
                 <!-- Блок распределения доходов -->
-                <div class="revenue-distribution-block">
+                <div class="revenue-distribution-block" id="revenue">
                     <h2 class="section-title">Распределение доходов</h2>
                     
                     <!-- Круговая диаграмма - Canvas вариант -->
@@ -800,8 +946,78 @@
                     </div>
                 </div>
             </div>
+            </div>
         </div>
     </main>
+    
+    <!-- Модальное окно для быстрой связи с командой проекта -->
+    <div class="modal" id="contact-team-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Связаться с командой проекта</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="contact-team-form">
+                    <div class="form-group">
+                        <label for="contact-subject">Тема сообщения</label>
+                        <select id="contact-subject" required>
+                            <option value="">Выберите тему...</option>
+                            <option value="investment">Вопрос об инвестировании</option>
+                            <option value="partnership">Предложение о партнерстве</option>
+                            <option value="technical">Технический вопрос</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-message">Сообщение</label>
+                        <textarea id="contact-message" rows="5" required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Отправить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно для подписки на обновления проекта -->
+    <div class="modal" id="subscribe-updates-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Подписаться на обновления</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="subscribe-form">
+                    <div class="form-group">
+                        <label for="notification-email">Email для уведомлений</label>
+                        <input type="email" id="notification-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Типы уведомлений</label>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" value="milestones" checked> Достижение этапов
+                            </label>
+                            <label>
+                                <input type="checkbox" value="updates" checked> Обновления проекта
+                            </label>
+                            <label>
+                                <input type="checkbox" value="investment" checked> Инвестиционные возможности
+                            </label>
+                            <label>
+                                <input type="checkbox" value="news" checked> Новости проекта
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Подписаться</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     </div>
     
     <footer>

@@ -33,8 +33,14 @@ function initAIlockButtons() {
   const calculateBtn = document.querySelector('.ailock-calculate-btn');
   if (calculateBtn) {
     calculateBtn.addEventListener('click', function() {
-      alert('AIlock анализирует проект и рассчитывает потенциальную доходность...');
-      // Здесь будет функциональность расчета
+      // Заменяем alert на более современное уведомление
+      showNotification('AIlock анализирует проект и рассчитывает потенциальную доходность...', 'info');
+      
+      // Имитация загрузки и расчета
+      setTimeout(() => {
+        // Показываем результаты в модальном окне или уведомлении
+        showNotification('Расчет завершен: Прогнозируемая доходность 215% за 18 месяцев', 'success');
+      }, 1500);
     });
   }
   
@@ -42,8 +48,14 @@ function initAIlockButtons() {
   const askBtn = document.querySelector('.ailock-ask-btn');
   if (askBtn) {
     askBtn.addEventListener('click', function() {
-      alert('AIlock отвечает на ваши вопросы о распределении доходов...');
-      // Здесь будет функциональность ответов на вопросы
+      // Заменяем alert на более современное уведомление
+      showNotification('AIlock анализирует ваш вопрос...', 'info');
+      
+      // Имитация обработки запроса
+      setTimeout(() => {
+        // Показываем результаты в модальном окне
+        showAIlockExplanation();
+      }, 1000);
     });
   }
 }
@@ -62,6 +74,11 @@ function initInvestmentOptions() {
         const price = this.closest('.investment-option')
           .querySelector('.option-price').textContent;
         joinButton.textContent = `Инвестировать ${price}`;
+        
+        // Анимация выбранного варианта
+        const allOptions = document.querySelectorAll('.investment-option');
+        allOptions.forEach(opt => opt.classList.remove('selected'));
+        this.closest('.investment-option').classList.add('selected');
       });
     });
     
@@ -74,8 +91,63 @@ function initInvestmentOptions() {
         const optionPrice = selectedOption.closest('.investment-option')
           .querySelector('.option-price').textContent;
         
-        alert(`Вы выбрали пакет "${optionTitle}" стоимостью ${optionPrice}. Переход к оплате...`);
-        // Здесь будет функциональность оплаты
+        // Заменяем alert на более современное уведомление
+        showNotification(`Вы выбрали пакет "${optionTitle}" стоимостью ${optionPrice}`, 'success');
+        
+        // Имитация перехода к оплате
+        setTimeout(() => {
+          showNotification('Переход к системе оплаты...', 'info');
+        }, 1500);
+      } else {
+        showNotification('Пожалуйста, выберите вариант инвестирования', 'warning');
+      }
+    });
+  }
+}
+
+/**
+ * Initialize dashboard functionality
+ */
+function initDashboard() {
+  // Dashboard refresh button
+  const refreshBtn = document.querySelector('.btn-dashboard-action:nth-child(1)');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', function() {
+      // Показываем анимацию обновления
+      this.querySelector('i').classList.add('fa-spin');
+      
+      // Имитация обновления данных
+      setTimeout(() => {
+        this.querySelector('i').classList.remove('fa-spin');
+        showNotification('Данные дашборда обновлены', 'success');
+        
+        // Обновляем некоторые метрики с небольшими изменениями
+        const investorsValue = document.querySelector('.dashboard-metric-card:nth-child(2) .metric-value');
+        if (investorsValue) {
+          const currentValue = parseInt(investorsValue.textContent);
+          investorsValue.textContent = currentValue + Math.floor(Math.random() * 5);
+        }
+      }, 1000);
+    });
+  }
+  
+  // Dashboard fullscreen button
+  const fullscreenBtn = document.querySelector('.btn-dashboard-action:nth-child(3)');
+  if (fullscreenBtn) {
+    fullscreenBtn.addEventListener('click', function() {
+      const dashboard = document.querySelector('.project-dashboard');
+      if (dashboard) {
+        dashboard.classList.toggle('fullscreen');
+        
+        // Изменяем иконку в зависимости от состояния
+        const icon = this.querySelector('i');
+        if (dashboard.classList.contains('fullscreen')) {
+          icon.classList.remove('fa-expand');
+          icon.classList.add('fa-compress');
+        } else {
+          icon.classList.remove('fa-compress');
+          icon.classList.add('fa-expand');
+        }
       }
     });
   }
@@ -89,6 +161,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize all components
   initAIlockButtons();
   initInvestmentOptions();
+  initDashboard();
+  
+  // Загружаем расширенную функциональность
+  loadEnhancedFunctionality();
   
   // Initialize similar projects hover effects
   const projectCards = document.querySelectorAll('.similar-project-card');
@@ -101,3 +177,25 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+/**
+ * Load enhanced functionality if script exists
+ */
+function loadEnhancedFunctionality() {
+  // Динамически загружаем расширенный скрипт
+  const enhancedScript = document.createElement('script');
+  enhancedScript.src = 'js/project-details-enhanced.js';
+  enhancedScript.onload = function() {
+    console.log('Enhanced functionality loaded successfully');
+  };
+  enhancedScript.onerror = function() {
+    console.error('Failed to load enhanced functionality');
+  };
+  document.head.appendChild(enhancedScript);
+  
+  // Загружаем расширенные стили
+  const enhancedStyles = document.createElement('link');
+  enhancedStyles.rel = 'stylesheet';
+  enhancedStyles.href = 'styles/project-details-enhanced.css';
+  document.head.appendChild(enhancedStyles);
+}

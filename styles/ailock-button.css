@@ -1,0 +1,65 @@
+/**
+ * AIlock Button Styles
+ * 
+ * Стили для кнопки "AIlock посчитает" в дашборде проекта
+ */
+
+.btn-ailock-calculate {
+  background: linear-gradient(135deg, #1E8AB9, #20B2AA);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  padding: 4px 8px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-width: 120px;
+}
+
+.btn-ailock-calculate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #20B2AA, #1E8AB9);
+}
+
+.btn-ailock-calculate:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-ailock-calculate i {
+  margin-right: 3px;
+  font-size: 8px;
+}
+
+/* Анимация при нажатии */
+.btn-ailock-calculate.calculating {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.btn-ailock-calculate.calculating i {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Стили для мобильных устройств */
+@media (max-width: 768px) {
+  .btn-ailock-calculate {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+}
