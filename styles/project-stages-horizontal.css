@@ -1,0 +1,290 @@
+/**
+ * Horizontal Project Stages Timeline
+ * 
+ * Стили для горизонтального отображения этапов проекта на странице деталей проекта.
+ */
+
+/* Основной контейнер блока этапов проекта */
+.project-stages-block {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+  margin-bottom: 30px;
+}
+
+/* Заголовок секции */
+.project-stages-block .section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #343a40;
+  margin: 0 0 25px 0;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.project-stages-block .section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #1E8AB9, #20B2AA);
+  border-radius: 3px;
+}
+
+/* Горизонтальная временная шкала */
+.timeline-horizontal {
+  display: flex;
+  position: relative;
+  margin: 40px 0 30px;
+  padding: 0;
+}
+
+/* Линия соединяющая точки шкалы */
+.timeline-horizontal::before {
+  content: '';
+  position: absolute;
+  top: 35px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: #e9ecef;
+  z-index: 1;
+}
+
+/* Элемент временной шкалы */
+.timeline-item-horizontal {
+  flex: 1;
+  position: relative;
+  text-align: center;
+  padding: 0 15px;
+  z-index: 2;
+}
+
+/* Точка на временной шкале */
+.timeline-point-horizontal {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  border: 4px solid #fff;
+  margin: 0 auto 15px;
+  position: relative;
+  z-index: 3;
+  transition: all 0.3s ease;
+}
+
+/* Содержимое элемента шкалы */
+.timeline-content-horizontal {
+  padding: 15px 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  height: 100%;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Заголовок этапа */
+.stage-title-horizontal {
+  font-size: 16px;
+  font-weight: 600;
+  color: #343a40;
+  margin: 0 0 10px 0;
+}
+
+/* Детали этапа */
+.stage-details-horizontal {
+  font-size: 14px;
+  color: #6c757d;
+  flex-grow: 1;
+}
+
+/* Дата этапа */
+.stage-date {
+  font-size: 12px;
+  color: #1E8AB9;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* Статус завершения */
+.completion-status {
+  font-size: 12px;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.completion-status i {
+  font-size: 14px;
+}
+
+/* Стили для завершенных этапов */
+.timeline-item-horizontal.completed .timeline-point-horizontal {
+  background-color: #1E8AB9;
+  box-shadow: 0 0 0 4px rgba(30, 138, 185, 0.2);
+}
+
+.timeline-item-horizontal.completed .timeline-content-horizontal {
+  border-left: 3px solid #1E8AB9;
+}
+
+.timeline-item-horizontal.completed .completion-status {
+  color: #28a745;
+}
+
+/* Стили для текущего этапа */
+.timeline-item-horizontal.current .timeline-point-horizontal {
+  background-color: #20B2AA;
+  box-shadow: 0 0 0 4px rgba(32, 178, 170, 0.3);
+  transform: scale(1.2);
+}
+
+.timeline-item-horizontal.current .timeline-content-horizontal {
+  background-color: rgba(32, 178, 170, 0.05);
+  border-left: 3px solid #20B2AA;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.timeline-item-horizontal.current .stage-title-horizontal {
+  color: #20B2AA;
+}
+
+.timeline-item-horizontal.current .completion-status {
+  color: #20B2AA;
+}
+
+/* Стили для будущих этапов */
+.timeline-item-horizontal.future .timeline-point-horizontal {
+  background-color: #e9ecef;
+}
+
+.timeline-item-horizontal.future .completion-status {
+  color: #6c757d;
+}
+
+/* Линия прогресса */
+.timeline-progress {
+  position: absolute;
+  top: 35px;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #1E8AB9, #20B2AA);
+  z-index: 2;
+  transition: width 1s ease;
+}
+
+/* Статус этапов */
+.stages-status {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e9ecef;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.stages-completed {
+  font-weight: 500;
+  color: #1E8AB9;
+}
+
+.stages-current {
+  font-weight: 500;
+  color: #20B2AA;
+}
+
+/* Кнопка подробнее */
+.stage-more-btn {
+  background: none;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  color: #6c757d;
+  font-size: 12px;
+  padding: 4px 8px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.stage-more-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #1E8AB9;
+  color: #1E8AB9;
+}
+
+/* Адаптивность */
+@media (max-width: 992px) {
+  .timeline-horizontal {
+    flex-direction: column;
+    margin-left: 20px;
+  }
+  
+  .timeline-horizontal::before {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: auto;
+    width: 4px;
+    height: auto;
+  }
+  
+  .timeline-item-horizontal {
+    padding: 0 0 30px 30px;
+    text-align: left;
+  }
+  
+  .timeline-point-horizontal {
+    position: absolute;
+    left: -12px;
+    top: 0;
+    margin: 0;
+  }
+  
+  .timeline-content-horizontal {
+    min-height: auto;
+  }
+  
+  .timeline-progress {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 4px !important;
+    height: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .project-stages-block {
+    padding: 20px 15px;
+  }
+  
+  .stages-status {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+/* Анимации */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(32, 178, 170, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(32, 178, 170, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(32, 178, 170, 0);
+  }
+}
+
+.timeline-item-horizontal.current .timeline-point-horizontal {
+  animation: pulse 2s infinite;
+}

@@ -1,0 +1,54 @@
+/**
+ * Исправление отображения блоков "Присоединиться к проекту"
+ * 
+ * Этот файл содержит стили для корректного отображения нового блока
+ * и скрытия старого блока "Присоединиться к проекту"
+ */
+
+/* Скрываем старый блок */
+.join-project-section {
+    display: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    z-index: -1 !important;
+}
+
+/* Убеждаемся, что новый блок отображается корректно */
+.join-project-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+    margin: 40px 0 !important;
+    padding: 30px !important;
+}
+
+/* Убеждаемся, что все элементы внутри нового блока отображаются */
+.join-project-container * {
+    visibility: visible !important;
+    display: inherit !important;
+}
+
+/* Восстанавливаем правильное отображение для flex-контейнеров */
+.join-benefits, .join-packages, .join-cta {
+    display: flex !important;
+}
+
+/* Восстанавливаем правильное отображение для блочных элементов */
+.benefit-card, .package-card, .join-button, .join-counter {
+    display: block !important;
+}
+
+/* Восстанавливаем правильное отображение для инлайновых элементов */
+.benefit-icon, .package-price .currency, .counter-number {
+    display: inline !important;
+}
+
+/* Восстанавливаем правильное отображение для иконок */
+.package-feature i {
+    display: inline-block !important;
+}

@@ -1,0 +1,253 @@
+/**
+ * Enhanced Team Section Styles
+ * 
+ * Стили для улучшенного блока "Команда проекта" на странице деталей проекта.
+ */
+
+/* Основной контейнер блока "Команда проекта" */
+.project-team {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+  margin-bottom: 30px;
+}
+
+/* Контейнер для членов команды */
+.team-members {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+/* Карточка члена команды */
+.team-member {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.team-member:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Аватар члена команды */
+.team-member-avatar {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 75%; /* Соотношение сторон 4:3 */
+}
+
+.team-member-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.team-member:hover .team-member-img {
+  transform: scale(1.05);
+}
+
+/* Информация о члене команды */
+.team-member-info {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.team-member-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #343a40;
+  margin: 0 0 5px 0;
+}
+
+.team-member-role {
+  font-size: 14px;
+  color: #1E8AB9;
+  font-weight: 500;
+  margin: 0 0 15px 0;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.team-member-bio {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #6c757d;
+  margin-bottom: 15px;
+  flex-grow: 1;
+}
+
+/* Социальные сети */
+.team-member-social {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.social-link {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.social-link:hover {
+  background-color: #1E8AB9;
+  color: white;
+}
+
+/* Специальные стили для разных социальных сетей */
+.social-link.linkedin:hover {
+  background-color: #0077B5;
+}
+
+.social-link.twitter:hover {
+  background-color: #1DA1F2;
+}
+
+.social-link.github:hover {
+  background-color: #333;
+}
+
+.social-link.artstation:hover {
+  background-color: #13AFF0;
+}
+
+/* Бейдж для ключевых членов команды */
+.key-member-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: linear-gradient(135deg, #1E8AB9, #20B2AA);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 2;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Индикатор специализации */
+.specialization-indicator {
+  display: inline-block;
+  padding: 3px 8px;
+  background-color: rgba(30, 138, 185, 0.1);
+  color: #1E8AB9;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+/* Кнопка "Связаться" */
+.contact-member-btn {
+  margin-top: 10px;
+  background: none;
+  border: 1px solid #1E8AB9;
+  color: #1E8AB9;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.contact-member-btn:hover {
+  background-color: #1E8AB9;
+  color: white;
+}
+
+/* Адаптивность */
+@media (max-width: 992px) {
+  .team-members {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .team-members {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Анимации */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.team-member {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.team-member:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.team-member:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.team-member:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+/* Дополнительные стили для секции команды */
+.team-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.team-filter {
+  display: flex;
+  gap: 10px;
+}
+
+.team-filter-btn {
+  background: none;
+  border: 1px solid #dee2e6;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.team-filter-btn:hover,
+.team-filter-btn.active {
+  background-color: #1E8AB9;
+  border-color: #1E8AB9;
+  color: white;
+}

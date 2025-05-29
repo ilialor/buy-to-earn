@@ -1,0 +1,249 @@
+/**
+ * Enhanced About Project Section Styles
+ * 
+ * Стили для улучшенного блока "О проекте" на странице деталей проекта.
+ */
+
+/* Основной контейнер блока "О проекте" */
+.project-about {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #343a40;
+  margin: 0 0 25px 0;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #1E8AB9, #20B2AA);
+  border-radius: 3px;
+}
+
+/* Структура контента */
+.about-content {
+  display: flex;
+  gap: 30px;
+}
+
+.about-main {
+  flex: 1;
+}
+
+.about-sidebar {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+/* Вводный текст */
+.about-intro {
+  margin-bottom: 25px;
+}
+
+.about-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #495057;
+  margin-bottom: 15px;
+}
+
+.about-text.highlight {
+  font-size: 18px;
+  color: #343a40;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-left: 4px solid #1E8AB9;
+  border-radius: 4px;
+}
+
+/* Подзаголовки */
+.about-subtitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #343a40;
+  margin: 0 0 15px 0;
+  display: flex;
+  align-items: center;
+}
+
+.about-subtitle i {
+  margin-right: 10px;
+  color: #1E8AB9;
+}
+
+/* Колонки с деталями */
+.about-details {
+  display: flex;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.about-column {
+  flex: 1;
+}
+
+/* Особенности проекта */
+.about-features {
+  margin-top: 30px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.feature-item {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1E8AB9, #20B2AA);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.feature-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 10px;
+}
+
+.feature-description {
+  font-size: 14px;
+  color: #6c757d;
+  line-height: 1.5;
+}
+
+/* Боковая панель */
+.about-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.about-card .card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #343a40;
+  margin: 0 0 15px 0;
+}
+
+.ecosystem-list {
+  padding-left: 20px;
+  margin-bottom: 15px;
+}
+
+.ecosystem-list li {
+  margin-bottom: 10px;
+  color: #495057;
+}
+
+.btn-sm {
+  padding: 8px 15px;
+  font-size: 14px;
+}
+
+/* Статистика */
+.about-stats {
+  background: linear-gradient(135deg, #1E8AB9, #20B2AA);
+  border-radius: 8px;
+  padding: 20px;
+  color: white;
+}
+
+.stat-item {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.stat-label {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* Адаптивность */
+@media (max-width: 992px) {
+  .about-content {
+    flex-direction: column;
+  }
+  
+  .about-sidebar {
+    width: 100%;
+  }
+  
+  .about-details {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .about-text.highlight {
+    font-size: 16px;
+  }
+}
+
+/* Анимации */
+.feature-item {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon i {
+  transition: transform 0.3s ease;
+}
+
+.feature-item:hover .feature-icon i {
+  transform: scale(1.2);
+}

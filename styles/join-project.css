@@ -1,0 +1,245 @@
+/**
+ * Join Project Block Styles - Упрощенная версия
+ * 
+ * Компактный горизонтальный блок "Присоединиться к проекту"
+ */
+
+/* Основной контейнер */
+.join-project-container {
+  position: relative;
+  margin: 40px 0;
+  padding: 30px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  border-top: 3px solid #1E8AB9;
+}
+
+/* Заголовок */
+.join-project-header {
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.join-project-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.join-project-subtitle {
+  font-size: 16px;
+  color: #666;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Блок преимуществ */
+.join-benefits {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.benefit-card {
+  flex: 1;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.benefit-card:hover {
+  transform: translateY(-5px);
+}
+
+.benefit-icon {
+  font-size: 24px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.benefit-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.benefit-text {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Ценовые пакеты */
+.join-packages {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 25px 0;
+}
+
+.package-card {
+  flex: 1;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.package-card:hover {
+  transform: translateY(-5px);
+}
+
+.package-card.selected {
+  border: 2px solid #1E8AB9;
+  background-color: #f0f8ff;
+}
+
+.package-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.package-price {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1E8AB9;
+  margin-bottom: 10px;
+}
+
+.package-price .currency {
+  font-size: 16px;
+  vertical-align: top;
+}
+
+.package-features {
+  margin: 15px 0;
+  text-align: left;
+}
+
+.package-feature {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.package-feature i {
+  color: #20B2AA;
+  margin-right: 5px;
+  font-size: 12px;
+}
+
+/* CTA секция */
+.join-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 25px;
+}
+
+.join-button {
+  background: linear-gradient(135deg, #1E8AB9, #20B2AA);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.join-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(30, 138, 185, 0.3);
+}
+
+.join-counter {
+  display: flex;
+  align-items: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.counter-number {
+  font-weight: 700;
+  color: #1E8AB9;
+  margin: 0 5px;
+}
+
+/* Прогресс-бары */
+.progress-bar {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  margin: 8px 0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1E8AB9, #20B2AA);
+  border-radius: 2px;
+  width: 85%;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .join-benefits {
+    flex-wrap: wrap;
+  }
+  
+  .benefit-card {
+    flex: 0 0 calc(50% - 10px);
+  }
+  
+  .join-packages {
+    overflow-x: auto;
+    padding-bottom: 15px;
+  }
+  
+  .package-card {
+    flex: 0 0 230px;
+  }
+  
+  .join-cta {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .join-counter {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .join-project-container {
+    padding: 20px;
+  }
+  
+  .join-project-title {
+    font-size: 24px;
+  }
+  
+  .benefit-card {
+    flex: 0 0 100%;
+    margin-bottom: 10px;
+  }
+  
+  .package-card {
+    flex: 0 0 200px;
+  }
+}

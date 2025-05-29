@@ -1,0 +1,166 @@
+/**
+ * Dashboard Revenue Distribution Styles
+ * 
+ * Стили для блока распределения доходов в дашборде проекта.
+ */
+
+/* Карточка распределения доходов в дашборде */
+.dashboard-revenue-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-revenue-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Заголовок */
+.revenue-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.revenue-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1E8AB9, #20B2AA);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.revenue-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #343a40;
+}
+
+/* Содержимое карточки */
+.revenue-card-content {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+}
+
+/* Мини-диаграмма */
+.mini-chart-container {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  margin-right: 15px;
+}
+
+.mini-revenue-chart {
+  width: 100%;
+  height: 100%;
+}
+
+/* Легенда диаграммы */
+.mini-revenue-legend {
+  flex-grow: 1;
+}
+
+.mini-legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.mini-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.mini-legend-text {
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Кнопка "Подробнее" */
+.revenue-details-btn {
+  margin-top: 10px;
+  background: none;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  color: #6c757d;
+  font-size: 12px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.revenue-details-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #1E8AB9;
+  color: #1E8AB9;
+}
+
+.revenue-details-btn i {
+  margin-right: 5px;
+}
+
+/* Запасной вариант диаграммы */
+.mini-static-pie-chart {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-pie-segment {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 50%;
+  background: conic-gradient(var(--color) 0% var(--percentage), transparent var(--percentage) 100%);
+}
+
+.mini-pie-hole {
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  top: 20%;
+  left: 20%;
+  background-color: white;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .revenue-card-content {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .mini-chart-container {
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
+  
+  .mini-revenue-legend {
+    width: 100%;
+  }
+}

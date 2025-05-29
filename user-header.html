@@ -1,21 +1,15 @@
 <!-- User Controls for Auth/Guest State -->
 <div class="user-controls user-controls-auth">
-  <button class="btn btn-outline" id="connect-wallet-btn"><i class="fas fa-wallet"></i> Connect Wallet</button>
+  <div class="btn btn-outline" id="wallet-balance-display">
+    <i class="fas fa-wallet"></i> <span id="wallet-balance-value">0.00</span> ETH
+  </div>
   <button class="btn btn-primary" id="sign-in-btn"><i class="fas fa-user"></i> Sign In</button>
 </div>
 
 <!-- User Controls for Logged-in State -->
 <div class="user-controls-logged-in">
-  <div class="btn btn-outline" id="wallet-balance-display">
-    <i class="fas fa-wallet"></i> <span id="wallet-balance-value">0.00</span> ETH
-  </div>
   
   <div class="user-info" id="user-info">
-    <div class="user-avatar" id="user-avatar">
-      <i class="fas fa-user"></i>
-    </div>
-    <span class="user-name" id="user-display-name">User</span>
-    <i class="fas fa-chevron-down"></i>
     
     <div class="user-dropdown" id="user-dropdown">
       <div class="user-dropdown-item" id="go-to-profile">

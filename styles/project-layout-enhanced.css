@@ -1,0 +1,158 @@
+/**
+ * Enhanced Project Layout Styles
+ * 
+ * Стили для улучшенного расположения блоков на странице деталей проекта.
+ */
+
+/* Контейнер для блоков информации о проекте */
+.project-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+/* Горизонтальное расположение блока этапов проекта */
+.project-stages-horizontal {
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+/* Контейнер для блоков "О проекте" и "Следите за проектом" */
+.project-about-social-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 992px) {
+  .project-about-social-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Стили для блока "Следите за проектом" */
+.project-social-block {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+  height: fit-content;
+}
+
+.project-social-block .section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #343a40;
+  margin: 0 0 25px 0;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.project-social-block .section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #1E8AB9, #20B2AA);
+  border-radius: 3px;
+}
+
+/* Улучшенные стили для социальных сетей */
+.social-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+}
+
+.social-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  color: white;
+}
+
+.website-icon {
+  background: linear-gradient(135deg, #1E8AB9, #20B2AA);
+}
+
+.twitter-icon {
+  background: #1DA1F2;
+}
+
+.discord-icon {
+  background: #7289DA;
+}
+
+.telegram-icon {
+  background: #0088cc;
+}
+
+.medium-icon {
+  background: #00ab6c;
+}
+
+.social-info {
+  flex-grow: 1;
+}
+
+.social-title {
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 5px;
+}
+
+.social-link {
+  color: #1E8AB9;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.social-link:hover {
+  color: #20B2AA;
+  text-decoration: underline;
+}
+
+.social-stats {
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 5px;
+}
+
+/* Кнопка "Все ресурсы" */
+.view-all-resources {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background: none;
+  border: 1px solid #1E8AB9;
+  border-radius: 6px;
+  color: #1E8AB9;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 15px;
+}
+
+.view-all-resources:hover {
+  background-color: #1E8AB9;
+  color: white;
+}

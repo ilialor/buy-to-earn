@@ -1,0 +1,32 @@
+/**
+ * Исправление отступов между блоками
+ */
+
+/* Общие стили для контейнеров блоков */
+.content-block-container {
+  margin-bottom: 30px;
+}
+
+/* Стили для блока "Присоединиться к проекту" */
+.join-project-container {
+  margin-bottom: 30px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+/* Стили для блока "Похожие проекты" */
+.related-projects-container {
+  margin-bottom: 30px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+/* Скрываем ненужные разделители */
+.block-separator + .content-block-container,
+.content-block-container + .block-separator {
+  margin-top: 0;
+}

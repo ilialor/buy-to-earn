@@ -1,0 +1,46 @@
+/**
+ * Переопределение стилей для блоков и разделителей
+ * 
+ * Этот файл содержит стили с высоким приоритетом для правильного
+ * отображения блоков и разделителей на странице деталей проекта
+ */
+
+/* Стили для блоков */
+.content-block-container {
+  margin-bottom: 30px !important;
+  background: white !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+  overflow: hidden !important;
+}
+
+/* Стили для разделителей */
+.block-separator {
+  height: 30px !important;
+  margin: 0 !important;
+  border: none !important;
+  background-color: #f8f9fa !important;
+  display: block !important;
+  width: 100% !important;
+  clear: both !important;
+}
+
+/* Специальные стили для блока "Присоединиться к проекту" */
+.join-project-container {
+  margin-bottom: 30px !important;
+}
+
+/* Специальные стили для блока "Похожие проекты" */
+.related-projects-container {
+  margin-bottom: 30px !important;
+}
+
+/* Убираем лишние отступы у вложенных элементов */
+.content-block-container > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Убираем лишние отступы у разделителей */
+.block-separator + .block-separator {
+  display: none !important;
+}

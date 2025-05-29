@@ -1,0 +1,38 @@
+/**
+ * Стили контейнеров для блоков "Присоединиться к проекту" и "Похожие проекты"
+ */
+
+/* Стили для контейнера блока "Присоединиться к проекту" */
+.join-project-container {
+  margin-bottom: 40px !important;
+  width: 100% !important;
+  background: white !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Стили для контейнера блока "Похожие проекты" */
+.related-projects-container {
+  margin-bottom: 40px !important;
+  width: 100% !important;
+  background: white !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Адаптивные стили */
+@media (max-width: 992px) {
+  .join-project-container,
+  .related-projects-container {
+    margin-bottom: 30px !important;
+  }
+}
+
+/* Удаляем ненужные разделители */
+.block-separator {
+  display: none !important;
+}

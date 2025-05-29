@@ -22,6 +22,34 @@
     <link rel="stylesheet" href="styles/modal-animation.css">
     <link rel="stylesheet" href="styles/header-layout-fix.css">
     <link rel="stylesheet" href="styles/ailock-button.css">
+    <link rel="stylesheet" href="styles/about-project-enhanced.css">
+    <link rel="stylesheet" href="styles/team-section-enhanced.css">
+    <link rel="stylesheet" href="styles/notifications.css">
+    <link rel="stylesheet" href="styles/project-stages-horizontal.css">
+    <link rel="stylesheet" href="styles/stage-details-modal.css">
+    <link rel="stylesheet" href="styles/project-layout-enhanced.css">
+    <link rel="stylesheet" href="styles/dashboard-revenue-distribution.css">
+    <link rel="stylesheet" href="styles/revenue-details-modal.css">
+    <link rel="stylesheet" href="styles/ailock-button-enhanced.css">
+    <link rel="stylesheet" href="styles/participation-card.css">
+    <link rel="stylesheet" href="styles/about-project-enhanced-v2.css">
+    <link rel="stylesheet" href="styles/project-containers.css">
+    <link rel="stylesheet" href="styles/modern-sidebar.css">
+    <link rel="stylesheet" href="styles/block-separator.css">
+    <link rel="stylesheet" href="styles/two-column-layout.css">
+    <link rel="stylesheet" href="styles/minimal-team.css">
+    <link rel="stylesheet" href="styles/team-section-compact.css">
+    <link rel="stylesheet" href="styles/team-cards-fix.css">
+    <link rel="stylesheet" href="styles/related-projects.css">
+    <link rel="stylesheet" href="styles/join-project.css">
+    <link rel="stylesheet" href="styles/hide-old-join-project.css">
+    <link rel="stylesheet" href="styles/join-project-fix.css">
+    <link rel="stylesheet" href="styles/blocks-spacing-fix.css">
+    <link rel="stylesheet" href="styles/join-project-containers.css">
+    <link rel="stylesheet" href="styles/block-spacing-override.css">
+    <link rel="stylesheet" href="styles/blocks-margin-fix.css">
+    
+
     
     <!-- Подключение Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -68,6 +96,11 @@
     <script src="js/project-stages.js" defer></script>
     <script src="js/revenue-distribution.js" defer></script>
     <script src="js/project-media-social.js" defer></script>
+    <script src="js/modern-sidebar.js" defer></script>
+    <script src="js/team-section-compact.js" defer></script>
+    <script src="js/team-cards-fix.js" defer></script>
+    <script src="js/related-projects.js" defer></script>
+    <script src="js/join-project.js" defer></script>
 </head>
 <body>
     <div id="notification-container" class="notification-container"></div>
@@ -117,20 +150,14 @@
             </nav>
             
             <div class="user-controls user-controls-auth">
-                <button class="btn btn-outline" id="connect-wallet-btn" data-i18n="wallet.connectWallet"><i class="fas fa-wallet"></i> Connect Wallet</button>
-                <button class="btn btn-primary" id="sign-in-btn" data-i18n="auth.signIn"><i class="fas fa-user"></i> Sign In</button>
-              </div>
-              <div class="user-controls-logged-in">
                 <div class="btn btn-outline" id="wallet-balance-display" data-modal="deposit-funds-modal">
                   <i class="fas fa-wallet"></i> <span id="wallet-balance-value">0.00</span> ETH
                 </div>
+                <button class="btn btn-primary" id="sign-in-btn" data-i18n="auth.signIn"><i class="fas fa-user"></i> Sign In</button>
+              </div>
+              <div class="user-controls-logged-in">
                 
                 <div class="user-info" id="user-info">
-                  <div class="user-avatar" id="user-avatar">
-                    <i class="fas fa-user"></i>
-                  </div>
-                  <span class="user-name" id="user-display-name">User</span>
-                  <i class="fas fa-chevron-down"></i>
                   
                   <div class="user-dropdown" id="user-dropdown">
                     <div class="user-dropdown-item" id="go-to-profile" data-i18n="profile.title" tabindex="0">
@@ -162,78 +189,65 @@
         <span>AIgents: Эволюционируй своего цифрового ассистента</span>
     </div>
     
+    <!-- Современная боковая навигация -->
+    <aside class="project-sidebar" id="project-sidebar">
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="active">
+                    <a href="#overview" onclick="scrollToElement('#overview')">
+                        <i class="fas fa-home"></i>
+                        <span class="tooltip">Обзор</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#about" onclick="scrollToElement('.project-about')">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip">О проекте</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#timeline" onclick="scrollToElement('#timeline')">
+                        <i class="fas fa-stream"></i>
+                        <span class="tooltip">Этапы</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#revenue" onclick="scrollToElement('#revenue')">
+                        <i class="fas fa-chart-pie"></i>
+                        <span class="tooltip">Распределение доходов</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#media" onclick="scrollToElement('#media')">
+                        <i class="fas fa-photo-video"></i>
+                        <span class="tooltip">Медиа</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#team" onclick="scrollToElement('.project-team')">
+                        <i class="fas fa-users"></i>
+                        <span class="tooltip">Команда</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#join" onclick="scrollToElement('.join-project-section')">
+                        <i class="fas fa-handshake"></i>
+                        <span class="tooltip">Инвестировать</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#similar-projects" onclick="scrollToElement('#similar-projects')">
+                        <i class="fas fa-project-diagram"></i>
+                        <span class="tooltip">Похожие проекты</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    
     <!-- Основное содержимое -->
     <main class="project-details-container">
         <div class="project-details-content">
-            <!-- Боковая навигация по разделам -->
-            <aside class="project-sidebar" id="project-sidebar">
-                <div class="sidebar-header">
-                    <h3>Навигация</h3>
-                    <button class="btn-toggle-sidebar" id="toggle-sidebar">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                </div>
-                <nav class="sidebar-nav">
-                    <ul>
-                        <li class="active"><a href="#overview" onclick="scrollToElement('#overview')"><i class="fas fa-home"></i> Обзор</a></li>
-                        <li><a href="#about" onclick="scrollToElement('.project-about')"><i class="fas fa-info-circle"></i> О проекте</a></li>
-                        <li><a href="#timeline" onclick="scrollToElement('#timeline')"><i class="fas fa-stream"></i> Этапы</a></li>
-                        <li><a href="#revenue" onclick="scrollToElement('#revenue')"><i class="fas fa-chart-pie"></i> Распределение доходов</a></li>
-                        <li><a href="#media" onclick="scrollToElement('.project-media')"><i class="fas fa-photo-video"></i> Медиа</a></li>
-                        <li><a href="#team" onclick="scrollToElement('.project-team')"><i class="fas fa-users"></i> Команда</a></li>
-                        <li><a href="#similar" onclick="scrollToElement('.similar-projects')"><i class="fas fa-project-diagram"></i> Похожие проекты</a></li>
-                        <li><a href="#join" onclick="scrollToElement('.join-project-section')"><i class="fas fa-handshake"></i> Инвестировать</a></li>
-                    </ul>
-                </nav>
-                
-                <div class="sidebar-section">
-                    <h4>Статус проекта</h4>
-                    <div class="project-status-indicator">
-                        <div class="status-label">В разработке</div>
-                        <div class="status-progress">
-                            <div class="progress-bar" style="width: 60%;"></div>
-                        </div>
-                        <div class="status-percentage">60% завершено</div>
-                    </div>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h4>Ключевые метрики</h4>
-                    <div class="sidebar-metrics">
-                        <div class="sidebar-metric">
-                            <i class="fas fa-chart-line"></i>
-                            <span>ROI: 215%</span>
-                        </div>
-                        <div class="sidebar-metric">
-                            <i class="fas fa-star"></i>
-                            <span>Рейтинг: 4.5/5</span>
-                        </div>
-                        <div class="sidebar-metric">
-                            <i class="fas fa-users"></i>
-                            <span>Инвесторов: 128</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h4>Последние обновления</h4>
-                    <div class="recent-updates">
-                        <div class="update-item">
-                            <div class="update-date">21 мая</div>
-                            <div class="update-content">Запущена бета-версия платформы</div>
-                        </div>
-                        <div class="update-item">
-                            <div class="update-date">15 мая</div>
-                            <div class="update-content">Добавлены новые функции ИИ</div>
-                        </div>
-                        <div class="update-item">
-                            <div class="update-date">10 мая</div>
-                            <div class="update-content">Завершен этап альфа-тестирования</div>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-            
             <!-- Основной контент -->
             <div class="main-content">
             <!-- Hero секция с баннером и логотипом проекта -->
@@ -323,6 +337,21 @@
                 </div>
                 
                 <div class="dashboard-metrics">
+                    <!-- Блок статуса проекта (перенесен из боковой панели) -->
+                    <div class="dashboard-metric-card project-status-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value">В разработке</div>
+                            <div class="metric-label">Статус проекта</div>
+                            <div class="metric-progress">
+                                <div class="progress-bar" style="width: 60%;"></div>
+                            </div>
+                            <div class="metric-target">60% завершено</div>
+                        </div>
+                    </div>
+                    
                     <div class="dashboard-metric-card">
                         <div class="metric-icon">
                             <i class="fas fa-coins"></i>
@@ -376,268 +405,418 @@
                         </div>
                     </div>
                     
-                    <div class="dashboard-metric-card">
-                        <div class="metric-icon">
-                            <i class="fas fa-dollar-sign"></i>
+                    <div class="dashboard-metric-card participation-card">
+                        <div class="revenue-card-header">
+                            <div class="revenue-icon">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                            <div class="revenue-title">Ваше участие в проекте</div>
                         </div>
                         <div class="metric-content">
-                            <div class="metric-value">$25</div>
-                            <div class="metric-label">Минимальный взнос</div>
-                            <button class="btn-ailock-calculate ailock-calculate-btn">
-                                <i class="fas fa-calculator"></i> AIlock посчитает
+                            <div class="participation-info">
+                                <div class="participation-min-amount">Минимальный взнос: <span>$25</span></div>
+                                <div class="participation-benefits">
+                                    Ожидаемый доход: ~$53
+                                </div>
+                                <div class="participation-note">
+                                    <i class="fas fa-info-circle"></i> Доход зависит от успешности продаж
+                                </div>
+                            </div>
+                        </div>
+                        <button class="revenue-details-btn ailock-calculate-btn compact-btn">
+                            <i class="fas fa-calculator"></i> Спросить AIlock
+                        </button>
+                    </div>
+                    
+                    <!-- Карточка распределения доходов -->
+                    <div class="dashboard-metric-card dashboard-revenue-card">
+                        <div class="revenue-card-header">
+                            <div class="revenue-icon">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <div class="revenue-title">Распределение доходов</div>
+                        </div>
+                        <div class="metric-content">
+                            <div class="mini-revenue-legend">
+                                <div class="mini-legend-item">
+                                    <div class="mini-legend-color" style="background-color: #4CAF50;"></div>
+                                    <div class="mini-legend-text">Игроки: 65%</div>
+                                </div>
+                                <div class="mini-legend-item">
+                                    <div class="mini-legend-color" style="background-color: #2196F3;"></div>
+                                    <div class="mini-legend-text">Создатели: 25%</div>
+                                </div>
+                                <div class="mini-legend-item">
+                                    <div class="mini-legend-color" style="background-color: #FFC107;"></div>
+                                    <div class="mini-legend-text">Платформа: 10%</div>
+                                </div>
+                            </div>
+                            <button class="revenue-details-btn" id="revenue-details-btn">
+                                <i class="fas fa-info-circle"></i> Подробнее
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Трехколоночный контейнер для метрик, этапов и распределения доходов -->
-            <div class="project-info-grid">
-
+            <!-- Контейнер для блоков информации о проекте -->
+            <div class="project-info-container">
                 
-                <!-- Блок этапов проекта -->
-                <div class="project-stages-block" id="timeline">
+                <!-- Блок этапов проекта (горизонтальный) -->
+                <div class="project-stages-block project-stages-horizontal" id="timeline">
                     <h2 class="section-title">Этапы проекта</h2>
                     
-                    <!-- Временная шкала -->
-                    <div class="timeline">
+                    <!-- Горизонтальная временная шкала -->
+                    <div class="timeline-horizontal">
+                        <!-- Линия прогресса (заполняется JS) -->
+                        <div class="timeline-progress" style="width: 50%;"></div>
+                        
                         <!-- Этап 1: Концепция -->
-                        <div class="timeline-item completed" data-stage="concept">
-                            <div class="timeline-point"></div>
-                            <div class="timeline-content">
-                                <h3 class="stage-title">Концепция</h3>
-                                <div class="stage-details">
-                                    <p>Разработка концепции проекта и исследование рынка.</p>
+                        <div class="timeline-item-horizontal completed" data-stage="concept">
+                            <div class="timeline-point-horizontal"></div>
+                            <div class="timeline-content-horizontal">
+                                <h3 class="stage-title-horizontal">Концепция</h3>
+                                <div class="stage-details-horizontal">
+                                    <p>Разработка концепции проекта и исследование рынка</p>
                                 </div>
+                                <div class="stage-date">Янв 2025 - Фев 2025</div>
+                                <div class="completion-status">
+                                    <i class="fas fa-check-circle"></i> Завершено
+                                </div>
+                                <button class="stage-more-btn" data-stage="concept">Подробнее</button>
                             </div>
                         </div>
                         
                         <!-- Этап 2: Альфа -->
-                        <div class="timeline-item completed" data-stage="alpha">
-                            <div class="timeline-point"></div>
-                            <div class="timeline-content">
-                                <h3 class="stage-title">Альфа</h3>
-                                <div class="stage-details">
-                                    <p>Разработка прототипа и тестирование основных функций.</p>
+                        <div class="timeline-item-horizontal completed" data-stage="alpha">
+                            <div class="timeline-point-horizontal"></div>
+                            <div class="timeline-content-horizontal">
+                                <h3 class="stage-title-horizontal">Альфа</h3>
+                                <div class="stage-details-horizontal">
+                                    <p>Разработка прототипа и тестирование основных функций</p>
                                 </div>
+                                <div class="stage-date">Мар 2025 - Апр 2025</div>
+                                <div class="completion-status">
+                                    <i class="fas fa-check-circle"></i> Завершено
+                                </div>
+                                <button class="stage-more-btn" data-stage="alpha">Подробнее</button>
                             </div>
                         </div>
                         
                         <!-- Этап 3: Бета -->
-                        <div class="timeline-item current" data-stage="beta">
-                            <div class="timeline-point"></div>
-                            <div class="timeline-content">
-                                <h3 class="stage-title">Бета</h3>
-                                <div class="stage-details">
-                                    <p>Расширенное тестирование и доработка функционала.</p>
+                        <div class="timeline-item-horizontal current" data-stage="beta">
+                            <div class="timeline-point-horizontal"></div>
+                            <div class="timeline-content-horizontal">
+                                <h3 class="stage-title-horizontal">Бета</h3>
+                                <div class="stage-details-horizontal">
+                                    <p>Расширенное тестирование и доработка функционала</p>
                                 </div>
+                                <div class="stage-date">Май 2025 - Июнь 2025</div>
+                                <div class="completion-status">
+                                    <i class="fas fa-clock"></i> В процессе
+                                </div>
+                                <button class="stage-more-btn" data-stage="beta">Подробнее</button>
                             </div>
                         </div>
                         
                         <!-- Этап 4: Запуск -->
-                        <div class="timeline-item" data-stage="launch">
-                            <div class="timeline-point"></div>
-                            <div class="timeline-content">
-                                <h3 class="stage-title">Запуск</h3>
-                                <div class="stage-details">
-                                    <p>Официальный запуск платформы и маркетинговая кампания.</p>
+                        <div class="timeline-item-horizontal future" data-stage="launch">
+                            <div class="timeline-point-horizontal"></div>
+                            <div class="timeline-content-horizontal">
+                                <h3 class="stage-title-horizontal">Запуск</h3>
+                                <div class="stage-details-horizontal">
+                                    <p>Официальный запуск платформы и маркетинговая кампания</p>
                                 </div>
+                                <div class="stage-date">Июль 2025</div>
+                                <div class="completion-status">
+                                    <i class="far fa-calendar-alt"></i> Планируется
+                                </div>
+                                <button class="stage-more-btn" data-stage="launch">Подробнее</button>
                             </div>
                         </div>
                         
                         <!-- Этап 5: Расширение -->
-                        <div class="timeline-item" data-stage="expansion">
-                            <div class="timeline-point"></div>
-                            <div class="timeline-content">
-                                <h3 class="stage-title">Расширение</h3>
-                                <div class="stage-details">
-                                    <p>Интеграция с партнерами и расширение экосистемы.</p>
+                        <div class="timeline-item-horizontal future" data-stage="expansion">
+                            <div class="timeline-point-horizontal"></div>
+                            <div class="timeline-content-horizontal">
+                                <h3 class="stage-title-horizontal">Расширение</h3>
+                                <div class="stage-details-horizontal">
+                                    <p>Интеграция с партнерами и расширение экосистемы</p>
                                 </div>
+                                <div class="stage-date">Авг 2025 - Дек 2025</div>
+                                <div class="completion-status">
+                                    <i class="far fa-calendar-alt"></i> Планируется
+                                </div>
+                                <button class="stage-more-btn" data-stage="expansion">Подробнее</button>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Статус этапов -->
                     <div class="stages-status">
-                        <span class="stages-completed">3/5 Завершено</span>
-                        <span class="stages-current">• Текущий: Бета-разработка</span>
+                        <span class="stages-completed"><i class="fas fa-tasks"></i> 2/5 Завершено</span>
+                        <span class="stages-current"><i class="fas fa-spinner fa-spin"></i> Текущий: Бета-разработка</span>
                     </div>
                 </div>
                 
-                <!-- Блок Социальные сети и ресурсы -->
-                <div class="project-social-block">
-                    <h2 class="section-title">Следите за проектом</h2>
+            </div>
+            
+            <!-- Контейнеры для блоков "О проекте", "Команда проекта" и "Медиа" -->
+            
+            <!-- Двухколоночный макет для блоков "О проекте" и "Следить за проектом" -->
+            <div class="two-column-container" id="about">
+                <!-- Левая колонка (основной контент) -->
+                <div class="column-main">
+                    <h2 class="column-title">О проекте</h2>
                     
-                    <!-- Официальный сайт -->
-                    <div class="social-item">
-                        <div class="social-icon website-icon">
-                            <i class="fas fa-globe"></i>
-                        </div>
-                        <div class="social-info">
-                            <div class="social-title">Официальный сайт</div>
-                            <a href="https://aigents.co" target="_blank" class="social-link">aigents.co</a>
+                    <div class="about-intro">
+                        <p class="about-text highlight">
+                            <strong>AIgents</strong> — это революционная GameFi платформа, объединяющая игровые механики, искусственный интеллект и блокчейн-технологии для создания экосистемы цифровых ассистентов нового поколения.
+                        </p>
+                    </div>
+                
+                    <div class="about-features">
+                        <h3 class="about-subtitle">Ключевые особенности проекта</h3>
+                        <div class="features-grid">
+                            <div class="feature-item">
+                                <div class="feature-icon"><i class="fas fa-brain"></i></div>
+                                <div class="feature-title">Эволюционирующий ИИ</div>
+                                <div class="feature-description">Ноосит учится и развивается на основе ваших действий и предпочтений</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon"><i class="fas fa-gamepad"></i></div>
+                                <div class="feature-title">Игровые механики</div>
+                                <div class="feature-description">Увлекательный геймплей с элементами стратегии и развития персонажа</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                                <div class="feature-title">Безопасность данных</div>
+                                <div class="feature-description">Все данные защищены и могут храниться локально или в ICP канистрах</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                                <div class="feature-title">Пассивный доход</div>
+                                <div class="feature-description">Ваш Ноосит может приносить доход, выполняя задачи для других пользователей</div>
+                            </div>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Правая колонка (боковая панель) -->
+                <div class="column-sidebar column-sidebar-sticky">
+                    <h2 class="column-title">Следить за развитием</h2>
                     
                     <!-- Социальные сети -->
-                    <div class="social-networks">
-                        <div class="social-item">
-                            <div class="social-icon twitter-icon">
+                    <div class="social-list-vertical">
+                        <!-- Официальный сайт -->
+                        <div class="social-item-vertical">
+                            <div class="social-icon-vertical website-icon" style="background-color: #0ea5e9;">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="social-info-vertical">
+                                <div class="social-title-vertical">Официальный сайт</div>
+                                <a href="https://aigents.co" target="_blank" class="social-link-vertical">aigents.co</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Twitter -->
+                        <div class="social-item-vertical">
+                            <div class="social-icon-vertical twitter-icon" style="background-color: #1DA1F2;">
                                 <i class="fab fa-twitter"></i>
                             </div>
-                            <div class="social-info">
-                                <div class="social-title">Twitter</div>
-                                <a href="https://twitter.com/AIgentsGame" target="_blank" class="social-link">@AIgentsGame</a>
-                                <div class="social-stats">1.2K подписчиков</div>
+                            <div class="social-info-vertical">
+                                <div class="social-title-vertical">Twitter</div>
+                                <a href="https://twitter.com/AIgentsGame" target="_blank" class="social-link-vertical">@AIgentsGame</a>
                             </div>
                         </div>
                         
-                        <div class="social-item">
-                            <div class="social-icon discord-icon">
+                        <!-- Discord -->
+                        <div class="social-item-vertical">
+                            <div class="social-icon-vertical discord-icon" style="background-color: #5865F2;">
                                 <i class="fab fa-discord"></i>
                             </div>
-                            <div class="social-info">
-                                <div class="social-title">Discord</div>
-                                <a href="https://discord.gg/aigents" target="_blank" class="social-link">AIgents Community</a>
-                                <div class="social-stats">850 участников</div>
+                            <div class="social-info-vertical">
+                                <div class="social-title-vertical">Discord</div>
+                                <a href="https://discord.gg/aigents" target="_blank" class="social-link-vertical">AIgents Community</a>
                             </div>
                         </div>
                         
-                        <div class="social-item">
-                            <div class="social-icon youtube-icon">
+                        <!-- YouTube -->
+                        <div class="social-item-vertical">
+                            <div class="social-icon-vertical youtube-icon" style="background-color: #FF0000;">
                                 <i class="fab fa-youtube"></i>
                             </div>
-                            <div class="social-info">
-                                <div class="social-title">YouTube</div>
-                                <a href="https://youtube.com/c/AIgentsOfficial" target="_blank" class="social-link">AIgents Official</a>
-                                <div class="social-stats">420 подписчиков</div>
+                            <div class="social-info-vertical">
+                                <div class="social-title-vertical">YouTube</div>
+                                <a href="https://youtube.com/c/AIgentsOfficial" target="_blank" class="social-link-vertical">AIgents Official</a>
                             </div>
                         </div>
                         
-                        <div class="social-item">
-                            <div class="social-icon telegram-icon">
+                        <!-- Telegram -->
+                        <div class="social-item-vertical">
+                            <div class="social-icon-vertical telegram-icon" style="background-color: #0088cc;">
                                 <i class="fab fa-telegram"></i>
                             </div>
-                            <div class="social-info">
-                                <div class="social-title">Telegram</div>
-                                <a href="https://t.me/AIgentsNews" target="_blank" class="social-link">@AIgentsNews</a>
-                                <div class="social-stats">680 подписчиков</div>
+                            <div class="social-info-vertical">
+                                <div class="social-title-vertical">Telegram</div>
+                                <a href="https://t.me/AIgentsNews" target="_blank" class="social-link-vertical">@AIgentsNews</a>
                             </div>
                         </div>
                         
-                        <div class="social-item">
-                            <div class="social-icon github-icon">
+                        <!-- GitHub -->
+                        <div class="social-item-vertical">
+                            <div class="social-icon-vertical github-icon" style="background-color: #333333;">
                                 <i class="fab fa-github"></i>
                             </div>
-                            <div class="social-info">
-                                <div class="social-title">GitHub</div>
-                                <a href="https://github.com/aigents-dev/core" target="_blank" class="social-link">aigents-dev/core</a>
-                                <div class="social-stats">45 <i class="fas fa-star"></i></div>
+                            <div class="social-info-vertical">
+                                <div class="social-title-vertical">GitHub</div>
+                                <a href="https://github.com/aigents-dev/core" target="_blank" class="social-link-vertical">aigents-dev/core</a>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Для разработчиков -->
-                    <div class="dev-resources">
-                        <h3 class="subsection-title">Для разработчиков</h3>
-                        <div class="dev-resources-list">
-                            <a href="#" class="dev-resource-link">
+                    <div class="dev-resources-vertical">
+                        <h3 class="column-title" style="font-size: 1.2rem;">Для разработчиков</h3>
+                        <div class="dev-resources-list-vertical">
+                            <a href="#" class="dev-resource-link-vertical">
                                 <i class="fas fa-book"></i> API документация
                             </a>
-                            <a href="#" class="dev-resource-link">
+                            <a href="#" class="dev-resource-link-vertical">
                                 <i class="fas fa-code"></i> SDK
                             </a>
-                            <a href="#" class="dev-resource-link">
-                                <i class="fas fa-puzzle-piece"></i> Плагины
+                            <a href="#" class="dev-resource-link-vertical">
+                                <i class="fas fa-puzzle-piece"></i> Примеры
                             </a>
                         </div>
                     </div>
                     
                     <!-- Кнопка присоединиться -->
-                    <div class="join-community-container">
-                        <button class="btn-join-community">
-                            <i class="fas fa-users"></i> Присоединиться к сообществу
-                        </button>
-                    </div>
+                    <button class="btn-join-community-vertical">
+                        <i class="fas fa-users"></i> Присоединиться к сообществу
+                    </button>
                 </div>
-                
-                <!-- Блок распределения доходов -->
-                <div class="revenue-distribution-block" id="revenue">
-                    <h2 class="section-title">Распределение доходов</h2>
-                    
-                    <!-- Круговая диаграмма - Canvas вариант -->
-                    <div class="revenue-chart-container">
-                        <canvas id="revenueDistributionChart" width="200" height="200"></canvas>
-                    </div>
-                    
-                    <!-- SVG вариант диаграммы (более надежный) -->
-                    <div class="revenue-chart-svg" style="display: none;">
-                        <!-- SVG будет добавлен через JavaScript -->
-                    </div>
-                    
-                    <!-- Запасной вариант диаграммы в виде изображения -->
-                    <div class="revenue-chart-fallback" style="display: none;">
-                        <div class="static-pie-chart">
-                            <div class="pie-segment players" style="--percentage: 65%; --color: #4CAF50;"></div>
-                            <div class="pie-segment creators" style="--percentage: 25%; --color: #2196F3;"></div>
-                            <div class="pie-segment platform" style="--percentage: 10%; --color: #FFC107;"></div>
-                            <div class="pie-hole"></div>
+            </div>
+            
+            <!-- Контейнер блока "Команда проекта" -->
+            <div class="project-team-container">
+                <!-- Project Team Section -->
+                <div class="project-team" id="team">
+                    <div class="team-section-header">
+                        <h2 class="section-title">Команда проекта</h2>
+                        <div class="team-filter">
+                            <button class="team-filter-btn active" data-filter="all">Все</button>
+                            <button class="team-filter-btn" data-filter="management">Руководство</button>
+                            <button class="team-filter-btn" data-filter="development">Разработка</button>
+                            <button class="team-filter-btn" data-filter="design">Дизайн</button>
                         </div>
                     </div>
                     
-                    <!-- Легенда диаграммы -->
-                    <div class="revenue-legend">
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: #4CAF50;"></div>
-                            <div class="legend-text">Игроки: 65%</div>
+                    <div class="team-members">
+                        <!-- CEO -->
+                        <div class="team-member" data-category="management">
+                            <div class="team-member-avatar">
+                                <div class="key-member-badge">Основатель</div>
+                                <img src="images/team-member-1.jpg" alt="Александр Иванов" class="team-member-img">
+                            </div>
+                            <div class="team-member-info">
+                                <h3 class="team-member-name">Александр Иванов</h3>
+                                <p class="team-member-role">Основатель и CEO</p>
+                                <span class="specialization-indicator">Стратегия и развитие</span>
+                                <p class="team-member-bio">Опытный предприниматель с 10-летним стажем в сфере технологий. Ранее основал два успешных стартапа в области ИИ. Эксперт в области блокчейн-технологий и токеномики.</p>
+                                <div class="team-member-social">
+                                    <a href="#" class="social-link linkedin"><i class="fab fa-linkedin"></i></a>
+                                    <a href="#" class="social-link twitter"><i class="fab fa-twitter"></i></a>
+                                    <a href="#" class="social-link"><i class="fas fa-globe"></i></a>
+                                </div>
+                                <button class="contact-member-btn" data-member="Александр Иванов"><i class="fas fa-envelope"></i> Связаться</button>
+                            </div>
                         </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: #2196F3;"></div>
-                            <div class="legend-text">Создатели: 25%</div>
+                        
+                        <!-- CTO -->
+                        <div class="team-member" data-category="development">
+                            <div class="team-member-avatar">
+                                <div class="key-member-badge">Ключевой участник</div>
+                                <img src="images/team-member-2.jpg" alt="Мария Петрова" class="team-member-img">
+                            </div>
+                            <div class="team-member-info">
+                                <h3 class="team-member-name">Мария Петрова</h3>
+                                <p class="team-member-role">CTO</p>
+                                <span class="specialization-indicator">Искусственный интеллект</span>
+                                <p class="team-member-bio">Эксперт в области машинного обучения и нейронных сетей с более чем 8-летним опытом. Ранее руководила отделом ИИ в крупной технологической компании. PhD в области компьютерных наук.</p>
+                                <div class="team-member-social">
+                                    <a href="#" class="social-link linkedin"><i class="fab fa-linkedin"></i></a>
+                                    <a href="#" class="social-link github"><i class="fab fa-github"></i></a>
+                                    <a href="#" class="social-link"><i class="fas fa-book"></i></a>
+                                </div>
+                                <button class="contact-member-btn" data-member="Мария Петрова"><i class="fas fa-envelope"></i> Связаться</button>
+                            </div>
                         </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: #FFC107;"></div>
-                            <div class="legend-text">Платформа: 10%</div>
+                        
+                        <!-- Lead Game Designer -->
+                        <div class="team-member" data-category="design">
+                            <div class="team-member-avatar">
+                                <img src="images/team-member-3.jpg" alt="Дмитрий Сидоров" class="team-member-img">
+                            </div>
+                            <div class="team-member-info">
+                                <h3 class="team-member-name">Дмитрий Сидоров</h3>
+                                <p class="team-member-role">Lead Game Designer</p>
+                                <span class="specialization-indicator">Игровая экономика</span>
+                                <p class="team-member-bio">Опытный гейм-дизайнер с портфолио из 5+ успешных игровых проектов. Специализируется на создании сбалансированных игровых экономик и механик вовлечения пользователей.</p>
+                                <div class="team-member-social">
+                                    <a href="#" class="social-link linkedin"><i class="fab fa-linkedin"></i></a>
+                                    <a href="#" class="social-link artstation"><i class="fab fa-artstation"></i></a>
+                                    <a href="#" class="social-link"><i class="fas fa-gamepad"></i></a>
+                                </div>
+                                <button class="contact-member-btn" data-member="Дмитрий Сидоров"><i class="fas fa-envelope"></i> Связаться</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Blockchain Developer -->
+                        <div class="team-member" data-category="development">
+                            <div class="team-member-avatar">
+                                <img src="images/team-member-4.jpg" alt="Анна Козлова" class="team-member-img">
+                            </div>
+                            <div class="team-member-info">
+                                <h3 class="team-member-name">Анна Козлова</h3>
+                                <p class="team-member-role">Blockchain Developer</p>
+                                <span class="specialization-indicator">Smart Contracts</span>
+                                <p class="team-member-bio">Эксперт по блокчейн-технологиям с опытом разработки смарт-контрактов для различных платформ. Участвовала в создании нескольких успешных DeFi-проектов.</p>
+                                <div class="team-member-social">
+                                    <a href="#" class="social-link github"><i class="fab fa-github"></i></a>
+                                    <a href="#" class="social-link"><i class="fab fa-ethereum"></i></a>
+                                </div>
+                                <button class="contact-member-btn" data-member="Анна Козлова"><i class="fas fa-envelope"></i> Связаться</button>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Кнопка "Спросить Айлока" -->
-                    <div class="ailock-button-container small">
-                        <button class="ailock-ask-btn">
-                            <i class="fas fa-question-circle"></i> Спросить Айлока
-                        </button>
+                    <div class="team-section-footer">
+                        <button class="btn-primary" id="view-all-team">Показать всю команду</button>
+                        <button class="btn-secondary" id="join-team">Присоединиться к команде</button>
                     </div>
                 </div>
             </div>
             
-            <!-- About Project -->
-            <div class="project-about">
-                <h2 class="section-title">О проекте</h2>
-                <p class="about-text">
-                    AIgents — это революционная GameFi платформа, где игроки создают, тренируют и развивают цифровых ассистентов, называемых Нооситами. Эти ИИ-агенты обучаются на взаимодействиях, растут в возможностях и предоставляют реальную пользу как внутри, так и вне игровой среды.
-                </p>
-                <p class="about-text">
-                    Платформа объединяет игровые механики с практическим развитием ИИ, позволяя участникам зарабатывать вознаграждения, когда их агенты выполняют задачи и предоставляют услуги другим пользователям. По мере эволюции Нооситов они приобретают более продвинутые возможности и генерируют все больший доход для своих владельцев.
-                </p>
-            </div>
-            
-            <!-- Блок Медиа и документы проекта -->
-            <div class="project-media">
-                <h2 class="section-title">Медиа и документы проекта</h2>
-                
-                <!-- Табы для медиа контента -->
-                <div class="media-tabs">
-                    <div class="media-tab active" data-tab="screenshots">Скриншоты</div>
-                    <div class="media-tab" data-tab="concept-art">Концепт-арт</div>
-                    <div class="media-tab" data-tab="documents">Документы</div>
-                    <div class="media-tab" data-tab="videos">Видео</div>
-                </div>
-                
-                <!-- Содержимое табов -->
-                <div class="media-content">
-                    <!-- Скриншоты -->
-                    <div class="media-tab-content active" id="screenshots">
-                        <div class="media-grid">
+            <!-- Контейнер блока "Медиа и документы проекта" -->
+            <div class="project-media-container content-block-container" id="media">
+                <!-- Блок Медиа и документы проекта -->
+                <div class="project-media">
+                    <h2 class="section-title">Медиа и документы проекта</h2>
+                    
+                    <!-- Табы для медиа контента -->
+                    <div class="media-tabs">
+                        <div class="media-tab active" data-tab="screenshots">Скриншоты</div>
+                        <div class="media-tab" data-tab="concept-art">Концепт-арт</div>
+                        <div class="media-tab" data-tab="documents">Документы</div>
+                        <div class="media-tab" data-tab="videos">Видео</div>
+                    </div>
+                    
+                    <!-- Содержимое табов -->
+                    <div class="media-content">
+                        <!-- Скриншоты -->
+                        <div class="media-tab-content active" id="screenshots">
+                            <div class="media-grid">
                             <div class="media-item" data-fullscreen="images/Project1.jpg">
                                 <img src="images/Project1.jpg" alt="Скриншот 1" class="media-image">
                                 <div class="media-overlay">
@@ -774,135 +953,8 @@
                 </div>
             </div>
             
-            <!-- Project Team Section -->
-            <div class="project-team">
-                <h2 class="section-title">Команда проекта</h2>
-                <div class="team-members">
-                    <div class="team-member">
-                        <div class="team-member-avatar">
-                            <img src="images/team-member-1.jpg" alt="Александр Иванов" class="team-member-img">
-                        </div>
-                        <div class="team-member-info">
-                            <h3 class="team-member-name">Александр Иванов</h3>
-                            <p class="team-member-role">Основатель и CEO</p>
-                            <p class="team-member-bio">Опытный предприниматель с 10-летним стажем в сфере технологий. Ранее основал два успешных стартапа в области ИИ.</p>
-                            <div class="team-member-social">
-                                <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="team-member">
-                        <div class="team-member-avatar">
-                            <img src="images/team-member-2.jpg" alt="Мария Петрова" class="team-member-img">
-                        </div>
-                        <div class="team-member-info">
-                            <h3 class="team-member-name">Мария Петрова</h3>
-                            <p class="team-member-role">CTO</p>
-                            <p class="team-member-bio">Эксперт в области машинного обучения и нейронных сетей. Ранее работала в крупных технологических компаниях.</p>
-                            <div class="team-member-social">
-                                <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-                                <a href="#" class="social-link"><i class="fab fa-github"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="team-member">
-                        <div class="team-member-avatar">
-                            <img src="images/team-member-3.jpg" alt="Дмитрий Сидоров" class="team-member-img">
-                        </div>
-                        <div class="team-member-info">
-                            <h3 class="team-member-name">Дмитрий Сидоров</h3>
-                            <p class="team-member-role">Lead Game Designer</p>
-                            <p class="team-member-bio">Опытный гейм-дизайнер с опытом работы над несколькими успешными игровыми проектами. Специализируется на игровой экономике.</p>
-                            <div class="team-member-social">
-                                <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-                                <a href="#" class="social-link"><i class="fab fa-artstation"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Similar Projects Section -->
-            <div class="similar-projects">
-                <h2 class="section-title">Похожие проекты</h2>
-                <div class="similar-projects-grid">
-                    <!-- Проект 1 -->
-                    <div class="similar-project-card">
-                        <div class="similar-project-img">
-                            <img src="images/similar-project-1.jpg" alt="CryptoQuest" class="project-thumbnail">
-                        </div>
-                        <div class="similar-project-info">
-                            <h3 class="similar-project-title">CryptoQuest</h3>
-                            <div class="similar-project-category">
-                                <span class="badge badge-gamefi">GameFi</span>
-                            </div>
-                            <div class="similar-project-rating">
-                                <div class="rating-stars small">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </div>
-                                <span class="rating-value">4.0/5</span>
-                            </div>
-                            <a href="#" class="btn btn-small">Подробнее</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Проект 2 -->
-                    <div class="similar-project-card">
-                        <div class="similar-project-img">
-                            <img src="images/similar-project-2.jpg" alt="AI Companions" class="project-thumbnail">
-                        </div>
-                        <div class="similar-project-info">
-                            <h3 class="similar-project-title">AI Companions</h3>
-                            <div class="similar-project-category">
-                                <span class="badge badge-ai">AI</span>
-                            </div>
-                            <div class="similar-project-rating">
-                                <div class="rating-stars small">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                </div>
-                                <span class="rating-value">4.5/5</span>
-                            </div>
-                            <a href="#" class="btn btn-small">Подробнее</a>
-                        </div>
-                    </div>
-                    
-                    <!-- Проект 3 -->
-                    <div class="similar-project-card">
-                        <div class="similar-project-img">
-                            <img src="images/similar-project-3.jpg" alt="MetaMinds" class="project-thumbnail">
-                        </div>
-                        <div class="similar-project-info">
-                            <h3 class="similar-project-title">MetaMinds</h3>
-                            <div class="similar-project-category">
-                                <span class="badge badge-gamefi">GameFi</span>
-                                <span class="badge badge-ai">AI</span>
-                            </div>
-                            <div class="similar-project-rating">
-                                <div class="rating-stars small">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </div>
-                                <span class="rating-value">5.0/5</span>
-                            </div>
-                            <a href="#" class="btn btn-small">Подробнее</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Разделитель блоков -->
+            <div style="height: 40px; background-color: #f8f9fa;"></div>
             
             <!-- Join Project Section -->
             <div class="join-project-section">
@@ -944,6 +996,206 @@
                         <button class="btn btn-primary btn-join">Инвестировать сейчас</button>
                         <p class="join-note">Осталось только <span class="highlight">21 день</span> до завершения раунда финансирования</p>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Разделитель блоков -->
+            <div class="block-separator"></div>
+            
+            <!-- Блок "Присоединиться к проекту" -->
+            <div class="join-project-container content-block-container" data-aos="fade-up" style="margin-bottom: 30px; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); overflow: hidden;">
+                <!-- Заголовок и описание -->
+                <div class="join-project-header">
+                    <h2 class="join-project-title">Присоединиться к проекту</h2>
+                    <p class="join-project-subtitle">Станьте частью революционной GameFi платформы с искусственным интеллектом</p>
+                </div>
+                
+                <!-- Преимущества -->
+                <div class="join-benefits">
+                    <!-- Преимущество 1 -->
+                    <div class="benefit-card">
+                        <div class="benefit-icon">🚀</div>
+                        <h3 class="benefit-title">Ранний доступ</h3>
+                        <p class="benefit-text">Получите доступ к платформе раньше всех и влияйте на её развитие</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-width="85%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Преимущество 2 -->
+                    <div class="benefit-card">
+                        <div class="benefit-icon">💎</div>
+                        <h3 class="benefit-title">NFT и бонусы</h3>
+                        <p class="benefit-text">Эксклюзивные NFT и бонусы для ранних инвесторов с уникальными преимуществами</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-width="70%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Преимущество 3 -->
+                    <div class="benefit-card">
+                        <div class="benefit-icon">📈</div>
+                        <h3 class="benefit-title">Доля в доходах</h3>
+                        <p class="benefit-text">Получайте долю в доходах проекта и растите вместе с нами</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-width="90%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Преимущество 4 -->
+                    <div class="benefit-card">
+                        <div class="benefit-icon">🎮</div>
+                        <h3 class="benefit-title">Влияние на развитие</h3>
+                        <p class="benefit-text">Участвуйте в принятии решений и голосуйте за новые функции</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" data-width="65%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ценовые пакеты -->
+                <div class="join-packages">
+                    <!-- Базовый пакет -->
+                    <div class="package-card">
+                        <h3 class="package-name">Базовый</h3>
+                        <div class="package-price"><span class="currency">$</span>25</div>
+                        <div class="package-features">
+                            <div class="package-feature"><i class="fas fa-check"></i> Ранний доступ к платформе</div>
+                            <div class="package-feature"><i class="fas fa-check"></i> Базовый NFT-бейдж</div>
+                            <div class="package-feature"><i class="fas fa-check"></i> 5% скидка на услуги</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Стандартный пакет -->
+                    <div class="package-card">
+                        <h3 class="package-name">Стандартный</h3>
+                        <div class="package-price"><span class="currency">$</span>100</div>
+                        <div class="package-features">
+                            <div class="package-feature"><i class="fas fa-check"></i> Всё из Базового пакета</div>
+                            <div class="package-feature"><i class="fas fa-check"></i> Уникальный NFT-аватар</div>
+                            <div class="package-feature"><i class="fas fa-check"></i> 2% доли в доходах</div>
+                            <div class="package-feature"><i class="fas fa-check"></i> Голосование за функции</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Премиум пакет -->
+                    <div class="package-card">
+                        <h3 class="package-name">Премиум</h3>
+                        <div class="package-price"><span class="currency">$</span>500</div>
+                        <div class="package-features">
+                            <div class="package-feature"><i class="fas fa-check"></i> Всё из Стандартного пакета</div>
+                            <div class="package-feature"><i class="fas fa-check"></i> Легендарный NFT-комплект</div>
+                            <div class="package-feature"><i class="fas fa-check"></i> 5% доли в доходах</div>
+                            <div class="package-feature"><i class="fas fa-check"></i> VIP-доступ к команде</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CTA и счетчик -->
+                <div class="join-cta">
+                    <button class="join-button">Инвестировать сейчас</button>
+                    <div class="join-counter">
+                        Уже присоединились: <span class="counter-number">0</span> инвесторов
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Разделитель блоков -->
+            <div style="height: 40px; background-color: #f8f9fa;"></div>
+            
+            <!-- Новый блок похожих проектов -->
+            <div class="related-projects-container content-block-container" style="margin-bottom: 30px; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); overflow: hidden;">
+                <h2 class="section-title">Похожие проекты</h2>
+                
+                <!-- Навигационные стрелки -->
+                <div class="related-nav prev" id="related-prev">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+                <div class="related-nav next" id="related-next">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                
+                <!-- Горизонтальный скроллер карточек -->
+                <div class="related-projects-scroller" id="related-projects-scroller">
+                    <!-- Проект 1 -->
+                    <div class="related-card">
+                        <div class="related-image">
+                            <img src="images/similar-project-1.jpg" alt="CryptoQuest">
+                        </div>
+                        <div class="related-content">
+                            <h3 class="related-title">CryptoQuest</h3>
+                            <div class="related-tags">
+                                <span class="badge badge-gamefi">GameFi</span>
+                            </div>
+                            <div class="related-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <span>4.0/5</span>
+                            </div>
+                            <a href="#" class="related-link">Подробнее</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Проект 2 -->
+                    <div class="related-card">
+                        <div class="related-image">
+                            <img src="images/similar-project-2.jpg" alt="AI Companions">
+                        </div>
+                        <div class="related-content">
+                            <h3 class="related-title">AI Companions</h3>
+                            <div class="related-tags">
+                                <span class="badge badge-ai">AI</span>
+                            </div>
+                            <div class="related-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <span>4.5/5</span>
+                            </div>
+                            <a href="#" class="related-link">Подробнее</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Проект 3 -->
+                    <div class="related-card">
+                        <div class="related-image">
+                            <img src="images/similar-project-3.jpg" alt="MetaMinds">
+                        </div>
+                        <div class="related-content">
+                            <h3 class="related-title">MetaMinds</h3>
+                            <div class="related-tags">
+                                <span class="badge badge-gamefi">GameFi</span>
+                                <span class="badge badge-ai">AI</span>
+                            </div>
+                            <div class="related-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span>5.0/5</span>
+                            </div>
+                            <a href="#" class="related-link">Подробнее</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Индикатор прокрутки -->
+                <div class="related-scroll-indicator">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
                 </div>
             </div>
             </div>
@@ -1055,8 +1307,11 @@
     
     <!-- Подключение скриптов -->
     <script src="js/project-details.js"></script>
+    <script src="js/team-section.js"></script>
     <script src="js/revenue-distribution.js"></script>
-    <script src="js/project-stages.js"></script>
+    <script src="js/project-stages-horizontal.js"></script>
+    <script src="js/dashboard-revenue-chart.js"></script>
+    <script src="js/join-project.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
         AOS.init();

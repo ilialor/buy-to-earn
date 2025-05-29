@@ -1,0 +1,15 @@
+/**
+ * Управление отображением блоков "Присоединиться к проекту"
+ */
+
+/* Скрываем старый блок */
+.join-project-section {
+    display: none !important;
+}
+
+/* Убеждаемся, что новый блок отображается */
+.join-project-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}

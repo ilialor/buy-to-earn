@@ -1,0 +1,173 @@
+/**
+ * Compact Team Section Styles
+ * 
+ * Compact styles for the "Project Team" section on the project details page.
+ */
+
+/* Reset team member styles to prevent conflicts */
+.project-team-container .team-member {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto;
+  max-height: 250px; /* Reduced height from ~400px to ~250px */
+  padding: 15px;
+}
+
+.project-team-container .team-member:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Compact avatar */
+.project-team-container .team-member-avatar {
+  position: relative;
+  width: 90px !important; /* Reduced from ~200px to 90px */
+  height: 90px !important;
+  border-radius: 50% !important; /* Keep circular shape */
+  margin: 0 auto 15px !important; /* Center above information */
+  padding-bottom: 0 !important; /* Remove padding-bottom that causes oval shape */
+  overflow: hidden;
+}
+
+.project-team-container .team-member-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  transition: transform 0.5s ease;
+  position: static !important; /* Static position */
+  display: block;
+}
+
+.project-team-container .team-member:hover .team-member-img {
+  transform: scale(1.05);
+}
+
+/* Key member badge position adjustment */
+.project-team-container .key-member-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: linear-gradient(135deg, #1E8AB9, #20B2AA);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 500;
+  z-index: 2;
+}
+
+/* Team member information */
+.project-team-container .team-member-info {
+  padding: 0; /* Remove padding as it's already in the parent */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  width: 100% !important; /* Ensure proper width */
+  max-width: 100%; /* Prevent overflow */
+}
+
+.project-team-container .team-member-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #343a40;
+  margin: 0 0 8px 0; /* Reduced bottom margin */
+}
+
+/* Combined role and specialization */
+.project-team-container .team-member-role {
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: 500;
+  margin: 0 0 12px 0 !important; /* Reduced bottom margin */
+  padding-bottom: 0 !important;
+  border-bottom: none !important;
+}
+
+/* Hide specialization indicator as it's now combined with role */
+.project-team-container .specialization-indicator {
+  display: none !important;
+}
+
+/* Compact bio section */
+.project-team-container .team-member-bio {
+  font-size: 14px;
+  line-height: 1.4; /* Reduced line height */
+  color: #6c757d;
+  margin-bottom: 12px;
+  flex-grow: 1;
+  
+  /* Limit to 3-4 lines with ellipsis */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3; /* Standard property for compatibility */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 4.2em; /* ~3 lines at 1.4 line height */
+}
+
+/* Social icons */
+.project-team-container .team-member-social {
+  display: flex;
+  justify-content: center; /* Center icons */
+  gap: 8px; /* Reduced gap between icons */
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.project-team-container .social-link {
+  width: 22px !important; /* Reduced from 36px to 22px */
+  height: 22px !important; /* Reduced from 36px to 22px */
+  border-radius: 50%;
+  background-color: #e9ecef;
+  color: #495057;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: 12px; /* Smaller icon size */
+}
+
+/* Contact button adjustment */
+.contact-member-btn {
+  margin-top: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+/* Add custom class to combine role and specialization */
+.combined-role {
+  font-size: 14px;
+  color: #6c757d;
+  margin: 0 0 12px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .team-members {
+    grid-template-columns: repeat(3, 1fr); /* Show more cards per row */
+  }
+}
+
+@media (max-width: 768px) {
+  .team-members {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .team-member {
+    max-height: 280px; /* Slightly taller on mobile */
+  }
+}
+
+@media (max-width: 576px) {
+  .team-members {
+    grid-template-columns: 1fr;
+  }
+}

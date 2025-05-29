@@ -1,0 +1,94 @@
+/**
+ * Block Separator Styles
+ * 
+ * This file contains styles for separating content blocks
+ * on the project details page.
+ */
+
+/* Common block container styles */
+.content-block-container {
+  margin-bottom: 40px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  clear: both; /* Очищает плавающие элементы */
+}
+
+/* Block separator - усиленный разделитель */
+.block-separator {
+  height: 40px;
+  position: relative;
+  clear: both;
+  display: block;
+  width: 100%;
+  margin: 20px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Similar projects specific styles */
+.similar-projects {
+  margin-top: 40px;
+  margin-bottom: 40px;
+  padding: 30px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  display: block;
+  clear: both;
+  position: relative;
+}
+
+/* Media container specific styles */
+.project-media-container {
+  margin-bottom: 40px;
+  display: block;
+  clear: both;
+  position: relative;
+}
+
+/* Дополнительные стили для четкого разделения */
+.project-media {
+  display: block;
+  position: relative;
+}
+
+/* Обертка для похожих проектов */
+.similar-projects-wrapper {
+  display: block;
+  clear: both;
+  position: relative;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .block-separator {
+    height: 30px;
+    margin: 15px 0;
+  }
+  
+  .similar-projects,
+  .content-block-container {
+    margin-bottom: 30px;
+  }
+  
+  .similar-projects {
+    margin-top: 30px;
+  }
+}
+
+@media (max-width: 576px) {
+  .block-separator {
+    height: 20px;
+    margin: 10px 0;
+  }
+  
+  .similar-projects,
+  .content-block-container {
+    margin-bottom: 20px;
+  }
+  
+  .similar-projects {
+    margin-top: 20px;
+  }
+}

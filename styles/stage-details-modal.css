@@ -1,0 +1,178 @@
+/**
+ * Stage Details Modal Styles
+ * 
+ * Стили для модального окна с подробной информацией об этапах проекта.
+ */
+
+/* Модальное окно */
+#stage-detail-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#stage-detail-modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+}
+
+/* Содержимое модального окна */
+#stage-detail-modal .modal-content {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 600px;
+  position: relative;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+  overflow: hidden;
+}
+
+#stage-detail-modal.active .modal-content {
+  transform: translateY(0);
+}
+
+/* Кнопка закрытия */
+#stage-detail-modal .close-modal {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 10;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+#stage-detail-modal .close-modal:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #343a40;
+}
+
+/* Тело модального окна */
+#stage-detail-modal .modal-body {
+  padding: 30px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Содержимое деталей этапа */
+.stage-detail-modal-content h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #343a40;
+  margin: 0 0 15px 0;
+  padding-right: 30px;
+}
+
+.stage-detail-date {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: rgba(30, 138, 185, 0.1);
+  color: #1E8AB9;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.stage-detail-date i {
+  margin-right: 5px;
+}
+
+.stage-detail-modal-content p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #495057;
+  margin-bottom: 20px;
+}
+
+.stage-detail-modal-content h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #343a40;
+  margin: 25px 0 15px 0;
+}
+
+/* Список достижений */
+.stage-achievements-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.stage-achievements-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: flex-start;
+}
+
+.stage-achievements-list li:last-child {
+  border-bottom: none;
+}
+
+.stage-achievements-list li i {
+  color: #28a745;
+  margin-right: 10px;
+  margin-top: 3px;
+}
+
+/* Адаптивность */
+@media (max-width: 576px) {
+  #stage-detail-modal .modal-content {
+    width: 95%;
+  }
+  
+  #stage-detail-modal .modal-body {
+    padding: 20px 15px;
+  }
+  
+  .stage-detail-modal-content h3 {
+    font-size: 20px;
+  }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+#stage-detail-modal.active {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+#stage-detail-modal.active .modal-content {
+  animation: slideUp 0.3s ease forwards;
+}
